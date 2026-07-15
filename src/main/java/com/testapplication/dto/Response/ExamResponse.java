@@ -1,0 +1,21 @@
+package com.testapplication.dto.Response;
+
+import lombok.*;
+
+import java.time.LocalDate;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ExamResponse {
+
+    private Long id;
+    private String examName;
+    private LocalDate examDate;
+    private Integer totalMarks;
+    private Integer totalQuestions;
+    private Integer duration;
+    private String categoryName;
+}

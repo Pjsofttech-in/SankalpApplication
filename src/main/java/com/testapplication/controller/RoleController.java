@@ -1,0 +1,51 @@
+package com.testapplication.controller;
+
+import com.testapplication.entity.Role;
+import com.testapplication.service.RoleService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/roles")
+@RequiredArgsConstructor
+@CrossOrigin(origins = "*")
+public class RoleController {
+
+    private final RoleService roleService;
+
+    // Save Role
+    @PostMapping
+    public Role saveRole(@RequestBody Role role) {
+        return roleService.saveRole(role);
+    }
+
+    // Get All Roles
+    @GetMapping
+    public List<Role> getAllRoles() {
+        return roleService.getAllRoles();
+    }
+
+    // Get Role By Id
+    @GetMapping("/{id}")
+    public Role getRoleById(@PathVariable Long id) {
+        return roleService.getRoleById(id);
+    }
+
+    // Update Role
+    @PutMapping("/{id}")
+    public Role updateRole(@PathVariable Long id,
+                           @RequestBody Role role) {
+        return roleService.updateRole(id, role);
+    }
+
+    // Delete Role
+    @DeleteMapping("/{id}")
+    public String deleteRole(@PathVariable Long id) {
+
+        roleService.deleteRole(id);
+
+        return "Role Deleted Successfully";
+    }
+}
