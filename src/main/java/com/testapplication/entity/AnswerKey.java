@@ -18,19 +18,25 @@ public class AnswerKey {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Answer Key Title
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
-    private String fileName;
+    // External PDF Link (Optional)
+    @Column(columnDefinition = "TEXT")
+    private String link;
 
-    @Column(nullable = false)
-    private String filePath;
+    // PDF File Stored in Database
+    @Lob
+    @Column(name = "pdf_blob")
+    private byte[] pdfBlob;
 
+    // Related Exam
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exam_id")
     private Exam exam;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean active = true;
 

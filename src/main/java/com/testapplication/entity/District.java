@@ -4,42 +4,30 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-@Table(name = "gallery")
+@Table(name = "districts")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Gallery {
+public class District {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String title;
-
-    @Column(columnDefinition = "TEXT")
-    private String description;
-
-    // Image URL or uploaded image path
-    @Column(nullable = false)
-    private String imageUrl;
-
-    // Event / School / Exam / Other
-    @Column(nullable = false)
-    private String category;
-
-    // Image display sequence
-    @Builder.Default
-    @Column(nullable = false)
-    private Integer displayOrder = 1;
+    @Column(nullable = false, unique = true)
+    private String districtName;
 
     @Builder.Default
     @Column(nullable = false)
     private Boolean active = true;
+
+    @OneToMany(mappedBy = "district", cascade = CascadeType.ALL)
+    private List<Taluka> talukas;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;

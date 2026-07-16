@@ -31,24 +31,29 @@ public class Center {
     private String village;
 
     @Column(nullable = false)
-    private String taluka;
-
-    @Column(nullable = false)
-    private String district;
-
-    @Column(nullable = false)
     private String state;
 
     @Column(nullable = false)
     private String pincode;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean active = true;
 
-    // One School -> Many Centers
+    // School
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "school_id")
+    @JoinColumn(name = "school_id", nullable = false)
     private School school;
+
+    // District
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "district_id", nullable =false)
+    private District district;
+
+    // Taluka
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "taluka_id", nullable = false)
+    private Taluka taluka;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;

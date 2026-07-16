@@ -24,7 +24,7 @@ public class AuthController {
 
 
     // Register User
-    @PostMapping("/register")
+    @PostMapping("/register")   
     public User register(@RequestBody User user) {
 
         // Encrypt Password

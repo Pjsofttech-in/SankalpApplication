@@ -27,9 +27,18 @@ public class CenterController {
         return centerService.getAllCenters();
     }
 
+    // Dynamic Dropdown
+    // GET /api/centers/taluka/1
+    @GetMapping("/taluka/{talukaId}")
+    public List<Center> getCentersByTaluka(@PathVariable Long talukaId) {
+
+        return centerService.getCentersByTaluka(talukaId);
+    }
+
     // Get Center By Id
     @GetMapping("/{id}")
     public Center getCenterById(@PathVariable Long id) {
+
         return centerService.getCenterById(id);
     }
 
@@ -37,13 +46,16 @@ public class CenterController {
     @PutMapping("/{id}")
     public Center updateCenter(@PathVariable Long id,
                                @RequestBody Center center) {
+
         return centerService.updateCenter(id, center);
     }
 
     // Delete Center
     @DeleteMapping("/{id}")
     public String deleteCenter(@PathVariable Long id) {
+
         centerService.deleteCenter(id);
+
         return "Center deleted successfully.";
     }
 }

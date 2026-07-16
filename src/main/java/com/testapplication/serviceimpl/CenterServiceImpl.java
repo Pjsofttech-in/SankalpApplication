@@ -54,12 +54,20 @@ public class CenterServiceImpl implements CenterService {
     public Center getCenterById(Long id) {
 
         return centerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Center not found with id : " + id));
+                .orElseThrow(() ->
+                        new RuntimeException("Center not found with id : " + id));
     }
 
     @Override
     public List<Center> getAllCenters() {
 
         return centerRepository.findAll();
+    }
+
+    // Dynamic Dropdown API
+    @Override
+    public List<Center> getCentersByTaluka(Long talukaId) {
+
+        return centerRepository.findByTalukaId(talukaId);
     }
 }

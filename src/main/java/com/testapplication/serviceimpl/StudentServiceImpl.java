@@ -18,11 +18,11 @@ public class StudentServiceImpl implements StudentService {
     public Student saveStudent(Student student) {
 
         if (studentRepository.existsByEmail(student.getEmail())) {
-            throw new RuntimeException("Student email already exists.");
+            throw new RuntimeException("Student Email already exists.");
         }
 
         if (studentRepository.existsByMobile(student.getMobile())) {
-            throw new RuntimeException("Student mobile already exists.");
+            throw new RuntimeException("Student Mobile already exists.");
         }
 
         return studentRepository.save(student);
@@ -41,8 +41,6 @@ public class StudentServiceImpl implements StudentService {
         existingStudent.setMedium(student.getMedium());
         existingStudent.setAddress(student.getAddress());
         existingStudent.setVillage(student.getVillage());
-        existingStudent.setTaluka(student.getTaluka());
-        existingStudent.setDistrict(student.getDistrict());
         existingStudent.setState(student.getState());
         existingStudent.setPincode(student.getPincode());
         existingStudent.setDateOfBirth(student.getDateOfBirth());
@@ -51,6 +49,8 @@ public class StudentServiceImpl implements StudentService {
         // Relations
         existingStudent.setUser(student.getUser());
         existingStudent.setSchool(student.getSchool());
+        existingStudent.setDistrict(student.getDistrict());
+        existingStudent.setTaluka(student.getTaluka());
         existingStudent.setCenter(student.getCenter());
         existingStudent.setCoordinator(student.getCoordinator());
 

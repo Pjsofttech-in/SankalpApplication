@@ -25,8 +25,10 @@ public class GalleryServiceImpl implements GalleryService {
         Gallery existing = getGalleryById(id);
 
         existing.setTitle(gallery.getTitle());
-        existing.setImageUrl(gallery.getImageUrl());
         existing.setDescription(gallery.getDescription());
+        existing.setImageUrl(gallery.getImageUrl());
+        existing.setCategory(gallery.getCategory());
+        existing.setDisplayOrder(gallery.getDisplayOrder());
         existing.setActive(gallery.getActive());
 
         return repository.save(existing);
@@ -39,7 +41,6 @@ public class GalleryServiceImpl implements GalleryService {
 
     @Override
     public Gallery getGalleryById(Long id) {
-
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Gallery Not Found"));
     }
@@ -47,5 +48,15 @@ public class GalleryServiceImpl implements GalleryService {
     @Override
     public List<Gallery> getAllGallery() {
         return repository.findAll();
+    }
+
+    @Override
+    public List<Gallery> getActiveGallery() {
+        return repository.findByActiveTrueOrderByDisplayOrderAsc();
+    }
+
+    @Override
+    public List<Gallery> getGalleryByCategory(String category) {
+        return repository.findByCategoryIgnoreCase(category);
     }
 }

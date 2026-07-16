@@ -3,6 +3,8 @@ package com.testapplication.controller;
 import com.testapplication.entity.AnswerKey;
 import com.testapplication.service.AnswerKeyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,6 +46,18 @@ public class AnswerKeyController {
     @DeleteMapping("/{id}")
     public String deleteAnswerKey(@PathVariable Long id) {
         answerKeyService.deleteAnswerKey(id);
-        return "Answer Key deleted successfully.";
+        return "Answer Key Deleted Successfully";
     }
+
+    // Download PDF
+    @GetMapping("/{id}/download")
+    public ResponseEntity<byte[]> downloadPdf(@PathVariable Long id) {
+
+        AnswerKey answerKey = answerKeyService.getAnswerKeyById(id);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(answerKey.getPdfBlob());
+    }
+
 }

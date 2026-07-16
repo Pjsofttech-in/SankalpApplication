@@ -15,4 +15,8 @@ public interface CenterService {
     Center getCenterById(Long id);
 
     List<Center> getAllCenters();
+
+    // Dynamic Dropdown
+    List<Center> getCentersByTaluka(Long talukaId);
+
 }

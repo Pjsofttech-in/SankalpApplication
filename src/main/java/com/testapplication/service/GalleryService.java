@@ -15,4 +15,8 @@ public interface GalleryService {
     Gallery getGalleryById(Long id);
 
     List<Gallery> getAllGallery();
+
+    List<Gallery> getActiveGallery();
+
+    List<Gallery> getGalleryByCategory(String category);
 }

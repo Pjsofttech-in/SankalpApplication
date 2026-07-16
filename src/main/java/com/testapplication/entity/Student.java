@@ -25,6 +25,9 @@ public class Student {
     @Column(nullable = false, unique = true, length = 10)
     private String mobile;
 
+    @Column(nullable = false, unique = true)
+    private String email;
+
     @Column(nullable = false)
     private String gender;
 
@@ -41,24 +44,15 @@ public class Student {
     private String village;
 
     @Column(nullable = false)
-    private String taluka;
-
-    @Column(nullable = false)
-    private String district;
-
-    @Column(nullable = false)
     private String state;
 
     @Column(nullable = false)
     private String pincode;
 
-    @Column(nullable = false, unique = true)
-    private String email;
-
     private LocalDate dateOfBirth;
 
-    @Column(nullable = false)
     @Builder.Default
+    @Column(nullable = false)
     private Boolean active = true;
 
     // Login User
@@ -66,17 +60,27 @@ public class Student {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // Student belongs to one School
+    // School
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "school_id", nullable = false)
     private School school;
 
-    // Student belongs to one Center
+    // District
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "district_id", nullable = false)
+    private District district;
+
+    // Taluka
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "taluka_id", nullable = false)
+    private Taluka taluka;
+
+    // Center
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "center_id", nullable = false)
     private Center center;
 
-    // Student registered by one Coordinator
+    // Coordinator
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coordinator_id", nullable = false)
     private Coordinator coordinator;

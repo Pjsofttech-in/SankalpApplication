@@ -25,8 +25,8 @@ public class AnswerKeyServiceImpl implements AnswerKeyService {
         AnswerKey existing = getAnswerKeyById(id);
 
         existing.setTitle(answerKey.getTitle());
-        existing.setFileName(answerKey.getFileName());
-        existing.setFilePath(answerKey.getFilePath());
+        existing.setLink(answerKey.getLink());
+        existing.setPdfBlob(answerKey.getPdfBlob());
         existing.setExam(answerKey.getExam());
         existing.setActive(answerKey.getActive());
 
