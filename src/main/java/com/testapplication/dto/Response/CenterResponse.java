@@ -10,14 +10,22 @@ import lombok.*;
 public class CenterResponse {
 
     private Long id;
+
     private String centerName;
     private String centerCode;
     private String address;
     private String village;
-    private String taluka;
-    private String district;
     private String state;
     private String pincode;
-    private String schoolName;
+
     private Boolean active;
+
+    private Long schoolId;
+    private String schoolName;
+
+    private Long districtId;
+    private String districtName;
+
+    private Long talukaId;
+    private String talukaName;
 }

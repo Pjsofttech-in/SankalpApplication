@@ -1,18 +1,19 @@
 package com.testapplication.service;
 
-import com.testapplication.entity.Category;
+import com.testapplication.dto.Request.CategoryRequest;
+import com.testapplication.dto.Response.CategoryResponse;
 
 import java.util.List;
 
 public interface CategoryService {
 
-    Category saveCategory(Category category);
+    CategoryResponse saveCategory(CategoryRequest request);
 
-    Category updateCategory(Long id, Category category);
+    CategoryResponse updateCategory(Long id, CategoryRequest request);
 
     void deleteCategory(Long id);
 
-    Category getCategoryById(Long id);
+    CategoryResponse getCategoryById(Long id);
 
-    List<Category> getAllCategories();
+    List<CategoryResponse> getAllCategories();
 }

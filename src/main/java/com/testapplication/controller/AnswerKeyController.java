@@ -1,11 +1,12 @@
 package com.testapplication.controller;
 
-import com.testapplication.entity.AnswerKey;
+import com.testapplication.dto.Response.AnswerKeyResponse;
 import com.testapplication.service.AnswerKeyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,35 +18,49 @@ public class AnswerKeyController {
 
     private final AnswerKeyService answerKeyService;
 
-    // Save Answer Key
-    @PostMapping
-    public AnswerKey saveAnswerKey(@RequestBody AnswerKey answerKey) {
-        return answerKeyService.saveAnswerKey(answerKey);
+    // Save Answer Key with PDF
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public AnswerKeyResponse saveAnswerKey(
+            @RequestParam String title,
+            @RequestParam(required = false) String link,
+            @RequestParam Long examId,
+            @RequestParam(defaultValue = "true") Boolean active,
+            @RequestParam("pdf") MultipartFile pdf) {
+
+        return answerKeyService.saveAnswerKey(title, link, examId, active, pdf);
     }
 
-    // Get All Answer Keys
+    // Get All
     @GetMapping
-    public List<AnswerKey> getAllAnswerKeys() {
+    public List<AnswerKeyResponse> getAllAnswerKeys() {
         return answerKeyService.getAllAnswerKeys();
     }
 
-    // Get Answer Key By Id
+    // Get By Id
     @GetMapping("/{id}")
-    public AnswerKey getAnswerKeyById(@PathVariable Long id) {
+    public AnswerKeyResponse getAnswerKeyById(@PathVariable Long id) {
         return answerKeyService.getAnswerKeyById(id);
     }
 
-    // Update Answer Key
-    @PutMapping("/{id}")
-    public AnswerKey updateAnswerKey(@PathVariable Long id,
-                                     @RequestBody AnswerKey answerKey) {
-        return answerKeyService.updateAnswerKey(id, answerKey);
+    // Update
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public AnswerKeyResponse updateAnswerKey(
+            @PathVariable Long id,
+            @RequestParam String title,
+            @RequestParam(required = false) String link,
+            @RequestParam Long examId,
+            @RequestParam Boolean active,
+            @RequestParam(value = "pdf", required = false) MultipartFile pdf) {
+
+        return answerKeyService.updateAnswerKey(id, title, link, examId, active, pdf);
     }
 
-    // Delete Answer Key
+    // Delete
     @DeleteMapping("/{id}")
     public String deleteAnswerKey(@PathVariable Long id) {
+
         answerKeyService.deleteAnswerKey(id);
+
         return "Answer Key Deleted Successfully";
     }
 
@@ -53,11 +68,10 @@ public class AnswerKeyController {
     @GetMapping("/{id}/download")
     public ResponseEntity<byte[]> downloadPdf(@PathVariable Long id) {
 
-        AnswerKey answerKey = answerKeyService.getAnswerKeyById(id);
+        byte[] pdf = answerKeyService.downloadPdf(id);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
-                .body(answerKey.getPdfBlob());
+                .body(pdf);
     }
-
 }

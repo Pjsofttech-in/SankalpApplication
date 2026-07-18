@@ -1,5 +1,7 @@
 package com.testapplication.serviceimpl;
 
+import com.testapplication.dto.Request.CategoryRequest;
+import com.testapplication.dto.Response.CategoryResponse;
 import com.testapplication.entity.Category;
 import com.testapplication.repository.CategoryRepository;
 import com.testapplication.service.CategoryService;
@@ -7,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -15,43 +18,67 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public Category saveCategory(Category category) {
+    public CategoryResponse saveCategory(CategoryRequest request) {
 
-        if (categoryRepository.findByCategoryName(category.getCategoryName()).isPresent()) {
+        if (categoryRepository.findByCategoryName(request.getCategoryName()).isPresent()) {
             throw new RuntimeException("Category already exists.");
         }
 
-        return categoryRepository.save(category);
+        Category category = Category.builder()
+                .categoryName(request.getCategoryName())
+                .description(request.getDescription())
+                .active(true)
+                .build();
+
+        return mapToResponse(categoryRepository.save(category));
     }
 
     @Override
-    public Category updateCategory(Long id, Category category) {
+    public CategoryResponse updateCategory(Long id, CategoryRequest request) {
 
-        Category existing = getCategoryById(id);
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Category not found."));
 
-        existing.setCategoryName(category.getCategoryName());
-        existing.setDescription(category.getDescription());
-        existing.setActive(category.getActive());
+        category.setCategoryName(request.getCategoryName());
+        category.setDescription(request.getDescription());
 
-        return categoryRepository.save(existing);
+        return mapToResponse(categoryRepository.save(category));
     }
 
     @Override
     public void deleteCategory(Long id) {
 
-        categoryRepository.delete(getCategoryById(id));
-    }
-
-    @Override
-    public Category getCategoryById(Long id) {
-
-        return categoryRepository.findById(id)
+        Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found."));
+
+        categoryRepository.delete(category);
     }
 
     @Override
-    public List<Category> getAllCategories() {
+    public CategoryResponse getCategoryById(Long id) {
 
-        return categoryRepository.findAll();
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Category not found."));
+
+        return mapToResponse(category);
+    }
+
+    @Override
+    public List<CategoryResponse> getAllCategories() {
+
+        return categoryRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    private CategoryResponse mapToResponse(Category category) {
+
+        return CategoryResponse.builder()
+                .id(category.getId())
+                .categoryName(category.getCategoryName())
+                .description(category.getDescription())
+                .active(category.getActive())
+                .build();
     }
 }

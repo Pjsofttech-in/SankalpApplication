@@ -1,6 +1,7 @@
 package com.testapplication.controller;
 
-import com.testapplication.entity.Student;
+import com.testapplication.dto.Request.StudentRequest;
+import com.testapplication.dto.Response.StudentResponse;
 import com.testapplication.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,27 +16,36 @@ public class StudentController {
 
     private final StudentService studentService;
 
+    // Save Student
     @PostMapping
-    public Student saveStudent(@RequestBody Student student) {
-        return studentService.saveStudent(student);
+    public StudentResponse saveStudent(@RequestBody StudentRequest request) {
+
+        return studentService.saveStudent(request);
     }
 
+    // Get All Students
     @GetMapping
-    public List<Student> getAllStudents() {
+    public List<StudentResponse> getAllStudents() {
+
         return studentService.getAllStudents();
     }
 
+    // Get Student By Id
     @GetMapping("/{id}")
-    public Student getStudentById(@PathVariable Long id) {
+    public StudentResponse getStudentById(@PathVariable Long id) {
+
         return studentService.getStudentById(id);
     }
 
+    // Update Student
     @PutMapping("/{id}")
-    public Student updateStudent(@PathVariable Long id,
-                                 @RequestBody Student student) {
-        return studentService.updateStudent(id, student);
+    public StudentResponse updateStudent(@PathVariable Long id,
+                                         @RequestBody StudentRequest request) {
+
+        return studentService.updateStudent(id, request);
     }
 
+    // Delete Student
     @DeleteMapping("/{id}")
     public String deleteStudent(@PathVariable Long id) {
 

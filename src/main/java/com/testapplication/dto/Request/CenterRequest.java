@@ -13,10 +13,11 @@ public class CenterRequest {
     private String centerCode;
     private String address;
     private String village;
-    private String taluka;
-    private String district;
     private String state;
     private String pincode;
+    private Boolean active;
 
     private Long schoolId;
+    private Long districtId;
+    private Long talukaId;
 }

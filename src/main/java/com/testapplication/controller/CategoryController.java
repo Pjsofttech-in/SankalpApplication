@@ -1,6 +1,7 @@
 package com.testapplication.controller;
 
-import com.testapplication.entity.Category;
+import com.testapplication.dto.Request.CategoryRequest;
+import com.testapplication.dto.Response.CategoryResponse;
 import com.testapplication.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,35 +16,33 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    // Save Category
     @PostMapping
-    public Category saveCategory(@RequestBody Category category) {
-        return categoryService.saveCategory(category);
+    public CategoryResponse saveCategory(@RequestBody CategoryRequest request) {
+        return categoryService.saveCategory(request);
     }
 
-    // Get All Categories
     @GetMapping
-    public List<Category> getAllCategories() {
+    public List<CategoryResponse> getAllCategories() {
         return categoryService.getAllCategories();
     }
 
-    // Get Category By Id
     @GetMapping("/{id}")
-    public Category getCategoryById(@PathVariable Long id) {
+    public CategoryResponse getCategoryById(@PathVariable Long id) {
         return categoryService.getCategoryById(id);
     }
 
-    // Update Category
     @PutMapping("/{id}")
-    public Category updateCategory(@PathVariable Long id,
-                                   @RequestBody Category category) {
-        return categoryService.updateCategory(id, category);
+    public CategoryResponse updateCategory(@PathVariable Long id,
+                                           @RequestBody CategoryRequest request) {
+
+        return categoryService.updateCategory(id, request);
     }
 
-    // Delete Category
     @DeleteMapping("/{id}")
     public String deleteCategory(@PathVariable Long id) {
+
         categoryService.deleteCategory(id);
+
         return "Category deleted successfully.";
     }
 }

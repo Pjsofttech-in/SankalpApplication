@@ -10,9 +10,14 @@ import lombok.*;
 public class PaymentRequest {
 
     private Double amount;
+
     private String paymentMode;
+
     private String transactionId;
+
     private String paymentStatus;
 
     private Long studentId;
 }
+
+

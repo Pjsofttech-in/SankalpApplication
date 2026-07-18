@@ -1,18 +1,19 @@
 package com.testapplication.service;
 
-import com.testapplication.entity.Exam;
+import com.testapplication.dto.Request.ExamRequest;
+import com.testapplication.dto.Response.ExamResponse;
 
 import java.util.List;
 
 public interface ExamService {
 
-    Exam saveExam(Exam exam);
+    ExamResponse saveExam(ExamRequest request);
 
-    Exam updateExam(Long id, Exam exam);
+    ExamResponse updateExam(Long id, ExamRequest request);
 
     void deleteExam(Long id);
 
-    Exam getExamById(Long id);
+    ExamResponse getExamById(Long id);
 
-    List<Exam> getAllExams();
+    List<ExamResponse> getAllExams();
 }

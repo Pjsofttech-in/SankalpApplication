@@ -1,6 +1,7 @@
 package com.testapplication.controller;
 
-import com.testapplication.entity.Gallery;
+import com.testapplication.dto.Request.GalleryRequest;
+import com.testapplication.dto.Response.GalleryResponse;
 import com.testapplication.service.GalleryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,39 +18,39 @@ public class GalleryController {
 
     // Save
     @PostMapping
-    public Gallery saveGallery(@RequestBody Gallery gallery) {
-        return galleryService.saveGallery(gallery);
+    public GalleryResponse saveGallery(@RequestBody GalleryRequest request) {
+        return galleryService.saveGallery(request);
     }
 
-    // All Gallery
+    // Get All
     @GetMapping
-    public List<Gallery> getAllGallery() {
+    public List<GalleryResponse> getAllGallery() {
         return galleryService.getAllGallery();
     }
 
-    // Active Gallery (Frontend)
+    // Active Gallery
     @GetMapping("/active")
-    public List<Gallery> getActiveGallery() {
+    public List<GalleryResponse> getActiveGallery() {
         return galleryService.getActiveGallery();
     }
 
-    // Category Wise Gallery
+    // Category Wise
     @GetMapping("/category/{category}")
-    public List<Gallery> getGalleryByCategory(@PathVariable String category) {
+    public List<GalleryResponse> getGalleryByCategory(@PathVariable String category) {
         return galleryService.getGalleryByCategory(category);
     }
 
-    // By Id
+    // Get By Id
     @GetMapping("/{id}")
-    public Gallery getGalleryById(@PathVariable Long id) {
+    public GalleryResponse getGalleryById(@PathVariable Long id) {
         return galleryService.getGalleryById(id);
     }
 
     // Update
     @PutMapping("/{id}")
-    public Gallery updateGallery(@PathVariable Long id,
-                                 @RequestBody Gallery gallery) {
-        return galleryService.updateGallery(id, gallery);
+    public GalleryResponse updateGallery(@PathVariable Long id,
+                                         @RequestBody GalleryRequest request) {
+        return galleryService.updateGallery(id, request);
     }
 
     // Delete

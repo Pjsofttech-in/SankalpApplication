@@ -1,18 +1,19 @@
 package com.testapplication.service;
 
-import com.testapplication.entity.Student;
+import com.testapplication.dto.Request.StudentRequest;
+import com.testapplication.dto.Response.StudentResponse;
 
 import java.util.List;
 
 public interface StudentService {
 
-    Student saveStudent(Student student);
+    StudentResponse saveStudent(StudentRequest request);
 
-    Student updateStudent(Long id, Student student);
+    StudentResponse updateStudent(Long id, StudentRequest request);
 
     void deleteStudent(Long id);
 
-    Student getStudentById(Long id);
+    StudentResponse getStudentById(Long id);
 
-    List<Student> getAllStudents();
+    List<StudentResponse> getAllStudents();
 }

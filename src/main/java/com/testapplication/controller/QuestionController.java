@@ -1,6 +1,7 @@
 package com.testapplication.controller;
 
-import com.testapplication.entity.Question;
+import com.testapplication.dto.Request.QuestionRequest;
+import com.testapplication.dto.Response.QuestionResponse;
 import com.testapplication.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,35 +16,37 @@ public class QuestionController {
 
     private final QuestionService questionService;
 
-    // Save Question
+    // Save
     @PostMapping
-    public Question saveQuestion(@RequestBody Question question) {
-        return questionService.saveQuestion(question);
+    public QuestionResponse saveQuestion(@RequestBody QuestionRequest request) {
+        return questionService.saveQuestion(request);
     }
 
-    // Get All Questions
+    // Get All
     @GetMapping
-    public List<Question> getAllQuestions() {
+    public List<QuestionResponse> getAllQuestions() {
         return questionService.getAllQuestions();
     }
 
-    // Get Question By Id
+    // Get By Id
     @GetMapping("/{id}")
-    public Question getQuestionById(@PathVariable Long id) {
+    public QuestionResponse getQuestionById(@PathVariable Long id) {
         return questionService.getQuestionById(id);
     }
 
-    // Update Question
+    // Update
     @PutMapping("/{id}")
-    public Question updateQuestion(@PathVariable Long id,
-                                   @RequestBody Question question) {
-        return questionService.updateQuestion(id, question);
+    public QuestionResponse updateQuestion(@PathVariable Long id,
+                                           @RequestBody QuestionRequest request) {
+        return questionService.updateQuestion(id, request);
     }
 
-    // Delete Question
+    // Delete
     @DeleteMapping("/{id}")
     public String deleteQuestion(@PathVariable Long id) {
+
         questionService.deleteQuestion(id);
+
         return "Question deleted successfully.";
     }
 }

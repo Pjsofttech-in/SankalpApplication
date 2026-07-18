@@ -1,22 +1,21 @@
 package com.testapplication.service;
 
-import com.testapplication.entity.Center;
+import com.testapplication.dto.Request.CenterRequest;
+import com.testapplication.dto.Response.CenterResponse;
 
 import java.util.List;
 
 public interface CenterService {
 
-    Center saveCenter(Center center);
+    CenterResponse saveCenter(CenterRequest request);
 
-    Center updateCenter(Long id, Center center);
+    CenterResponse updateCenter(Long id, CenterRequest request);
 
     void deleteCenter(Long id);
 
-    Center getCenterById(Long id);
+    CenterResponse getCenterById(Long id);
 
-    List<Center> getAllCenters();
+    List<CenterResponse> getAllCenters();
 
-    // Dynamic Dropdown
-    List<Center> getCentersByTaluka(Long talukaId);
-
+    List<CenterResponse> getCentersByTaluka(Long talukaId);
 }

@@ -12,10 +12,13 @@ import java.time.LocalDate;
 public class ExamResponse {
 
     private Long id;
+
     private String examName;
     private LocalDate examDate;
     private Integer totalMarks;
     private Integer totalQuestions;
     private Integer duration;
+
+    private Long categoryId;
     private String categoryName;
 }

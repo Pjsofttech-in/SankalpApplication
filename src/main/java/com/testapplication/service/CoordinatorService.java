@@ -1,18 +1,19 @@
 package com.testapplication.service;
 
-import com.testapplication.entity.Coordinator;
+import com.testapplication.dto.Request.CoordinatorRequest;
+import com.testapplication.dto.Response.CoordinatorResponse;
 
 import java.util.List;
 
 public interface CoordinatorService {
 
-    Coordinator saveCoordinator(Coordinator coordinator);
+    CoordinatorResponse saveCoordinator(CoordinatorRequest request);
 
-    Coordinator updateCoordinator(Long id, Coordinator coordinator);
+    CoordinatorResponse updateCoordinator(Long id, CoordinatorRequest request);
 
     void deleteCoordinator(Long id);
 
-    Coordinator getCoordinatorById(Long id);
+    CoordinatorResponse getCoordinatorById(Long id);
 
-    List<Coordinator> getAllCoordinators();
+    List<CoordinatorResponse> getAllCoordinators();
 }

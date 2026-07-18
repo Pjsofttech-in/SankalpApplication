@@ -2,6 +2,8 @@ package com.testapplication.dto.Response;
 
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -10,14 +12,36 @@ import lombok.*;
 public class StudentResponse {
 
     private Long id;
+
     private String studentName;
-    private String email;
     private String mobile;
+    private String email;
     private String gender;
     private String studentClass;
     private String medium;
-    private String schoolName;
-    private String centerName;
-    private String coordinatorName;
+    private String address;
+    private String village;
+    private String state;
+    private String pincode;
+    private LocalDate dateOfBirth;
+
     private Boolean active;
+
+    private Long userId;
+    private String userName;
+
+    private Long schoolId;
+    private String schoolName;
+
+    private Long districtId;
+    private String districtName;
+
+    private Long talukaId;
+    private String talukaName;
+
+    private Long centerId;
+    private String centerName;
+
+    private Long coordinatorId;
+    private String coordinatorName;
 }

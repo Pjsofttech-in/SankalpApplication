@@ -1,22 +1,23 @@
 package com.testapplication.service;
 
-import com.testapplication.entity.Gallery;
+import com.testapplication.dto.Request.GalleryRequest;
+import com.testapplication.dto.Response.GalleryResponse;
 
 import java.util.List;
 
 public interface GalleryService {
 
-    Gallery saveGallery(Gallery gallery);
+    GalleryResponse saveGallery(GalleryRequest request);
 
-    Gallery updateGallery(Long id, Gallery gallery);
+    GalleryResponse updateGallery(Long id, GalleryRequest request);
 
     void deleteGallery(Long id);
 
-    Gallery getGalleryById(Long id);
+    GalleryResponse getGalleryById(Long id);
 
-    List<Gallery> getAllGallery();
+    List<GalleryResponse> getAllGallery();
 
-    List<Gallery> getActiveGallery();
+    List<GalleryResponse> getActiveGallery();
 
-    List<Gallery> getGalleryByCategory(String category);
+    List<GalleryResponse> getGalleryByCategory(String category);
 }

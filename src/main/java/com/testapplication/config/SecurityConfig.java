@@ -27,7 +27,6 @@ public class SecurityConfig {
             throws Exception {
 
         http
-
                 .csrf(csrf -> csrf.disable())
 
                 .cors(Customizer.withDefaults())
@@ -35,47 +34,32 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                .exceptionHandling(ex ->
-                        ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+                .exceptionHandling(exception ->
+                        exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
 
                 .authorizeHttpRequests(auth -> auth
 
                         // Public APIs
                         .requestMatchers(
                                 "/api/auth/**",
-                                "/api/roles/**",
-                                "/api/users/**",
-                                "/api/schools/**",
-                                "/api/centers/**",
-                                "/api/coordinators/**",
-                                "/api/students/**",
-                                "/api/categories/**",
-                                "/api/exams/**",
-                                "/api/questions/**",
-                                "/api/results/**",
-                                "/api/payments/**",
-                                "/api/gallery/**",
-                                "/api/downloads/**",
-                                "/api/answerkeys/**",
-                                "/api/contacts/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**"
                         ).permitAll()
 
-                        // Admin APIs
-                        .requestMatchers("/api/admin/**")
+                        // Admin Only
+                        .requestMatchers("/api/users/**")
                         .hasAuthority("ADMIN")
 
-                        // Coordinator APIs
+                        // Coordinator
                         .requestMatchers("/api/coordinator/**")
                         .hasAuthority("COORDINATOR")
 
-                        // Student APIs
+                        // Student
                         .requestMatchers("/api/student/**")
                         .hasAuthority("STUDENT")
 
-                        // Authentication Required
+                        // All Other APIs Require Login
                         .anyRequest().authenticated()
                 );
 

@@ -1,18 +1,19 @@
 package com.testapplication.service;
 
-import com.testapplication.entity.Question;
+import com.testapplication.dto.Request.QuestionRequest;
+import com.testapplication.dto.Response.QuestionResponse;
 
 import java.util.List;
 
 public interface QuestionService {
 
-    Question saveQuestion(Question question);
+    QuestionResponse saveQuestion(QuestionRequest request);
 
-    Question updateQuestion(Long id, Question question);
+    QuestionResponse updateQuestion(Long id, QuestionRequest request);
 
     void deleteQuestion(Long id);
 
-    Question getQuestionById(Long id);
+    QuestionResponse getQuestionById(Long id);
 
-    List<Question> getAllQuestions();
+    List<QuestionResponse> getAllQuestions();
 }

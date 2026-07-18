@@ -1,7 +1,8 @@
 package com.testapplication.controller;
 
 import com.razorpay.RazorpayException;
-import com.testapplication.entity.Payment;
+import com.testapplication.dto.Request.PaymentRequest;
+import com.testapplication.dto.Response.PaymentResponse;
 import com.testapplication.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +17,12 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    // Save Payment
     @PostMapping
-    public Payment savePayment(@RequestBody Payment payment) {
-        return paymentService.savePayment(payment);
+    public PaymentResponse savePayment(@RequestBody PaymentRequest request) {
+
+        return paymentService.savePayment(request);
     }
 
-    // Create Razorpay Order
     @PostMapping("/create-order")
     public String createOrder(@RequestParam Double amount)
             throws RazorpayException {
@@ -30,27 +30,25 @@ public class PaymentController {
         return paymentService.createOrder(amount).toString();
     }
 
-    // Get All Payments
     @GetMapping
-    public List<Payment> getAllPayments() {
+    public List<PaymentResponse> getAllPayments() {
+
         return paymentService.getAllPayments();
     }
 
-    // Get Payment By Id
     @GetMapping("/{id}")
-    public Payment getPaymentById(@PathVariable Long id) {
+    public PaymentResponse getPaymentById(@PathVariable Long id) {
+
         return paymentService.getPaymentById(id);
     }
 
-    // Update Payment
     @PutMapping("/{id}")
-    public Payment updatePayment(@PathVariable Long id,
-                                 @RequestBody Payment payment) {
+    public PaymentResponse updatePayment(@PathVariable Long id,
+                                         @RequestBody PaymentRequest request) {
 
-        return paymentService.updatePayment(id, payment);
+        return paymentService.updatePayment(id, request);
     }
 
-    // Delete Payment
     @DeleteMapping("/{id}")
     public String deletePayment(@PathVariable Long id) {
 

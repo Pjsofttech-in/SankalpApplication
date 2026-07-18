@@ -1,18 +1,19 @@
 package com.testapplication.service;
 
-import com.testapplication.entity.Result;
+import com.testapplication.dto.Request.ResultRequest;
+import com.testapplication.dto.Response.ResultResponse;
 
 import java.util.List;
 
 public interface ResultService {
 
-    Result saveResult(Result result);
+    ResultResponse saveResult(ResultRequest request);
 
-    Result updateResult(Long id, Result result);
+    ResultResponse updateResult(Long id, ResultRequest request);
 
     void deleteResult(Long id);
 
-    Result getResultById(Long id);
+    ResultResponse getResultById(Long id);
 
-    List<Result> getAllResults();
+    List<ResultResponse> getAllResults();
 }

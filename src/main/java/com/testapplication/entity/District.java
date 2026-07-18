@@ -2,7 +2,7 @@ package com.testapplication.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,6 +27,7 @@ public class District {
     private Boolean active = true;
 
     @OneToMany(mappedBy = "district", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Taluka> talukas;
 
     @Column(updatable = false)

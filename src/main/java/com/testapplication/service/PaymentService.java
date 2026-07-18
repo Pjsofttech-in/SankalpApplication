@@ -1,23 +1,23 @@
 package com.testapplication.service;
 
 import com.razorpay.RazorpayException;
-import com.testapplication.entity.Payment;
+import com.testapplication.dto.Request.PaymentRequest;
+import com.testapplication.dto.Response.PaymentResponse;
 import org.json.JSONObject;
 
 import java.util.List;
 
 public interface PaymentService {
 
-    Payment savePayment(Payment payment);
+    PaymentResponse savePayment(PaymentRequest request);
 
-    Payment updatePayment(Long id, Payment payment);
+    PaymentResponse updatePayment(Long id, PaymentRequest request);
 
     void deletePayment(Long id);
 
-    Payment getPaymentById(Long id);
+    PaymentResponse getPaymentById(Long id);
 
-    List<Payment> getAllPayments();
+    List<PaymentResponse> getAllPayments();
 
-    // Razorpay
     JSONObject createOrder(Double amount) throws RazorpayException;
 }

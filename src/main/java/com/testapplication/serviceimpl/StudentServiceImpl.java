@@ -1,80 +1,190 @@
 package com.testapplication.serviceimpl;
 
-import com.testapplication.entity.Student;
-import com.testapplication.repository.StudentRepository;
+import com.testapplication.dto.Request.StudentRequest;
+import com.testapplication.dto.Response.StudentResponse;
+import com.testapplication.entity.*;
+import com.testapplication.repository.*;
 import com.testapplication.service.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
+    private final UserRepository userRepository;
+    private final SchoolRepository schoolRepository;
+    private final DistrictRepository districtRepository;
+    private final TalukaRepository talukaRepository;
+    private final CenterRepository centerRepository;
+    private final CoordinatorRepository coordinatorRepository;
 
     @Override
-    public Student saveStudent(Student student) {
+    public StudentResponse saveStudent(StudentRequest request) {
 
-        if (studentRepository.existsByEmail(student.getEmail())) {
+        if (studentRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Student Email already exists.");
         }
 
-        if (studentRepository.existsByMobile(student.getMobile())) {
+        if (studentRepository.existsByMobile(request.getMobile())) {
             throw new RuntimeException("Student Mobile already exists.");
         }
 
-        return studentRepository.save(student);
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        School school = schoolRepository.findById(request.getSchoolId())
+                .orElseThrow(() -> new RuntimeException("School not found"));
+
+        District district = districtRepository.findById(request.getDistrictId())
+                .orElseThrow(() -> new RuntimeException("District not found"));
+
+        Taluka taluka = talukaRepository.findById(request.getTalukaId())
+                .orElseThrow(() -> new RuntimeException("Taluka not found"));
+
+        Center center = centerRepository.findById(request.getCenterId())
+                .orElseThrow(() -> new RuntimeException("Center not found"));
+
+        Coordinator coordinator = coordinatorRepository.findById(request.getCoordinatorId())
+                .orElseThrow(() -> new RuntimeException("Coordinator not found"));
+
+        Student student = Student.builder()
+                .studentName(request.getStudentName())
+                .mobile(request.getMobile())
+                .email(request.getEmail())
+                .gender(request.getGender())
+                .studentClass(request.getStudentClass())
+                .medium(request.getMedium())
+                .address(request.getAddress())
+                .village(request.getVillage())
+                .state(request.getState())
+                .pincode(request.getPincode())
+                .dateOfBirth(request.getDateOfBirth())
+                .active(request.getActive())
+                .user(user)
+                .school(school)
+                .district(district)
+                .taluka(taluka)
+                .center(center)
+                .coordinator(coordinator)
+                .build();
+
+        return mapToResponse(studentRepository.save(student));
     }
 
     @Override
-    public Student updateStudent(Long id, Student student) {
+    public StudentResponse updateStudent(Long id, StudentRequest request) {
 
-        Student existingStudent = getStudentById(id);
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Student not found with id : " + id));
 
-        existingStudent.setStudentName(student.getStudentName());
-        existingStudent.setMobile(student.getMobile());
-        existingStudent.setEmail(student.getEmail());
-        existingStudent.setGender(student.getGender());
-        existingStudent.setStudentClass(student.getStudentClass());
-        existingStudent.setMedium(student.getMedium());
-        existingStudent.setAddress(student.getAddress());
-        existingStudent.setVillage(student.getVillage());
-        existingStudent.setState(student.getState());
-        existingStudent.setPincode(student.getPincode());
-        existingStudent.setDateOfBirth(student.getDateOfBirth());
-        existingStudent.setActive(student.getActive());
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Relations
-        existingStudent.setUser(student.getUser());
-        existingStudent.setSchool(student.getSchool());
-        existingStudent.setDistrict(student.getDistrict());
-        existingStudent.setTaluka(student.getTaluka());
-        existingStudent.setCenter(student.getCenter());
-        existingStudent.setCoordinator(student.getCoordinator());
+        School school = schoolRepository.findById(request.getSchoolId())
+                .orElseThrow(() -> new RuntimeException("School not found"));
 
-        return studentRepository.save(existingStudent);
+        District district = districtRepository.findById(request.getDistrictId())
+                .orElseThrow(() -> new RuntimeException("District not found"));
+
+        Taluka taluka = talukaRepository.findById(request.getTalukaId())
+                .orElseThrow(() -> new RuntimeException("Taluka not found"));
+
+        Center center = centerRepository.findById(request.getCenterId())
+                .orElseThrow(() -> new RuntimeException("Center not found"));
+
+        Coordinator coordinator = coordinatorRepository.findById(request.getCoordinatorId())
+                .orElseThrow(() -> new RuntimeException("Coordinator not found"));
+
+        student.setStudentName(request.getStudentName());
+        student.setMobile(request.getMobile());
+        student.setEmail(request.getEmail());
+        student.setGender(request.getGender());
+        student.setStudentClass(request.getStudentClass());
+        student.setMedium(request.getMedium());
+        student.setAddress(request.getAddress());
+        student.setVillage(request.getVillage());
+        student.setState(request.getState());
+        student.setPincode(request.getPincode());
+        student.setDateOfBirth(request.getDateOfBirth());
+        student.setActive(request.getActive());
+
+        student.setUser(user);
+        student.setSchool(school);
+        student.setDistrict(district);
+        student.setTaluka(taluka);
+        student.setCenter(center);
+        student.setCoordinator(coordinator);
+
+        return mapToResponse(studentRepository.save(student));
     }
 
     @Override
     public void deleteStudent(Long id) {
 
-        Student student = getStudentById(id);
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Student not found with id : " + id));
+
         studentRepository.delete(student);
     }
 
     @Override
-    public Student getStudentById(Long id) {
+    public StudentResponse getStudentById(Long id) {
 
-        return studentRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Student not found with id : " + id));
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Student not found with id : " + id));
+
+        return mapToResponse(student);
     }
 
     @Override
-    public List<Student> getAllStudents() {
+    public List<StudentResponse> getAllStudents() {
 
-        return studentRepository.findAll();
+        return studentRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    private StudentResponse mapToResponse(Student student) {
+
+        return StudentResponse.builder()
+                .id(student.getId())
+                .studentName(student.getStudentName())
+                .mobile(student.getMobile())
+                .email(student.getEmail())
+                .gender(student.getGender())
+                .studentClass(student.getStudentClass())
+                .medium(student.getMedium())
+                .address(student.getAddress())
+                .village(student.getVillage())
+                .state(student.getState())
+                .pincode(student.getPincode())
+                .dateOfBirth(student.getDateOfBirth())
+                .active(student.getActive())
+
+                .userId(student.getUser().getId())
+                .userName(student.getUser().getFullName())
+
+                .schoolId(student.getSchool().getId())
+                .schoolName(student.getSchool().getSchoolName())
+
+                .districtId(student.getDistrict().getId())
+                .districtName(student.getDistrict().getDistrictName())
+
+                .talukaId(student.getTaluka().getId())
+                .talukaName(student.getTaluka().getTalukaName())
+
+                .centerId(student.getCenter().getId())
+                .centerName(student.getCenter().getCenterName())
+
+                .coordinatorId(student.getCoordinator().getId())
+                .coordinatorName(student.getCoordinator().getFullName())
+
+                .build();
     }
 }

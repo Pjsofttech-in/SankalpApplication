@@ -1,19 +1,30 @@
 package com.testapplication.service;
 
-import com.testapplication.entity.AnswerKey;
+import com.testapplication.dto.Response.AnswerKeyResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface AnswerKeyService {
 
-    AnswerKey saveAnswerKey(AnswerKey answerKey);
+    AnswerKeyResponse saveAnswerKey(String title,
+                                    String link,
+                                    Long examId,
+                                    Boolean active,
+                                    MultipartFile pdf);
 
-    AnswerKey updateAnswerKey(Long id, AnswerKey answerKey);
+    AnswerKeyResponse updateAnswerKey(Long id,
+                                      String title,
+                                      String link,
+                                      Long examId,
+                                      Boolean active,
+                                      MultipartFile pdf);
 
     void deleteAnswerKey(Long id);
 
-    AnswerKey getAnswerKeyById(Long id);
+    AnswerKeyResponse getAnswerKeyById(Long id);
 
-    List<AnswerKey> getAllAnswerKeys();
+    List<AnswerKeyResponse> getAllAnswerKeys();
 
+    byte[] downloadPdf(Long id);
 }

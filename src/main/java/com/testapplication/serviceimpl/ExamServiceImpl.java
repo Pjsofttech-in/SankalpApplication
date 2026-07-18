@@ -1,53 +1,102 @@
 package com.testapplication.serviceimpl;
 
+import com.testapplication.dto.Request.ExamRequest;
+import com.testapplication.dto.Response.ExamResponse;
+import com.testapplication.entity.Category;
 import com.testapplication.entity.Exam;
+import com.testapplication.repository.CategoryRepository;
 import com.testapplication.repository.ExamRepository;
 import com.testapplication.service.ExamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ExamServiceImpl implements ExamService {
 
     private final ExamRepository examRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
-    public Exam saveExam(Exam exam) {
-        return examRepository.save(exam);
+    public ExamResponse saveExam(ExamRequest request) {
+
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        Exam exam = Exam.builder()
+                .examName(request.getExamName())
+                .examDate(request.getExamDate())
+                .totalMarks(request.getTotalMarks())
+                .totalQuestions(request.getTotalQuestions())
+                .duration(request.getDuration())
+                .category(category)
+                .build();
+
+        return mapToResponse(examRepository.save(exam));
     }
 
     @Override
-    public Exam updateExam(Long id, Exam exam) {
+    public ExamResponse updateExam(Long id, ExamRequest request) {
 
-        Exam existing = getExamById(id);
+        Exam exam = examRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Exam not found"));
 
-        existing.setExamName(exam.getExamName());
-        existing.setExamDate(exam.getExamDate());
-        existing.setTotalMarks(exam.getTotalMarks());
-        existing.setTotalQuestions(exam.getTotalQuestions());
-        existing.setDuration(exam.getDuration());
-        existing.setCategory(exam.getCategory());
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
 
-        return examRepository.save(existing);
+        exam.setExamName(request.getExamName());
+        exam.setExamDate(request.getExamDate());
+        exam.setTotalMarks(request.getTotalMarks());
+        exam.setTotalQuestions(request.getTotalQuestions());
+        exam.setDuration(request.getDuration());
+        exam.setCategory(category);
+
+        return mapToResponse(examRepository.save(exam));
     }
 
     @Override
     public void deleteExam(Long id) {
-        examRepository.delete(getExamById(id));
+
+        Exam exam = examRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Exam not found"));
+
+        examRepository.delete(exam);
     }
 
     @Override
-    public Exam getExamById(Long id) {
+    public ExamResponse getExamById(Long id) {
 
-        return examRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Exam not found."));
+        Exam exam = examRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Exam not found"));
+
+        return mapToResponse(exam);
     }
 
     @Override
-    public List<Exam> getAllExams() {
-        return examRepository.findAll();
+    public List<ExamResponse> getAllExams() {
+
+        return examRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    private ExamResponse mapToResponse(Exam exam) {
+
+        return ExamResponse.builder()
+                .id(exam.getId())
+                .examName(exam.getExamName())
+                .examDate(exam.getExamDate())
+                .totalMarks(exam.getTotalMarks())
+                .totalQuestions(exam.getTotalQuestions())
+                .duration(exam.getDuration())
+
+                .categoryId(exam.getCategory().getId())
+                .categoryName(exam.getCategory().getCategoryName())
+
+                .build();
     }
 }

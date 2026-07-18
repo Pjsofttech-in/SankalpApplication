@@ -1,62 +1,116 @@
 package com.testapplication.serviceimpl;
 
+import com.testapplication.dto.Request.CoordinatorRequest;
+import com.testapplication.dto.Response.CoordinatorResponse;
 import com.testapplication.entity.Coordinator;
+import com.testapplication.entity.School;
+import com.testapplication.entity.User;
 import com.testapplication.repository.CoordinatorRepository;
+import com.testapplication.repository.SchoolRepository;
+import com.testapplication.repository.UserRepository;
 import com.testapplication.service.CoordinatorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CoordinatorServiceImpl implements CoordinatorService {
 
     private final CoordinatorRepository coordinatorRepository;
+    private final SchoolRepository schoolRepository;
+    private final UserRepository userRepository;
 
     @Override
-    public Coordinator saveCoordinator(Coordinator coordinator) {
+    public CoordinatorResponse saveCoordinator(CoordinatorRequest request) {
 
-        if (coordinatorRepository.existsByEmail(coordinator.getEmail())) {
+        if (coordinatorRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Coordinator email already exists.");
         }
 
-        return coordinatorRepository.save(coordinator);
+        School school = schoolRepository.findById(request.getSchoolId())
+                .orElseThrow(() -> new RuntimeException("School not found"));
+
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Coordinator coordinator = Coordinator.builder()
+                .fullName(request.getFullName())
+                .email(request.getEmail())
+                .mobile(request.getMobile())
+                .address(request.getAddress())
+                .active(true)
+                .school(school)
+                .user(user)
+                .build();
+
+        return mapToResponse(coordinatorRepository.save(coordinator));
     }
 
     @Override
-    public Coordinator updateCoordinator(Long id, Coordinator coordinator) {
+    public CoordinatorResponse updateCoordinator(Long id, CoordinatorRequest request) {
 
-        Coordinator existingCoordinator = getCoordinatorById(id);
+        Coordinator coordinator = coordinatorRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Coordinator not found with id : " + id));
 
-        existingCoordinator.setFullName(coordinator.getFullName());
-        existingCoordinator.setEmail(coordinator.getEmail());
-        existingCoordinator.setMobile(coordinator.getMobile());
-        existingCoordinator.setAddress(coordinator.getAddress());
-        existingCoordinator.setActive(coordinator.getActive());
-        existingCoordinator.setUser(coordinator.getUser());
-        existingCoordinator.setSchool(coordinator.getSchool());
+        School school = schoolRepository.findById(request.getSchoolId())
+                .orElseThrow(() -> new RuntimeException("School not found"));
 
-        return coordinatorRepository.save(existingCoordinator);
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        coordinator.setFullName(request.getFullName());
+        coordinator.setEmail(request.getEmail());
+        coordinator.setMobile(request.getMobile());
+        coordinator.setAddress(request.getAddress());
+        coordinator.setSchool(school);
+        coordinator.setUser(user);
+
+        return mapToResponse(coordinatorRepository.save(coordinator));
     }
 
     @Override
     public void deleteCoordinator(Long id) {
 
-        Coordinator coordinator = getCoordinatorById(id);
+        Coordinator coordinator = coordinatorRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Coordinator not found with id : " + id));
+
         coordinatorRepository.delete(coordinator);
     }
 
     @Override
-    public Coordinator getCoordinatorById(Long id) {
+    public CoordinatorResponse getCoordinatorById(Long id) {
 
-        return coordinatorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Coordinator not found with id : " + id));
+        Coordinator coordinator = coordinatorRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Coordinator not found with id : " + id));
+
+        return mapToResponse(coordinator);
     }
 
     @Override
-    public List<Coordinator> getAllCoordinators() {
+    public List<CoordinatorResponse> getAllCoordinators() {
 
-        return coordinatorRepository.findAll();
+        return coordinatorRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    private CoordinatorResponse mapToResponse(Coordinator coordinator) {
+
+        return CoordinatorResponse.builder()
+                .id(coordinator.getId())
+                .fullName(coordinator.getFullName())
+                .email(coordinator.getEmail())
+                .mobile(coordinator.getMobile())
+                .address(coordinator.getAddress())
+                .active(coordinator.getActive())
+                .schoolName(coordinator.getSchool().getSchoolName())
+                .build();
     }
 }

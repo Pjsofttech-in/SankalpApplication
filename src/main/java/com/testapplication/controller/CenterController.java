@@ -1,6 +1,7 @@
 package com.testapplication.controller;
 
-import com.testapplication.entity.Center;
+import com.testapplication.dto.Request.CenterRequest;
+import com.testapplication.dto.Response.CenterResponse;
 import com.testapplication.service.CenterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,45 +18,39 @@ public class CenterController {
 
     // Save Center
     @PostMapping
-    public Center saveCenter(@RequestBody Center center) {
-        return centerService.saveCenter(center);
+    public CenterResponse saveCenter(@RequestBody CenterRequest request) {
+        return centerService.saveCenter(request);
     }
 
     // Get All Centers
     @GetMapping
-    public List<Center> getAllCenters() {
+    public List<CenterResponse> getAllCenters() {
         return centerService.getAllCenters();
     }
 
-    // Dynamic Dropdown
-    // GET /api/centers/taluka/1
+    // Get Centers By Taluka (Dynamic Dropdown)
     @GetMapping("/taluka/{talukaId}")
-    public List<Center> getCentersByTaluka(@PathVariable Long talukaId) {
-
+    public List<CenterResponse> getCentersByTaluka(@PathVariable Long talukaId) {
         return centerService.getCentersByTaluka(talukaId);
     }
 
     // Get Center By Id
     @GetMapping("/{id}")
-    public Center getCenterById(@PathVariable Long id) {
-
+    public CenterResponse getCenterById(@PathVariable Long id) {
         return centerService.getCenterById(id);
     }
 
     // Update Center
     @PutMapping("/{id}")
-    public Center updateCenter(@PathVariable Long id,
-                               @RequestBody Center center) {
-
-        return centerService.updateCenter(id, center);
+    public CenterResponse updateCenter(@PathVariable Long id,
+                                       @RequestBody CenterRequest request) {
+        return centerService.updateCenter(id, request);
     }
 
     // Delete Center
     @DeleteMapping("/{id}")
     public String deleteCenter(@PathVariable Long id) {
-
         centerService.deleteCenter(id);
-
         return "Center deleted successfully.";
     }
 }

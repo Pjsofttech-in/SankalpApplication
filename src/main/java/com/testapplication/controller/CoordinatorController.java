@@ -1,6 +1,7 @@
 package com.testapplication.controller;
 
-import com.testapplication.entity.Coordinator;
+import com.testapplication.dto.Request.CoordinatorRequest;
+import com.testapplication.dto.Response.CoordinatorResponse;
 import com.testapplication.service.CoordinatorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,32 +16,27 @@ public class CoordinatorController {
 
     private final CoordinatorService coordinatorService;
 
-    // Save Coordinator
     @PostMapping
-    public Coordinator saveCoordinator(@RequestBody Coordinator coordinator) {
-        return coordinatorService.saveCoordinator(coordinator);
+    public CoordinatorResponse saveCoordinator(@RequestBody CoordinatorRequest request) {
+        return coordinatorService.saveCoordinator(request);
     }
 
-    // Get All Coordinators
     @GetMapping
-    public List<Coordinator> getAllCoordinators() {
+    public List<CoordinatorResponse> getAllCoordinators() {
         return coordinatorService.getAllCoordinators();
     }
 
-    // Get Coordinator By Id
     @GetMapping("/{id}")
-    public Coordinator getCoordinatorById(@PathVariable Long id) {
+    public CoordinatorResponse getCoordinatorById(@PathVariable Long id) {
         return coordinatorService.getCoordinatorById(id);
     }
 
-    // Update Coordinator
     @PutMapping("/{id}")
-    public Coordinator updateCoordinator(@PathVariable Long id,
-                                         @RequestBody Coordinator coordinator) {
-        return coordinatorService.updateCoordinator(id, coordinator);
+    public CoordinatorResponse updateCoordinator(@PathVariable Long id,
+                                                 @RequestBody CoordinatorRequest request) {
+        return coordinatorService.updateCoordinator(id, request);
     }
 
-    // Delete Coordinator
     @DeleteMapping("/{id}")
     public String deleteCoordinator(@PathVariable Long id) {
         coordinatorService.deleteCoordinator(id);

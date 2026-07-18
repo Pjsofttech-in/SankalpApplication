@@ -24,7 +24,7 @@ public class AuthController {
 
 
     // Register User
-    @PostMapping("/register")   
+    @PostMapping("/register")
     public User register(@RequestBody User user) {
 
         // Encrypt Password
@@ -33,7 +33,6 @@ public class AuthController {
         return userService.saveUser(user);
     }
 
-    // Login User
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest request) {
 
@@ -50,6 +49,7 @@ public class AuthController {
         String token = jwtUtil.generateToken(userDetails);
 
         return LoginResponse.builder()
+                .userId(user.getId())   // ✅ Add this line
                 .token(token)
                 .email(user.getEmail())
                 .fullName(user.getFullName())

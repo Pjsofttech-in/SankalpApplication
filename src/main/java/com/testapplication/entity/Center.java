@@ -1,6 +1,7 @@
 package com.testapplication.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -41,18 +42,21 @@ public class Center {
     private Boolean active = true;
 
     // School
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "school_id", nullable = false)
+    @JsonIgnoreProperties({"centers","coordinators","students"})
     private School school;
 
     // District
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "district_id", nullable =false)
+    @JsonIgnoreProperties({"talukas"})
     private District district;
 
     // Taluka
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "taluka_id", nullable = false)
+    @JsonIgnoreProperties({"centers","district"})
     private Taluka taluka;
 
     @Column(updatable = false)

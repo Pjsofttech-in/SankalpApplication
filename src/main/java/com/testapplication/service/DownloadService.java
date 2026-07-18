@@ -1,18 +1,19 @@
 package com.testapplication.service;
 
-import com.testapplication.entity.Download;
+import com.testapplication.dto.Request.DownloadRequest;
+import com.testapplication.dto.Response.DownloadResponse;
 
 import java.util.List;
 
 public interface DownloadService {
 
-    Download saveDownload(Download download);
+    DownloadResponse saveDownload(DownloadRequest request);
 
-    Download updateDownload(Long id, Download download);
+    DownloadResponse updateDownload(Long id, DownloadRequest request);
 
     void deleteDownload(Long id);
 
-    Download getDownloadById(Long id);
+    DownloadResponse getDownloadById(Long id);
 
-    List<Download> getAllDownloads();
+    List<DownloadResponse> getAllDownloads();
 }

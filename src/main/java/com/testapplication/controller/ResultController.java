@@ -1,6 +1,7 @@
 package com.testapplication.controller;
 
-import com.testapplication.entity.Result;
+import com.testapplication.dto.Request.ResultRequest;
+import com.testapplication.dto.Response.ResultResponse;
 import com.testapplication.service.ResultService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,35 +16,32 @@ public class ResultController {
 
     private final ResultService resultService;
 
-    // Save Result
     @PostMapping
-    public Result saveResult(@RequestBody Result result) {
-        return resultService.saveResult(result);
+    public ResultResponse saveResult(@RequestBody ResultRequest request) {
+        return resultService.saveResult(request);
     }
 
-    // Get All Results
     @GetMapping
-    public List<Result> getAllResults() {
+    public List<ResultResponse> getAllResults() {
         return resultService.getAllResults();
     }
 
-    // Get Result By Id
     @GetMapping("/{id}")
-    public Result getResultById(@PathVariable Long id) {
+    public ResultResponse getResultById(@PathVariable Long id) {
         return resultService.getResultById(id);
     }
 
-    // Update Result
     @PutMapping("/{id}")
-    public Result updateResult(@PathVariable Long id,
-                               @RequestBody Result result) {
-        return resultService.updateResult(id, result);
+    public ResultResponse updateResult(@PathVariable Long id,
+                                       @RequestBody ResultRequest request) {
+        return resultService.updateResult(id, request);
     }
 
-    // Delete Result
     @DeleteMapping("/{id}")
     public String deleteResult(@PathVariable Long id) {
+
         resultService.deleteResult(id);
+
         return "Result deleted successfully.";
     }
 }

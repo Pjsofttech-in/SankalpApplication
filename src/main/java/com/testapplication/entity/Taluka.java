@@ -1,5 +1,6 @@
 package com.testapplication.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,8 +23,10 @@ public class Taluka {
     @Column(nullable = false)
     private String talukaName;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "district_id", nullable = false)
+    @JsonBackReference
     private District district;
 
     @Builder.Default
