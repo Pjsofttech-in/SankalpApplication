@@ -21,8 +21,8 @@ public class StudentAnswer {
     @Column(nullable = false)
     private String selectedAnswer;
 
-    @Column(nullable = false)
     @Builder.Default
+    @Column(nullable = false)
     private Boolean correct = false;
 
     // Student who answered
@@ -40,6 +40,11 @@ public class StudentAnswer {
 
     @PrePersist
     public void onCreate() {
+
+        if (correct == null) {
+            correct = false;
+        }
+
         createdAt = LocalDateTime.now();
     }
 }

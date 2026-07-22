@@ -44,11 +44,12 @@ public class School {
 
     private String pincode;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean active = true;
 
     // Login Account
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -60,7 +61,7 @@ public class School {
     @OneToMany(mappedBy = "school", cascade = CascadeType.ALL)
     private List<Coordinator> coordinators;
 
-    // Student.java झाल्यावर हा relation enable करू
+    // One School -> Many Students
     @OneToMany(mappedBy = "school", cascade = CascadeType.ALL)
     private List<Student> students;
 
@@ -71,6 +72,11 @@ public class School {
 
     @PrePersist
     public void onCreate() {
+
+        if (active == null) {
+            active = true;
+        }
+
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }

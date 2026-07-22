@@ -3,6 +3,7 @@ package com.testapplication.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -37,6 +38,11 @@ public class District {
 
     @PrePersist
     public void onCreate() {
+
+        if (active == null) {
+            active = true;
+        }
+
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }

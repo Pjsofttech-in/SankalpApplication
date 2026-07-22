@@ -48,6 +48,15 @@ public class Gallery {
 
     @PrePersist
     public void onCreate() {
+
+        if (displayOrder == null) {
+            displayOrder = 1;
+        }
+
+        if (active == null) {
+            active = true;
+        }
+
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }

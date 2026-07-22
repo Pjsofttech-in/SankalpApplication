@@ -4,6 +4,7 @@ import com.testapplication.dto.Request.StudentRequest;
 import com.testapplication.dto.Response.StudentResponse;
 import com.testapplication.service.StudentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class StudentController {
 
     // Save Student
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
     public StudentResponse saveStudent(@RequestBody StudentRequest request) {
 
         return studentService.saveStudent(request);
@@ -25,6 +27,7 @@ public class StudentController {
 
     // Get All Students
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
     public List<StudentResponse> getAllStudents() {
 
         return studentService.getAllStudents();
@@ -32,6 +35,7 @@ public class StudentController {
 
     // Get Student By Id
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
     public StudentResponse getStudentById(@PathVariable Long id) {
 
         return studentService.getStudentById(id);
@@ -39,6 +43,7 @@ public class StudentController {
 
     // Update Student
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
     public StudentResponse updateStudent(@PathVariable Long id,
                                          @RequestBody StudentRequest request) {
 
@@ -47,6 +52,7 @@ public class StudentController {
 
     // Delete Student
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String deleteStudent(@PathVariable Long id) {
 
         studentService.deleteStudent(id);

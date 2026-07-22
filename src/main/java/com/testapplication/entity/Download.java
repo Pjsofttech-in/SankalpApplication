@@ -29,6 +29,7 @@ public class Download {
     @Column(nullable = false)
     private String filePath;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean active = true;
 
@@ -39,6 +40,11 @@ public class Download {
 
     @PrePersist
     public void onCreate() {
+
+        if (active == null) {
+            active = true;
+        }
+
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }

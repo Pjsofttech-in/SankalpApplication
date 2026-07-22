@@ -1,7 +1,7 @@
 package com.testapplication.entity;
 
-import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -44,19 +44,19 @@ public class Center {
     // School
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "school_id", nullable = false)
-    @JsonIgnoreProperties({"centers","coordinators","students"})
+    @JsonIgnoreProperties({"centers", "coordinators", "students"})
     private School school;
 
     // District
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "district_id", nullable =false)
+    @JoinColumn(name = "district_id", nullable = false)
     @JsonIgnoreProperties({"talukas"})
     private District district;
 
     // Taluka
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "taluka_id", nullable = false)
-    @JsonIgnoreProperties({"centers","district"})
+    @JsonIgnoreProperties({"district", "centers"})
     private Taluka taluka;
 
     @Column(updatable = false)
@@ -66,12 +66,18 @@ public class Center {
 
     @PrePersist
     public void onCreate() {
+
+        if (active == null) {
+            active = true;
+        }
+
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     public void onUpdate() {
+
         updatedAt = LocalDateTime.now();
     }
 }

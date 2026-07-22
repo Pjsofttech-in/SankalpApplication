@@ -47,6 +47,12 @@ public class AnswerKey {
 
     @PrePersist
     public void onCreate() {
+
+        // Fix for active column null issue
+        if (active == null) {
+            active = true;
+        }
+
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }

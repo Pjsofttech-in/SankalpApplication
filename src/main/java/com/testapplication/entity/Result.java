@@ -41,6 +41,10 @@ public class Result {
     @JoinColumn(name = "exam_id", nullable = false)
     private Exam exam;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean active = true;
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
@@ -48,6 +52,11 @@ public class Result {
 
     @PrePersist
     public void onCreate() {
+
+        if (active == null) {
+            active = true;
+        }
+
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }

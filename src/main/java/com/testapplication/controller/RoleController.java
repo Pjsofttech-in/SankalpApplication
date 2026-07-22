@@ -3,6 +3,7 @@ package com.testapplication.controller;
 import com.testapplication.entity.Role;
 import com.testapplication.service.RoleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,24 +18,28 @@ public class RoleController {
 
     // Save Role
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Role saveRole(@RequestBody Role role) {
         return roleService.saveRole(role);
     }
 
     // Get All Roles
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public List<Role> getAllRoles() {
         return roleService.getAllRoles();
     }
 
     // Get Role By Id
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Role getRoleById(@PathVariable Long id) {
         return roleService.getRoleById(id);
     }
 
     // Update Role
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Role updateRole(@PathVariable Long id,
                            @RequestBody Role role) {
         return roleService.updateRole(id, role);
@@ -42,6 +47,7 @@ public class RoleController {
 
     // Delete Role
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String deleteRole(@PathVariable Long id) {
 
         roleService.deleteRole(id);

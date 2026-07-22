@@ -30,6 +30,7 @@ public class Contact {
     @Column(columnDefinition = "TEXT")
     private String message;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean replied = false;
 
@@ -38,6 +39,11 @@ public class Contact {
 
     @PrePersist
     public void onCreate() {
+
+        if (replied == null) {
+            replied = false;
+        }
+
         createdAt = LocalDateTime.now();
     }
 }

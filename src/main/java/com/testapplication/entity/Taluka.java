@@ -23,7 +23,6 @@ public class Taluka {
     @Column(nullable = false)
     private String talukaName;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "district_id", nullable = false)
     @JsonBackReference
@@ -43,6 +42,11 @@ public class Taluka {
 
     @PrePersist
     public void onCreate() {
+
+        if (active == null) {
+            active = true;
+        }
+
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }

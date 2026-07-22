@@ -33,7 +33,7 @@ public class Exam {
     private Integer totalQuestions;
 
     @Column(nullable = false)
-    private Integer duration; // Minutes
+    private Integer duration;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
@@ -41,6 +41,10 @@ public class Exam {
 
     @OneToMany(mappedBy = "exam", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Question> questions;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean active = true;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -51,6 +55,10 @@ public class Exam {
     public void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+
+        if (active == null) {
+            active = true;
+        }
     }
 
     @PreUpdate

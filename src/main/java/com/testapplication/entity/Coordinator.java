@@ -30,6 +30,7 @@ public class Coordinator {
     @Column(nullable = false)
     private String address;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean active = true;
 
@@ -50,6 +51,11 @@ public class Coordinator {
 
     @PrePersist
     public void onCreate() {
+
+        if (active == null) {
+            active = true;
+        }
+
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }

@@ -16,35 +16,29 @@ public class UserController {
 
     private final UserService userService;
 
-    // Get All Users
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    // Get User By Id
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','COORDINATOR')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
     public User getUserById(@PathVariable Long id) {
         return userService.getUserById(id);
     }
-    // Update User
+
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public User updateUser(@PathVariable Long id,
                            @RequestBody User user) {
-
         return userService.updateUser(id, user);
     }
 
-    // Delete User
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String deleteUser(@PathVariable Long id) {
-
         userService.deleteUser(id);
-
         return "User Deleted Successfully";
     }
 }

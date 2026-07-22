@@ -49,6 +49,7 @@ public class Payment {
     private LocalDateTime paymentDate;
 
     @Builder.Default
+    @Column(nullable = false)
     private Boolean active = true;
 
     @Column(updatable = false)
@@ -58,8 +59,10 @@ public class Payment {
 
     @PrePersist
     public void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
+
+        if (active == null) {
+            active = true;
+        }
 
         if (paymentDate == null) {
             paymentDate = LocalDateTime.now();
@@ -68,6 +71,9 @@ public class Payment {
         if (paymentStatus == null) {
             paymentStatus = "PENDING";
         }
+
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate

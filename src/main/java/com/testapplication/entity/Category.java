@@ -24,6 +24,7 @@ public class Category {
 
     private String description;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean active = true;
 
@@ -37,6 +38,9 @@ public class Category {
 
     @PrePersist
     public void onCreate() {
+        if (active == null) {
+            active = true;
+        }
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
