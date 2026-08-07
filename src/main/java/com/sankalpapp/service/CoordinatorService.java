@@ -13,6 +13,8 @@ public interface CoordinatorService {
 
     void deleteCoordinator(Long id);
 
+    List<CoordinatorResponse> getCoordinatorByCenter(Long centerId);
+
     CoordinatorResponse getCoordinatorById(Long id);
 
     List<CoordinatorResponse> getAllCoordinators();

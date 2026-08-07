@@ -41,6 +41,14 @@ public class CoordinatorController {
         return coordinatorService.getCoordinatorById(id);
     }
 
+    // Get Coordinator By Center Id
+    @GetMapping("/center/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
+    public List<CoordinatorResponse> getCoordinatorByCenterId(@PathVariable Long id) {
+
+        return coordinatorService.getCoordinatorByCenter(id);
+    }
+
     // Update Coordinator
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")

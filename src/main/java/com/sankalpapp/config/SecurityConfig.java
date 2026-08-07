@@ -54,7 +54,7 @@ public class SecurityConfig {
 
                         // Coordinator APIs
                         .requestMatchers("/api/coordinators/**")
-                        .hasAuthority("COORDINATOR")
+                        .hasAnyAuthority("ADMIN","COORDINATOR")
 
                         // Student APIs
                         .requestMatchers("/api/students/**")

@@ -23,4 +23,7 @@ public class CoordinatorResponse {
 
     private Long userId;
     private String userName;
+
+    private Long centerId;
+    private String centerName;
 }

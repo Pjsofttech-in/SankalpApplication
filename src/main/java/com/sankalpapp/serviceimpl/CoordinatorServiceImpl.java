@@ -2,16 +2,20 @@ package com.sankalpapp.serviceimpl;
 
 import com.sankalpapp.dto.Request.CoordinatorRequest;
 import com.sankalpapp.dto.Response.CoordinatorResponse;
+import com.sankalpapp.entity.Center;
 import com.sankalpapp.entity.Coordinator;
 import com.sankalpapp.entity.School;
 import com.sankalpapp.entity.User;
+import com.sankalpapp.repository.CenterRepository;
 import com.sankalpapp.repository.CoordinatorRepository;
 import com.sankalpapp.repository.SchoolRepository;
 import com.sankalpapp.repository.UserRepository;
 import com.sankalpapp.service.CoordinatorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +26,7 @@ public class CoordinatorServiceImpl implements CoordinatorService {
     private final CoordinatorRepository coordinatorRepository;
     private final SchoolRepository schoolRepository;
     private final UserRepository userRepository;
+    private final CenterRepository centerRepository;
 
     @Override
     public CoordinatorResponse saveCoordinator(CoordinatorRequest request) {
@@ -36,6 +41,9 @@ public class CoordinatorServiceImpl implements CoordinatorService {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        Center center = centerRepository.findById(request.getCenterId())
+                .orElseThrow(() -> new RuntimeException("Center not found"));
+
         Coordinator coordinator = Coordinator.builder()
                 .fullName(request.getFullName())
                 .email(request.getEmail())
@@ -44,6 +52,7 @@ public class CoordinatorServiceImpl implements CoordinatorService {
                 .active(true)
                 .school(school)
                 .user(user)
+                .center(center)
                 .build();
 
         return mapToResponse(coordinatorRepository.save(coordinator));
@@ -62,12 +71,16 @@ public class CoordinatorServiceImpl implements CoordinatorService {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        Center center = centerRepository.findById(request.getCenterId())
+                .orElseThrow(() -> new RuntimeException("Center not found"));
+
         coordinator.setFullName(request.getFullName());
         coordinator.setEmail(request.getEmail());
         coordinator.setMobile(request.getMobile());
         coordinator.setAddress(request.getAddress());
         coordinator.setSchool(school);
         coordinator.setUser(user);
+        coordinator.setCenter(center);
 
         return mapToResponse(coordinatorRepository.save(coordinator));
     }
@@ -83,8 +96,16 @@ public class CoordinatorServiceImpl implements CoordinatorService {
     }
 
     @Override
-    public CoordinatorResponse getCoordinatorById(Long id) {
+    public List<CoordinatorResponse> getCoordinatorByCenter(Long centerId) {
+        List<Coordinator> coordinatorList = coordinatorRepository.findAllByCenterIdAndActiveTrue(centerId);
+        if (!CollectionUtils.isEmpty(coordinatorList)) {
+            return coordinatorList.stream().map(this::mapToResponse).collect(Collectors.toList());
+        }
+        return new ArrayList<>();
+    }
 
+    @Override
+    public CoordinatorResponse getCoordinatorById(Long id) {
         Coordinator coordinator = coordinatorRepository.findById(id)
                 .orElseThrow(() ->
                         new RuntimeException("Coordinator not found with id : " + id));
@@ -111,6 +132,11 @@ public class CoordinatorServiceImpl implements CoordinatorService {
                 .address(coordinator.getAddress())
                 .active(coordinator.getActive())
                 .schoolName(coordinator.getSchool().getSchoolName())
+                .schoolId(coordinator.getSchool().getId())
+                .centerName(coordinator.getCenter().getCenterName())
+                .centerId(coordinator.getCenter().getId())
+                .userName(coordinator.getUser().getFullName())
+                .userId(coordinator.getUser().getId())
                 .build();
     }
 }

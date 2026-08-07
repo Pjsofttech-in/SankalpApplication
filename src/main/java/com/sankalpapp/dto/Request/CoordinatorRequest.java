@@ -16,4 +16,5 @@ public class CoordinatorRequest {
 
     private Long schoolId;
     private Long userId;
+    private Long centerId;
 }

@@ -39,6 +39,10 @@ public class Coordinator {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "center_id")
+    private Center center;
+
     // School Relation
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "school_id")
