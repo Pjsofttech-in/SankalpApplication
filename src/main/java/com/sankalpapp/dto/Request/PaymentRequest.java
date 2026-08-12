@@ -18,6 +18,12 @@ public class PaymentRequest {
     private String paymentStatus;
 
     private Long studentId;
+
+    private String orderId;
+
+    private String paymentId;
+
+    private String signature;
 }
 
 

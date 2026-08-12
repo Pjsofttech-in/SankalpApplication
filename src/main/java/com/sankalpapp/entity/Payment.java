@@ -19,7 +19,7 @@ public class Payment {
     private Long id;
 
     // Student
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
@@ -34,6 +34,9 @@ public class Payment {
     // Razorpay Payment Id
     @Column(unique = true)
     private String paymentId;
+
+    @Column(unique = true)
+    private String signature;
 
     // Transaction Id
     @Column(unique = true)

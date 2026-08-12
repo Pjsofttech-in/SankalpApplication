@@ -19,5 +19,7 @@ public interface PaymentService {
 
     List<PaymentResponse> getAllPayments();
 
-    JSONObject createOrder(Double amount) throws RazorpayException;
+    JSONObject createOrder(PaymentRequest request) throws RazorpayException;
+
+    boolean verifyPayment(String orderId, String paymentId, String signature);
 }

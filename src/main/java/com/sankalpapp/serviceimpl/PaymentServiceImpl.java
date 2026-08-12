@@ -13,8 +13,12 @@ import com.sankalpapp.repository.StudentRepository;
 import com.sankalpapp.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,9 +26,17 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
+    @Autowired
     private final PaymentRepository paymentRepository;
+
+    @Autowired
     private final StudentRepository studentRepository;
-    private final RazorpayClient razorpayClient;
+
+    @Value("${razorpay.key}")
+    private String key;
+
+    @Value("${razorpay.secret}")
+    private String secret;
 
     @Override
     public PaymentResponse savePayment(PaymentRequest request) {
@@ -36,6 +48,8 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = Payment.builder()
                 .amount(request.getAmount())
                 .paymentMode(request.getPaymentMode())
+                .orderId(request.getOrderId())
+                .paymentId(request.getPaymentId())
                 .transactionId(request.getTransactionId())
                 .paymentStatus(request.getPaymentStatus())
                 .student(student)
@@ -95,17 +109,46 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public JSONObject createOrder(Double amount) throws RazorpayException {
+    public JSONObject createOrder(PaymentRequest request) throws RazorpayException {
+
+        RazorpayClient razorpayClient = new RazorpayClient(key, secret);
 
         JSONObject options = new JSONObject();
 
-        options.put("amount", amount * 100);
+        String transactionId = "receipt_" + System.currentTimeMillis();
+
+        options.put("amount", request.getAmount() * 100);
         options.put("currency", "INR");
-        options.put("receipt", "receipt_" + System.currentTimeMillis());
+        options.put("receipt", transactionId);
 
         Order order = razorpayClient.orders.create(options);
+        request.setTransactionId(transactionId);
+        request.setOrderId(order.get("id"));
+        savePayment(request);
 
         return order.toJson();
+    }
+
+    @Override
+    public boolean verifyPayment(String orderId, String paymentId, String signature) {
+        try {
+            String data = orderId + "|" + paymentId;
+
+            Mac mac = Mac.getInstance("HmacSHA256");
+            mac.init(new SecretKeySpec(secret.getBytes(), "HmacSHA256"));
+
+            byte[] hash = mac.doFinal(data.getBytes());
+
+            StringBuilder hex = new StringBuilder();
+            for (byte b : hash) {
+                hex.append(String.format("%02x", b));
+            }
+
+            return hex.toString().equals(signature);
+
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private PaymentResponse mapToResponse(Payment payment) {
