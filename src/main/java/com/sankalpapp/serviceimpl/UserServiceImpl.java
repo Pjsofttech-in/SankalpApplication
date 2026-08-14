@@ -2,6 +2,7 @@ package com.sankalpapp.serviceimpl;
 
 import com.sankalpapp.entity.Role;
 import com.sankalpapp.entity.User;
+import com.sankalpapp.repository.PaymentRepository;
 import com.sankalpapp.repository.RoleRepository;
 import com.sankalpapp.repository.UserRepository;
 import com.sankalpapp.service.UserService;
@@ -16,6 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -40,9 +42,6 @@ public class UserServiceImpl implements UserService {
         // Encrypt Password
 
         String encodedPassword = passwordEncoder.encode(user.getPassword());
-        // Encrypt Password
-        System.out.println("REGISTER - RAW: [" + user.getPassword() + "]");
-        System.out.println("REGISTER - ENCODED: [" + encodedPassword + "]");
         user.setPassword(encodedPassword);
 
         return userRepository.save(user);
@@ -92,5 +91,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> getUserByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public Optional<User> getUserByMobile(String mobile) {
+        return userRepository.findByMobile(mobile);
     }
 }

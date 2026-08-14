@@ -55,6 +55,11 @@ public class Student {
     @Column(nullable = false)
     private Boolean active = true;
 
+    // Payment
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id", nullable = false)
+    private Payment payment;
+
     // Login User
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

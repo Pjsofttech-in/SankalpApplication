@@ -19,8 +19,8 @@ public class Payment {
     private Long id;
 
     // Student
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "student_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id", nullable = true)
     private Student student;
 
     // Amount
@@ -48,6 +48,9 @@ public class Payment {
     // SUCCESS / FAILED / PENDING
     @Column(nullable = false)
     private String paymentStatus;
+
+    @Column(nullable = false)
+    private String mobile;
 
     private LocalDateTime paymentDate;
 

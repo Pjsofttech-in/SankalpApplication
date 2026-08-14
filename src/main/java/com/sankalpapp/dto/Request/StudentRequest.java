@@ -14,6 +14,7 @@ public class StudentRequest {
     private String studentName;
     private String mobile;
     private String email;
+    private String password;
     private String gender;
     private String studentClass;
     private String medium;

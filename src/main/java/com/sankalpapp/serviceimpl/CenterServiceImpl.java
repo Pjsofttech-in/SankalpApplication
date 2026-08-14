@@ -50,7 +50,6 @@ public class CenterServiceImpl implements CenterService {
                 .state(request.getState())
                 .pincode(request.getPincode())
                 .active(request.getActive())
-                .school(school)
                 .district(district)
                 .taluka(taluka)
                 .build();
@@ -80,7 +79,6 @@ public class CenterServiceImpl implements CenterService {
         center.setState(request.getState());
         center.setPincode(request.getPincode());
         center.setActive(request.getActive());
-        center.setSchool(school);
         center.setDistrict(district);
         center.setTaluka(taluka);
 
@@ -134,9 +132,6 @@ public class CenterServiceImpl implements CenterService {
                 .state(center.getState())
                 .pincode(center.getPincode())
                 .active(center.getActive())
-
-                .schoolId(center.getSchool().getId())
-                .schoolName(center.getSchool().getSchoolName())
 
                 .districtId(center.getDistrict().getId())
                 .districtName(center.getDistrict().getDistrictName())

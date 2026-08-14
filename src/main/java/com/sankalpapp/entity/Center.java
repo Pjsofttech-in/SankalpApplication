@@ -41,12 +41,6 @@ public class Center {
     @Column(nullable = false)
     private Boolean active = true;
 
-    // School
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "school_id", nullable = false)
-    @JsonIgnoreProperties({"centers", "coordinators", "students"})
-    private School school;
-
     // District
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "district_id", nullable = false)

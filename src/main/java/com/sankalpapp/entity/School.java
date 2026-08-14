@@ -2,6 +2,8 @@ package com.sankalpapp.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -49,20 +51,23 @@ public class School {
     private Boolean active = true;
 
     // Login Account
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
 
-    // One School -> Many Centers
-    @OneToMany(mappedBy = "school", cascade = CascadeType.ALL)
-    private List<Center> centers;
+    // Many Schools -> One Center
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "center_id")
+    private Center center;
 
     // One School -> Many Coordinators
     @OneToMany(mappedBy = "school", cascade = CascadeType.ALL)
+    @Fetch(FetchMode.SUBSELECT)
     private List<Coordinator> coordinators;
 
     // One School -> Many Students
     @OneToMany(mappedBy = "school", cascade = CascadeType.ALL)
+    @Fetch(FetchMode.SUBSELECT)
     private List<Student> students;
 
     @Column(updatable = false)

@@ -44,4 +44,6 @@ public class StudentResponse {
 
     private Long coordinatorId;
     private String coordinatorName;
+
+    private boolean isPaymentDone;
 }

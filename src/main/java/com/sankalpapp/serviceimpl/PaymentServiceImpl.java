@@ -41,12 +41,11 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentResponse savePayment(PaymentRequest request) {
 
-        Student student = studentRepository.findById(request.getStudentId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Student not found with id : " + request.getStudentId()));
+        Student student = studentRepository.findById(request.getStudentId()).orElse(null);
 
         Payment payment = Payment.builder()
                 .amount(request.getAmount())
+                .mobile(request.getMobileNo())
                 .paymentMode(request.getPaymentMode())
                 .orderId(request.getOrderId())
                 .paymentId(request.getPaymentId())

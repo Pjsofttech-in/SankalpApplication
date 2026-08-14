@@ -18,4 +18,6 @@ public interface UserService {
     List<User> getAllUsers();
 
     Optional<User> getUserByEmail(String email);
+
+    Optional<User> getUserByMobile(String mobile);
 }

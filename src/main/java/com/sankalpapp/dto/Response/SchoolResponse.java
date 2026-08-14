@@ -1,6 +1,7 @@
 package com.sankalpapp.dto.Response;
 
 import lombok.*;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -21,4 +22,18 @@ public class SchoolResponse {
     private String state;
     private String pincode;
     private Boolean active;
+    
+    // Flattened Relationship Fields
+    private Long userId;
+    private String userEmail; // Optional helper field
+    
+    private Long centerId;
+    private String centerName; // Optional helper field
+
+    // Counter helpers instead of pulling heavy nested lists
+    private int totalCoordinators;
+    private int totalStudents;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

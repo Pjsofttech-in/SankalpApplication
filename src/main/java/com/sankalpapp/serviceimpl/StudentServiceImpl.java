@@ -6,9 +6,11 @@ import com.sankalpapp.entity.*;
 import com.sankalpapp.repository.*;
 import com.sankalpapp.service.StudentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,12 +18,13 @@ import java.util.stream.Collectors;
 public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
-    private final UserRepository userRepository;
     private final SchoolRepository schoolRepository;
     private final DistrictRepository districtRepository;
     private final TalukaRepository talukaRepository;
     private final CenterRepository centerRepository;
     private final CoordinatorRepository coordinatorRepository;
+    private final UserRepository userRepository;
+    private final PaymentRepository paymentRepository;
 
     @Override
     public StudentResponse saveStudent(StudentRequest request) {
@@ -52,6 +55,9 @@ public class StudentServiceImpl implements StudentService {
         Coordinator coordinator = coordinatorRepository.findById(request.getCoordinatorId())
                 .orElseThrow(() -> new RuntimeException("Coordinator not found"));
 
+        Payment payment = paymentRepository.findByMobileAndPaymentStatusIgnoreCase(request.getMobile(), "success")
+                .orElseThrow(() -> new RuntimeException("Payment not found"));
+
         Student student = Student.builder()
                 .studentName(request.getStudentName())
                 .mobile(request.getMobile())
@@ -64,8 +70,10 @@ public class StudentServiceImpl implements StudentService {
                 .state(request.getState())
                 .pincode(request.getPincode())
                 .dateOfBirth(request.getDateOfBirth())
+                .email(request.getEmail())
                 .active(request.getActive())
                 .user(user)
+                .payment(payment)
                 .school(school)
                 .district(district)
                 .taluka(taluka)
@@ -73,7 +81,9 @@ public class StudentServiceImpl implements StudentService {
                 .coordinator(coordinator)
                 .build();
 
-        return mapToResponse(studentRepository.save(student));
+        payment.setStudent(student);
+        student = studentRepository.saveAndFlush(student);
+        return mapToResponse(student);
     }
 
     @Override
@@ -82,7 +92,7 @@ public class StudentServiceImpl implements StudentService {
         Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Student not found with id : " + id));
 
-        User user = userRepository.findById(request.getUserId())
+        User user = userRepository.findById(request.getSchoolId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         School school = schoolRepository.findById(request.getSchoolId())
@@ -167,9 +177,6 @@ public class StudentServiceImpl implements StudentService {
                 .dateOfBirth(student.getDateOfBirth())
                 .active(student.getActive())
 
-                .userId(student.getUser().getId())
-                .userName(student.getUser().getFullName())
-
                 .schoolId(student.getSchool().getId())
                 .schoolName(student.getSchool().getSchoolName())
 
@@ -184,6 +191,8 @@ public class StudentServiceImpl implements StudentService {
 
                 .coordinatorId(student.getCoordinator().getId())
                 .coordinatorName(student.getCoordinator().getFullName())
+
+                .isPaymentDone(student.getPayment()!=null)
 
                 .build();
     }

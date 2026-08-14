@@ -17,6 +17,8 @@ public class PaymentRequest {
 
     private String paymentStatus;
 
+    private String mobileNo;
+
     private Long studentId;
 
     private String orderId;

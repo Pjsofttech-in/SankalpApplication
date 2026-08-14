@@ -13,5 +13,7 @@ public class LoginRequest {
 
     private String email;
 
+    private String mobile;
+
     private String password;
 }
