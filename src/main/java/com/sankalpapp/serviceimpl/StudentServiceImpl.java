@@ -5,12 +5,13 @@ import com.sankalpapp.dto.Response.StudentResponse;
 import com.sankalpapp.entity.*;
 import com.sankalpapp.repository.*;
 import com.sankalpapp.service.StudentService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,9 +25,12 @@ public class StudentServiceImpl implements StudentService {
     private final CenterRepository centerRepository;
     private final CoordinatorRepository coordinatorRepository;
     private final UserRepository userRepository;
+    private final RoleRepository rolerepository;
     private final PaymentRepository paymentRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional
     public StudentResponse saveStudent(StudentRequest request) {
 
         if (studentRepository.existsByEmail(request.getEmail())) {
@@ -37,8 +41,21 @@ public class StudentServiceImpl implements StudentService {
             throw new RuntimeException("Student Mobile already exists.");
         }
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = null;
+        if (Objects.nonNull(request.getUserId())) {
+            user = userRepository.findById(request.getUserId()).orElse(null);
+        }
+
+        if (Objects.isNull(user)) {
+            user = new User();
+            user.setRole(rolerepository.findByRoleNameIgnoreCase("student").orElseThrow(() -> new RuntimeException("Student Role not found")));
+            user.setEmail(request.getEmail());
+            user.setActive(true);
+            user.setFullName(request.getStudentName());
+            user.setMobile(request.getMobile());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            userRepository.saveAndFlush(user);
+        }
 
         School school = schoolRepository.findById(request.getSchoolId())
                 .orElseThrow(() -> new RuntimeException("School not found"));
@@ -192,7 +209,7 @@ public class StudentServiceImpl implements StudentService {
                 .coordinatorId(student.getCoordinator().getId())
                 .coordinatorName(student.getCoordinator().getFullName())
 
-                .isPaymentDone(student.getPayment()!=null)
+                .isPaymentDone(student.getPayment() != null)
 
                 .build();
     }
