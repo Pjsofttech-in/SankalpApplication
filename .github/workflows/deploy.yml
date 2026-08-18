@@ -52,7 +52,7 @@ jobs:
 
             echo "Moving JAR to application directory..."
 
-            sudo mv /home/ec2-user/*.jar /opt/sankalp-backend/
+            sudo mv /home/ec2-user/target/*.jar /opt/sankalp-backend/
 
             echo "Reloading systemd..."
 
