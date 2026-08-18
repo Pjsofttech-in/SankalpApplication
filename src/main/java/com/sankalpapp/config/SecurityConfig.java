@@ -55,6 +55,10 @@ public class SecurityConfig {
                                 "/api/talukas/**", "/api/centers/**", "/api/payments/create-order", "/api/payments/verify")
                         .permitAll()
 
+                        // Coordinator GET APIs - public
+                        .requestMatchers("/api/payments/create-order", "/api/payments/verify")
+                        .permitAll()
+
                         // Admin APIs
                         .requestMatchers("/api/users/**")
                         .hasAnyAuthority("ADMIN")
