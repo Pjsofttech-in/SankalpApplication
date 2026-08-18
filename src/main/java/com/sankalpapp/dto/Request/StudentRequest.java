@@ -25,6 +25,10 @@ public class StudentRequest {
     private String schoolName;
     private LocalDate dateOfBirth;
 
+    private String paymentMode;
+    private String paymentStatus;
+    private Double amount;
+
     private Boolean active;
 
     private Long userId;

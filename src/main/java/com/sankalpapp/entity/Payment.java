@@ -86,4 +86,8 @@ public class Payment {
     public void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    public enum PaymentStatus {
+        SUCCESS, PENDING, FAILED;
+    }
 }

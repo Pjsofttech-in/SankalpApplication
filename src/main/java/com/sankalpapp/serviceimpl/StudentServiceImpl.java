@@ -18,8 +18,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,8 +83,28 @@ public class StudentServiceImpl implements StudentService {
         Coordinator coordinator = coordinatorRepository.findById(request.getCoordinatorId())
                 .orElseThrow(() -> new RuntimeException("Coordinator not found"));
 
-        Payment payment = paymentRepository.findByMobileAndPaymentStatusIgnoreCase(request.getMobile(), "success")
-                .orElseThrow(() -> new RuntimeException("Payment not found"));
+        Payment payment;
+        if (StringUtils.isBlank(request.getPaymentMode()) || StringUtils.isBlank(request.getPaymentStatus())) {
+            payment = paymentRepository.findByMobileAndPaymentStatusIgnoreCase(request.getMobile(), "success")
+                    .orElseThrow(() -> new RuntimeException("Payment not found"));
+        } else {
+            String orderId = "order-" + createOfflinePayment();
+            String paymentId = "payment-" + createOfflinePayment();
+            String transactionId = "transaction-" + createOfflinePayment();
+            payment = Payment.builder()
+                    .active(true)
+                    .amount(request.getAmount())
+                    .mobile(request.getMobile())
+                    .orderId(orderId)
+                    .paymentId(paymentId)
+                    .paymentMode(request.getPaymentMode())
+                    .paymentStatus(String.valueOf(Payment.PaymentStatus.valueOf(request.getPaymentStatus())))
+                    .paymentDate(LocalDateTime.now())
+                    .transactionId(transactionId)
+                    .build();
+
+            payment = paymentRepository.saveAndFlush(payment);
+        }
 
         Student student = Student.builder()
                 .studentName(request.getStudentName())
@@ -252,5 +274,11 @@ public class StudentServiceImpl implements StudentService {
         return students.map(
                 StudentMapper::toDTO
         );
+    }
+
+    public String createOfflinePayment() {
+        // Generates a 40-character unique ID
+        String rawUuid = UUID.randomUUID().toString().replace("-", "");
+        return "offline-" + rawUuid;
     }
 }

@@ -1,6 +1,7 @@
 package com.sankalpapp.controller;
 
-import com.sankalpapp.entity.Taluka;
+import com.sankalpapp.dto.Request.TalukaRequest;
+import com.sankalpapp.dto.Response.TalukaDTO;
 import com.sankalpapp.service.TalukaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,47 +20,45 @@ public class TalukaController {
     // Save Taluka
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Taluka saveTaluka(@RequestBody Taluka taluka) {
-        return talukaService.saveTaluka(taluka);
+    public TalukaDTO saveTaluka(@RequestBody TalukaRequest request) {
+        return talukaService.saveTaluka(request);
     }
 
     // Get All Talukas
     @GetMapping
 //    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
-    public List<Taluka> getAllTalukas() {
+    public List<TalukaDTO> getAllTalukas() {
         return talukaService.getAllTalukas();
     }
 
     // Get Talukas By District
     @GetMapping("/district/{districtId}")
 //    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
-    public List<Taluka> getTalukasByDistrict(@PathVariable Long districtId) {
+    public List<TalukaDTO> getTalukasByDistrict(@PathVariable Long districtId) {
         return talukaService.getTalukasByDistrict(districtId);
     }
 
     // Get Taluka By Id
     @GetMapping("/{id}")
 //    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
-    public Taluka getTalukaById(@PathVariable Long id) {
+    public TalukaDTO getTalukaById(@PathVariable Long id) {
         return talukaService.getTalukaById(id);
     }
 
     // Update Taluka
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Taluka updateTaluka(@PathVariable Long id,
-                               @RequestBody Taluka taluka) {
+    public TalukaDTO updateTaluka(@PathVariable Long id,
+                                  @RequestBody TalukaRequest request) {
 
-        return talukaService.updateTaluka(id, taluka);
+        return talukaService.updateTaluka(id, request);
     }
 
     // Delete Taluka
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public String deleteTaluka(@PathVariable Long id) {
-
         talukaService.deleteTaluka(id);
-
         return "Taluka Deleted Successfully";
     }
 }

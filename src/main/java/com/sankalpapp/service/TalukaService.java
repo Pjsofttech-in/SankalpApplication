@@ -1,21 +1,22 @@
 package com.sankalpapp.service;
 
-import com.sankalpapp.entity.Taluka;
+import com.sankalpapp.dto.Request.TalukaRequest;
+import com.sankalpapp.dto.Response.TalukaDTO;
 
 import java.util.List;
 
 public interface TalukaService {
 
-    Taluka saveTaluka(Taluka taluka);
+    TalukaDTO saveTaluka(TalukaRequest taluka);
 
-    Taluka updateTaluka(Long id, Taluka taluka);
+    TalukaDTO updateTaluka(Long id, TalukaRequest request);
 
     void deleteTaluka(Long id);
 
-    Taluka getTalukaById(Long id);
+    TalukaDTO getTalukaById(Long id);
 
-    List<Taluka> getAllTalukas();
+    List<TalukaDTO> getAllTalukas();
 
-    List<Taluka> getTalukasByDistrict(Long districtId);
+    List<TalukaDTO> getTalukasByDistrict(Long districtId);
 
 }
