@@ -36,7 +36,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "SankalpApplication-*.jar"
+          source: "target/SankalpApplication-*.jar"
           target: "/home/ec2-user/"
 
       # 5. Deploy and restart Spring Boot
