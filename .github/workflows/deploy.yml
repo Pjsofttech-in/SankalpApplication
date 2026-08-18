@@ -11,11 +11,11 @@ jobs:
 
     steps:
 
-      # 1. Checkout source
+      # 1. Checkout repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Setup Java
+      # 2. Setup Java 21
       - name: Setup Java 23
         uses: actions/setup-java@v4
         with:
@@ -29,57 +29,57 @@ jobs:
           chmod +x mvnw
           ./mvnw clean package -DskipTests
 
-      # 4. Find generated JAR
-      - name: Find generated JAR
+      # 4. Find and prepare JAR
+      - name: Prepare JAR
         run: |
           echo "Contents of target:"
           ls -lah target/
 
-          JAR_FILE=$(find target -maxdepth 1 -type f -name "*.jar" \
+          JAR_FILE=$(find target \
+            -maxdepth 1 \
+            -type f \
+            -name "*.jar" \
             ! -name "*-sources.jar" \
             ! -name "*-javadoc.jar" \
             | head -n 1)
 
           if [ -z "$JAR_FILE" ]; then
-            echo "ERROR: No JAR file found in target/"
+            echo "ERROR: No JAR file found!"
             exit 1
           fi
 
-          echo "Found JAR:"
-          echo "$JAR_FILE"
+          echo "Found JAR: $JAR_FILE"
 
-          cp "$JAR_FILE" "$GITHUB_WORKSPACE/sankalp-backend.jar"
+          cp "$JAR_FILE" sankalp-backend.jar
 
-      # 5. Verify deployment file
-      - name: Verify deployment JAR
+          echo "Prepared JAR:"
+          ls -lh sankalp-backend.jar
+
+      # 5. Configure SSH
+      - name: Configure SSH
         run: |
-          echo "Current directory:"
-          pwd
+          mkdir -p ~/.ssh
 
-          echo "Workspace:"
-          echo "$GITHUB_WORKSPACE"
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key
 
-          echo "Deployment JAR:"
-          ls -lh "$GITHUB_WORKSPACE/sankalp-backend.jar"
+          chmod 600 ~/.ssh/ec2_key
 
-      # 6. Upload JAR to EC2
+          ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
+
+      # 6. Upload JAR using normal SCP
       - name: Upload JAR to EC2
-        uses: appleboy/scp-action@v1
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: "sankalp-backend.jar"
-          target: "/home/ec2-user/"
+        run: |
+          scp \
+            -i ~/.ssh/ec2_key \
+            sankalp-backend.jar \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ec2-user/
 
       # 7. Deploy on EC2
       - name: Deploy application
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
+        run: |
+          ssh \
+            -i ~/.ssh/ec2_key \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
 
             set -e
 
@@ -115,14 +115,16 @@ jobs:
 
             sudo systemctl restart sankalp-backend
 
-            echo "Waiting for application..."
+            echo "Waiting for application to start..."
 
             sleep 5
 
-            echo "Checking service..."
+            echo "Checking service status..."
 
             sudo systemctl status sankalp-backend --no-pager
 
             echo "======================================"
             echo "Deployment completed successfully!"
             echo "======================================"
+
+          EOF
