@@ -7,14 +7,18 @@ import com.sankalpapp.entity.Coordinator;
 import com.sankalpapp.entity.User;
 import com.sankalpapp.repository.CenterRepository;
 import com.sankalpapp.repository.CoordinatorRepository;
+import com.sankalpapp.repository.RoleRepository;
 import com.sankalpapp.repository.UserRepository;
 import com.sankalpapp.service.CoordinatorService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,16 +28,32 @@ public class CoordinatorServiceImpl implements CoordinatorService {
     private final CoordinatorRepository coordinatorRepository;
     private final UserRepository userRepository;
     private final CenterRepository centerRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional
     public CoordinatorDTO saveCoordinator(CoordinatorRequest request) {
 
         if (coordinatorRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Coordinator email already exists.");
         }
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = null;
+        if (Objects.nonNull(request.getUserId())) {
+            user = userRepository.findById(request.getUserId()).orElse(null);
+        }
+
+        if (Objects.isNull(user)) {
+            user = new User();
+            user.setRole(roleRepository.findByRoleNameIgnoreCase("student").orElseThrow(() -> new RuntimeException("Student Role not found")));
+            user.setEmail(request.getEmail());
+            user.setActive(true);
+            user.setFullName(request.getFullName());
+            user.setMobile(request.getMobile());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            userRepository.saveAndFlush(user);
+        }
 
         Center center = centerRepository.findById(request.getCenterId())
                 .orElseThrow(() -> new RuntimeException("Center not found"));
@@ -122,7 +142,6 @@ public class CoordinatorServiceImpl implements CoordinatorService {
                 .active(coordinator.getActive())
                 .centerName(coordinator.getCenter().getCenterName())
                 .centerId(coordinator.getCenter().getId())
-                .userId(coordinator.getUser().getId())
                 .userId(coordinator.getUser().getId())
                 .build();
     }

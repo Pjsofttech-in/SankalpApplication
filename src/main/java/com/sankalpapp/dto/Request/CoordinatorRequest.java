@@ -11,6 +11,8 @@ public class CoordinatorRequest {
 
     private String fullName;
 
+    private String password;
+
     private String email;
 
     private String mobile;
