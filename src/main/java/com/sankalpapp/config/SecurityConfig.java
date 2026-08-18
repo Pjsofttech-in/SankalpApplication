@@ -56,7 +56,7 @@ public class SecurityConfig {
                         .permitAll()
 
                         // Coordinator GET APIs - public
-                        .requestMatchers("/api/payments/create-order", "/api/payments/verify")
+                        .requestMatchers("/api/payments/create-order","/api/payments/verify")
                         .permitAll()
 
                         // Admin APIs
