@@ -39,7 +39,7 @@ public class PaymentController {
 
     // ✅ Create Order
     @PostMapping("/create-order")
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
     public String createOrder(@RequestBody PaymentRequest request) throws Exception {
 
         JSONObject order = paymentService.createOrder(request);
