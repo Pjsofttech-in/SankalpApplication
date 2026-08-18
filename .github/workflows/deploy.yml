@@ -3,7 +3,7 @@ name: Deploy Sankalp Backend
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   deploy:
