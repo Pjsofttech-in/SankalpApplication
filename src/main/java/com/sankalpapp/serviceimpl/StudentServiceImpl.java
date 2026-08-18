@@ -1,13 +1,20 @@
 package com.sankalpapp.serviceimpl;
 
 import com.sankalpapp.dto.Request.StudentRequest;
-import com.sankalpapp.dto.Response.StudentResponse;
+import com.sankalpapp.dto.Response.StudentDTO;
+import com.sankalpapp.dto.Response.StudentFilterDTO;
+import com.sankalpapp.dto.mapper.StudentMapper;
+import com.sankalpapp.dto.mapper.StudentSpecification;
 import com.sankalpapp.entity.*;
 import com.sankalpapp.repository.*;
 import com.sankalpapp.service.StudentService;
 import io.micrometer.common.util.StringUtils;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,10 +35,11 @@ public class StudentServiceImpl implements StudentService {
     private final RoleRepository rolerepository;
     private final PaymentRepository paymentRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EntityManager entityManager;
 
     @Override
     @Transactional
-    public StudentResponse saveStudent(StudentRequest request) {
+    public StudentDTO saveStudent(StudentRequest request) {
 
         if (studentRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Student Email already exists.");
@@ -58,7 +66,7 @@ public class StudentServiceImpl implements StudentService {
         }
 
         if (StringUtils.isBlank(request.getSchoolName())) {
-           throw new RuntimeException("School name is required");
+            throw new RuntimeException("School name is required");
         }
 
         District district = districtRepository.findById(request.getDistrictId())
@@ -105,7 +113,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public StudentResponse updateStudent(Long id, StudentRequest request) {
+    public StudentDTO updateStudent(Long id, StudentRequest request) {
 
         Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Student not found with id : " + id));
@@ -158,7 +166,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public StudentResponse getStudentById(Long id) {
+    public StudentDTO getStudentById(Long id) {
 
         Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Student not found with id : " + id));
@@ -167,7 +175,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<StudentResponse> getAllStudents() {
+    public List<StudentDTO> getAllStudents() {
 
         return studentRepository.findAll()
                 .stream()
@@ -175,9 +183,9 @@ public class StudentServiceImpl implements StudentService {
                 .collect(Collectors.toList());
     }
 
-    private StudentResponse mapToResponse(Student student) {
+    private StudentDTO mapToResponse(Student student) {
 
-        return StudentResponse.builder()
+        return StudentDTO.builder()
                 .id(student.getId())
                 .studentName(student.getStudentName())
                 .mobile(student.getMobile())
@@ -192,7 +200,7 @@ public class StudentServiceImpl implements StudentService {
                 .dateOfBirth(student.getDateOfBirth())
                 .active(student.getActive())
 
-                .schoolName(student.getSchool())
+                .school(student.getSchool())
 
                 .districtId(student.getDistrict().getId())
                 .districtName(student.getDistrict().getDistrictName())
@@ -209,5 +217,40 @@ public class StudentServiceImpl implements StudentService {
                 .isPaymentDone(student.getPayment() != null)
 
                 .build();
+    }
+
+    @Override
+    public Page<StudentDTO> getStudents(
+            StudentFilterDTO filter,
+            Pageable pageable
+    ) {
+
+        Specification<Student> specification =
+                StudentSpecification.filter(
+                        entityManager,
+
+                        filter.getDistrictId(),
+                        filter.getTalukaId(),
+                        filter.getCenterId(),
+
+                        filter.getSchool(),
+                        filter.getStudentClass(),
+                        filter.getMedium(),
+                        filter.getGender(),
+
+                        filter.getActive(),
+
+                        filter.getSearch()
+                );
+
+        Page<Student> students =
+                studentRepository.findAll(
+                        specification,
+                        pageable
+                );
+
+        return students.map(
+                StudentMapper::toDTO
+        );
     }
 }
