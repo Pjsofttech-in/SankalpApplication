@@ -5,6 +5,7 @@ import com.sankalpapp.dto.Response.StudentResponse;
 import com.sankalpapp.entity.*;
 import com.sankalpapp.repository.*;
 import com.sankalpapp.service.StudentService;
+import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +20,6 @@ import java.util.stream.Collectors;
 public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
-    private final SchoolRepository schoolRepository;
     private final DistrictRepository districtRepository;
     private final TalukaRepository talukaRepository;
     private final CenterRepository centerRepository;
@@ -57,8 +57,9 @@ public class StudentServiceImpl implements StudentService {
             userRepository.saveAndFlush(user);
         }
 
-        School school = schoolRepository.findById(request.getSchoolId())
-                .orElseThrow(() -> new RuntimeException("School not found"));
+        if (StringUtils.isBlank(request.getSchoolName())) {
+           throw new RuntimeException("School name is required");
+        }
 
         District district = districtRepository.findById(request.getDistrictId())
                 .orElseThrow(() -> new RuntimeException("District not found"));
@@ -86,12 +87,12 @@ public class StudentServiceImpl implements StudentService {
                 .village(request.getVillage())
                 .state(request.getState())
                 .pincode(request.getPincode())
+                .school(request.getSchoolName())
                 .dateOfBirth(request.getDateOfBirth())
                 .email(request.getEmail())
                 .active(request.getActive())
                 .user(user)
                 .payment(payment)
-                .school(school)
                 .district(district)
                 .taluka(taluka)
                 .center(center)
@@ -109,11 +110,8 @@ public class StudentServiceImpl implements StudentService {
         Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Student not found with id : " + id));
 
-        User user = userRepository.findById(request.getSchoolId())
+        User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
-        School school = schoolRepository.findById(request.getSchoolId())
-                .orElseThrow(() -> new RuntimeException("School not found"));
 
         District district = districtRepository.findById(request.getDistrictId())
                 .orElseThrow(() -> new RuntimeException("District not found"));
@@ -137,11 +135,11 @@ public class StudentServiceImpl implements StudentService {
         student.setVillage(request.getVillage());
         student.setState(request.getState());
         student.setPincode(request.getPincode());
+        student.setSchool(request.getSchoolName());
         student.setDateOfBirth(request.getDateOfBirth());
         student.setActive(request.getActive());
 
         student.setUser(user);
-        student.setSchool(school);
         student.setDistrict(district);
         student.setTaluka(taluka);
         student.setCenter(center);
@@ -194,8 +192,7 @@ public class StudentServiceImpl implements StudentService {
                 .dateOfBirth(student.getDateOfBirth())
                 .active(student.getActive())
 
-                .schoolId(student.getSchool().getId())
-                .schoolName(student.getSchool().getSchoolName())
+                .schoolName(student.getSchool())
 
                 .districtId(student.getDistrict().getId())
                 .districtName(student.getDistrict().getDistrictName())

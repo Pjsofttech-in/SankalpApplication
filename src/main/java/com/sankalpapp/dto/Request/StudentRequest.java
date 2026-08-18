@@ -22,12 +22,12 @@ public class StudentRequest {
     private String village;
     private String state;
     private String pincode;
+    private String schoolName;
     private LocalDate dateOfBirth;
 
     private Boolean active;
 
     private Long userId;
-    private Long schoolId;
     private Long districtId;
     private Long talukaId;
     private Long centerId;

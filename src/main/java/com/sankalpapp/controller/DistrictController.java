@@ -26,7 +26,7 @@ public class DistrictController {
 
     // Get All Districts
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
     public List<District> getAllDistricts() {
 
         return districtService.getAllDistricts();
@@ -34,7 +34,7 @@ public class DistrictController {
 
     // Get District By Id
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
     public District getDistrictById(@PathVariable Long id) {
 
         return districtService.getDistrictById(id);

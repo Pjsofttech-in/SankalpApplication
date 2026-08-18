@@ -30,7 +30,6 @@ public class StudentResponse {
     private Long userId;
     private String userName;
 
-    private Long schoolId;
     private String schoolName;
 
     private Long districtId;

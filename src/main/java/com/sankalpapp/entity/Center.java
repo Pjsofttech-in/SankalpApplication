@@ -53,6 +53,10 @@ public class Center {
     @JsonIgnoreProperties({"district", "centers"})
     private Taluka taluka;
 
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "coordinator_id")
+    private Coordinator coordinator;
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
 

@@ -1,14 +1,12 @@
 package com.sankalpapp.serviceimpl;
 
 import com.sankalpapp.dto.Request.CoordinatorRequest;
-import com.sankalpapp.dto.Response.CoordinatorResponse;
+import com.sankalpapp.dto.Response.CoordinatorDTO;
 import com.sankalpapp.entity.Center;
 import com.sankalpapp.entity.Coordinator;
-import com.sankalpapp.entity.School;
 import com.sankalpapp.entity.User;
 import com.sankalpapp.repository.CenterRepository;
 import com.sankalpapp.repository.CoordinatorRepository;
-import com.sankalpapp.repository.SchoolRepository;
 import com.sankalpapp.repository.UserRepository;
 import com.sankalpapp.service.CoordinatorService;
 import lombok.RequiredArgsConstructor;
@@ -24,19 +22,15 @@ import java.util.stream.Collectors;
 public class CoordinatorServiceImpl implements CoordinatorService {
 
     private final CoordinatorRepository coordinatorRepository;
-    private final SchoolRepository schoolRepository;
     private final UserRepository userRepository;
     private final CenterRepository centerRepository;
 
     @Override
-    public CoordinatorResponse saveCoordinator(CoordinatorRequest request) {
+    public CoordinatorDTO saveCoordinator(CoordinatorRequest request) {
 
         if (coordinatorRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Coordinator email already exists.");
         }
-
-        School school = schoolRepository.findById(request.getSchoolId())
-                .orElseThrow(() -> new RuntimeException("School not found"));
 
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -50,7 +44,6 @@ public class CoordinatorServiceImpl implements CoordinatorService {
                 .mobile(request.getMobile())
                 .address(request.getAddress())
                 .active(true)
-                .school(school)
                 .user(user)
                 .center(center)
                 .build();
@@ -59,14 +52,11 @@ public class CoordinatorServiceImpl implements CoordinatorService {
     }
 
     @Override
-    public CoordinatorResponse updateCoordinator(Long id, CoordinatorRequest request) {
+    public CoordinatorDTO updateCoordinator(Long id, CoordinatorRequest request) {
 
         Coordinator coordinator = coordinatorRepository.findById(id)
                 .orElseThrow(() ->
                         new RuntimeException("Coordinator not found with id : " + id));
-
-        School school = schoolRepository.findById(request.getSchoolId())
-                .orElseThrow(() -> new RuntimeException("School not found"));
 
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -78,7 +68,6 @@ public class CoordinatorServiceImpl implements CoordinatorService {
         coordinator.setEmail(request.getEmail());
         coordinator.setMobile(request.getMobile());
         coordinator.setAddress(request.getAddress());
-        coordinator.setSchool(school);
         coordinator.setUser(user);
         coordinator.setCenter(center);
 
@@ -96,7 +85,7 @@ public class CoordinatorServiceImpl implements CoordinatorService {
     }
 
     @Override
-    public List<CoordinatorResponse> getCoordinatorByCenter(Long centerId) {
+    public List<CoordinatorDTO> getCoordinatorByCenter(Long centerId) {
         List<Coordinator> coordinatorList = coordinatorRepository.findAllByCenterIdAndActiveTrue(centerId);
         if (!CollectionUtils.isEmpty(coordinatorList)) {
             return coordinatorList.stream().map(this::mapToResponse).collect(Collectors.toList());
@@ -105,7 +94,7 @@ public class CoordinatorServiceImpl implements CoordinatorService {
     }
 
     @Override
-    public CoordinatorResponse getCoordinatorById(Long id) {
+    public CoordinatorDTO getCoordinatorById(Long id) {
         Coordinator coordinator = coordinatorRepository.findById(id)
                 .orElseThrow(() ->
                         new RuntimeException("Coordinator not found with id : " + id));
@@ -114,7 +103,7 @@ public class CoordinatorServiceImpl implements CoordinatorService {
     }
 
     @Override
-    public List<CoordinatorResponse> getAllCoordinators() {
+    public List<CoordinatorDTO> getAllCoordinators() {
 
         return coordinatorRepository.findAll()
                 .stream()
@@ -122,20 +111,18 @@ public class CoordinatorServiceImpl implements CoordinatorService {
                 .collect(Collectors.toList());
     }
 
-    private CoordinatorResponse mapToResponse(Coordinator coordinator) {
+    private CoordinatorDTO mapToResponse(Coordinator coordinator) {
 
-        return CoordinatorResponse.builder()
+        return CoordinatorDTO.builder()
                 .id(coordinator.getId())
                 .fullName(coordinator.getFullName())
                 .email(coordinator.getEmail())
                 .mobile(coordinator.getMobile())
                 .address(coordinator.getAddress())
                 .active(coordinator.getActive())
-                .schoolName(coordinator.getSchool().getSchoolName())
-                .schoolId(coordinator.getSchool().getId())
                 .centerName(coordinator.getCenter().getCenterName())
                 .centerId(coordinator.getCenter().getId())
-                .userName(coordinator.getUser().getFullName())
+                .userId(coordinator.getUser().getId())
                 .userId(coordinator.getUser().getId())
                 .build();
     }

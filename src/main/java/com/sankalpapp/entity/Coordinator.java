@@ -43,11 +43,6 @@ public class Coordinator {
     @JoinColumn(name = "center_id")
     private Center center;
 
-    // School Relation
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "school_id")
-    private School school;
-
     @Column(updatable = false)
     private LocalDateTime createdAt;
 

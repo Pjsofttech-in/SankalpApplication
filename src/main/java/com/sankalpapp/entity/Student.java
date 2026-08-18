@@ -49,6 +49,9 @@ public class Student {
     @Column(nullable = false)
     private String pincode;
 
+    @Column(nullable = false)
+    private String school;
+
     private LocalDate dateOfBirth;
 
     @Builder.Default
@@ -64,11 +67,6 @@ public class Student {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    // School
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "school_id", nullable = false)
-    private School school;
 
     // District
     @ManyToOne(fetch = FetchType.LAZY)

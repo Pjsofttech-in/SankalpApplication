@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -151,8 +152,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private PaymentResponse mapToResponse(Payment payment) {
-
-        return PaymentResponse.builder()
+        PaymentResponse response = PaymentResponse.builder()
                 .id(payment.getId())
                 .amount(payment.getAmount())
                 .orderId(payment.getOrderId())
@@ -162,10 +162,13 @@ public class PaymentServiceImpl implements PaymentService {
                 .paymentStatus(payment.getPaymentStatus())
                 .paymentDate(payment.getPaymentDate())
                 .active(payment.getActive())
-
-                .studentId(payment.getStudent().getId())
-                .studentName(payment.getStudent().getStudentName())
-
                 .build();
+
+        if (Objects.nonNull(payment.getStudent())) {
+            response.setStudentId(payment.getStudent().getId());
+            response.setStudentName(payment.getStudent().getStudentName());
+        }
+
+        return response;
     }
 }

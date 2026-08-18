@@ -25,21 +25,21 @@ public class TalukaController {
 
     // Get All Talukas
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
     public List<Taluka> getAllTalukas() {
         return talukaService.getAllTalukas();
     }
 
     // Get Talukas By District
     @GetMapping("/district/{districtId}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
     public List<Taluka> getTalukasByDistrict(@PathVariable Long districtId) {
         return talukaService.getTalukasByDistrict(districtId);
     }
 
     // Get Taluka By Id
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
     public Taluka getTalukaById(@PathVariable Long id) {
         return talukaService.getTalukaById(id);
     }

@@ -1,7 +1,7 @@
 package com.sankalpapp.controller;
 
 import com.sankalpapp.dto.Request.CoordinatorRequest;
-import com.sankalpapp.dto.Response.CoordinatorResponse;
+import com.sankalpapp.dto.Response.CoordinatorDTO;
 import com.sankalpapp.service.CoordinatorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,31 +20,31 @@ public class CoordinatorController {
     // Save Coordinator
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public CoordinatorResponse saveCoordinator(@RequestBody CoordinatorRequest request) {
+    public CoordinatorDTO saveCoordinator(@RequestBody CoordinatorRequest request) {
 
         return coordinatorService.saveCoordinator(request);
     }
 
     // Get All Coordinators
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
-    public List<CoordinatorResponse> getAllCoordinators() {
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
+    public List<CoordinatorDTO> getAllCoordinators() {
 
         return coordinatorService.getAllCoordinators();
     }
 
     // Get Coordinator By Id
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
-    public CoordinatorResponse getCoordinatorById(@PathVariable Long id) {
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
+    public CoordinatorDTO getCoordinatorById(@PathVariable Long id) {
 
         return coordinatorService.getCoordinatorById(id);
     }
 
     // Get Coordinator By Center Id
     @GetMapping("/center/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
-    public List<CoordinatorResponse> getCoordinatorByCenterId(@PathVariable Long id) {
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
+    public List<CoordinatorDTO> getCoordinatorByCenterId(@PathVariable Long id) {
 
         return coordinatorService.getCoordinatorByCenter(id);
     }
@@ -52,7 +52,7 @@ public class CoordinatorController {
     // Update Coordinator
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public CoordinatorResponse updateCoordinator(@PathVariable Long id,
+    public CoordinatorDTO updateCoordinator(@PathVariable Long id,
                                                  @RequestBody CoordinatorRequest request) {
 
         return coordinatorService.updateCoordinator(id, request);

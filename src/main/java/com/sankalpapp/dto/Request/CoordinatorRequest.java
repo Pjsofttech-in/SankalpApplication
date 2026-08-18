@@ -10,11 +10,16 @@ import lombok.*;
 public class CoordinatorRequest {
 
     private String fullName;
+
     private String email;
+
     private String mobile;
+
     private String address;
 
-    private Long schoolId;
+    private Boolean active;
+
     private Long userId;
+
     private Long centerId;
 }

@@ -5,6 +5,7 @@ import com.sankalpapp.security.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -48,6 +49,11 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**"
                         ).permitAll()
+
+                        // Coordinator GET APIs - public
+                        .requestMatchers(HttpMethod.GET, "/api/coordinators/**", "/api/districts/**",
+                                "/api/talukas/**", "/api/centers/**")
+                        .permitAll()
 
                         // Admin APIs
                         .requestMatchers("/api/users/**")

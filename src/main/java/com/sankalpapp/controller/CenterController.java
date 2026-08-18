@@ -1,7 +1,7 @@
 package com.sankalpapp.controller;
 
 import com.sankalpapp.dto.Request.CenterRequest;
-import com.sankalpapp.dto.Response.CenterResponse;
+import com.sankalpapp.dto.Response.CenterDTO;
 import com.sankalpapp.service.CenterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,31 +20,37 @@ public class CenterController {
     // Save Center
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public CenterResponse saveCenter(@RequestBody CenterRequest request) {
+    public CenterDTO saveCenter(@RequestBody CenterRequest request) {
 
         return centerService.saveCenter(request);
     }
 
     // Get All Centers
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
-    public List<CenterResponse> getAllCenters() {
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
+    public List<CenterDTO> getAllCenters() {
 
         return centerService.getAllCenters();
     }
 
     // Get Centers By Taluka (Dynamic Dropdown)
     @GetMapping("/taluka/{talukaId}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
-    public List<CenterResponse> getCentersByTaluka(@PathVariable Long talukaId) {
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
+    public List<CenterDTO> getCentersByTaluka(@PathVariable Long talukaId) {
 
         return centerService.getCentersByTaluka(talukaId);
     }
 
+    @GetMapping("/schools/{centerId}")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
+    public List<String> getSchoolsByCenter(@PathVariable Long centerId) {
+        return centerService.getSchoolsByCenter(centerId);
+    }
+
     // Get Center By Id
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
-    public CenterResponse getCenterById(@PathVariable Long id) {
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
+    public CenterDTO getCenterById(@PathVariable Long id) {
 
         return centerService.getCenterById(id);
     }
@@ -52,8 +58,8 @@ public class CenterController {
     // Update Center
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public CenterResponse updateCenter(@PathVariable Long id,
-                                       @RequestBody CenterRequest request) {
+    public CenterDTO updateCenter(@PathVariable Long id,
+                                  @RequestBody CenterRequest request) {
 
         return centerService.updateCenter(id, request);
     }

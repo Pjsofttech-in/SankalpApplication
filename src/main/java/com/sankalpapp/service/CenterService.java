@@ -1,21 +1,23 @@
 package com.sankalpapp.service;
 
 import com.sankalpapp.dto.Request.CenterRequest;
-import com.sankalpapp.dto.Response.CenterResponse;
+import com.sankalpapp.dto.Response.CenterDTO;
 
 import java.util.List;
 
 public interface CenterService {
 
-    CenterResponse saveCenter(CenterRequest request);
+    CenterDTO saveCenter(CenterRequest request);
 
-    CenterResponse updateCenter(Long id, CenterRequest request);
+    CenterDTO updateCenter(Long id, CenterRequest request);
 
     void deleteCenter(Long id);
 
-    CenterResponse getCenterById(Long id);
+    CenterDTO getCenterById(Long id);
 
-    List<CenterResponse> getAllCenters();
+    List<CenterDTO> getAllCenters();
 
-    List<CenterResponse> getCentersByTaluka(Long talukaId);
+    List<CenterDTO> getCentersByTaluka(Long talukaId);
+
+    List<String> getSchoolsByCenter(Long centerId);
 }
