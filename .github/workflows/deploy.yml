@@ -3,7 +3,7 @@ name: Deploy Sankalp Backend
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   deploy:
@@ -11,7 +11,7 @@ jobs:
 
     steps:
 
-      # 1. Checkout source code
+      # 1. Checkout source
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -29,18 +29,51 @@ jobs:
           chmod +x mvnw
           ./mvnw clean package -DskipTests
 
-      # 4. Upload JAR to EC2
+      # 4. Find generated JAR
+      - name: Find generated JAR
+        run: |
+          echo "Contents of target:"
+          ls -lah target/
+
+          JAR_FILE=$(find target -maxdepth 1 -type f -name "*.jar" \
+            ! -name "*-sources.jar" \
+            ! -name "*-javadoc.jar" \
+            | head -n 1)
+
+          if [ -z "$JAR_FILE" ]; then
+            echo "ERROR: No JAR file found in target/"
+            exit 1
+          fi
+
+          echo "Found JAR:"
+          echo "$JAR_FILE"
+
+          cp "$JAR_FILE" "$GITHUB_WORKSPACE/sankalp-backend.jar"
+
+      # 5. Verify deployment file
+      - name: Verify deployment JAR
+        run: |
+          echo "Current directory:"
+          pwd
+
+          echo "Workspace:"
+          echo "$GITHUB_WORKSPACE"
+
+          echo "Deployment JAR:"
+          ls -lh "$GITHUB_WORKSPACE/sankalp-backend.jar"
+
+      # 6. Upload JAR to EC2
       - name: Upload JAR to EC2
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "target/SankalpApplication-*.jar"
+          source: "sankalp-backend.jar"
           target: "/home/ec2-user/"
 
-      # 5. Deploy and restart Spring Boot
-      - name: Deploy on EC2
+      # 7. Deploy on EC2
+      - name: Deploy application
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -50,20 +83,46 @@ jobs:
 
             set -e
 
-            echo "Moving JAR to application directory..."
+            echo "======================================"
+            echo "Starting Sankalp Backend Deployment"
+            echo "======================================"
 
-            sudo mv /home/ec2-user/target/*.jar /opt/sankalp-backend/
+            echo "Checking uploaded JAR..."
+
+            ls -lh /home/ec2-user/sankalp-backend.jar
+
+            echo "Removing previous JAR..."
+
+            sudo rm -f \
+              /opt/sankalp-backend/sankalp-backend.jar
+
+            echo "Moving new JAR..."
+
+            sudo mv \
+              /home/ec2-user/sankalp-backend.jar \
+              /opt/sankalp-backend/sankalp-backend.jar
+
+            echo "Setting ownership..."
+
+            sudo chown ec2-user:ec2-user \
+              /opt/sankalp-backend/sankalp-backend.jar
 
             echo "Reloading systemd..."
 
             sudo systemctl daemon-reload
 
-            echo "Restarting Sankalp backend..."
+            echo "Restarting Sankalp Backend..."
 
             sudo systemctl restart sankalp-backend
 
-            echo "Checking service status..."
+            echo "Waiting for application..."
+
+            sleep 5
+
+            echo "Checking service..."
 
             sudo systemctl status sankalp-backend --no-pager
 
+            echo "======================================"
             echo "Deployment completed successfully!"
+            echo "======================================"
