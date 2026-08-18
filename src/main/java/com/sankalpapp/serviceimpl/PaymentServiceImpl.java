@@ -41,8 +41,10 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentResponse savePayment(PaymentRequest request) {
-
-        Student student = studentRepository.findById(request.getStudentId()).orElse(null);
+        Student student = null;
+        if(Objects.nonNull(request.getStudentId())) {
+            student = studentRepository.findById(request.getStudentId()).orElse(null);
+        }
 
         Payment payment = Payment.builder()
                 .amount(request.getAmount())
