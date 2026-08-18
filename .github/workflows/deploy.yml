@@ -54,10 +54,6 @@ jobs:
 
             sudo mv /home/ec2-user/target/*.jar /opt/sankalp-backend/
 
-            cd /home/ec2-user/
-
-            sudo rm -rf target
-
             echo "Reloading systemd..."
 
             sudo systemctl daemon-reload
