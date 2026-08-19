@@ -24,7 +24,7 @@ public class StudentController {
 
     // Save Student
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
     public StudentDTO saveStudent(@RequestBody StudentRequest request) {
 
         return studentService.saveStudent(request);

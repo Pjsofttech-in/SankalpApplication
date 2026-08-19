@@ -59,6 +59,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/payments/create-order","/api/payments/verify")
                         .permitAll()
 
+                        .requestMatchers(HttpMethod.POST,"/api/students")
+                        .permitAll()
+
                         // Admin APIs
                         .requestMatchers("/api/users/**")
                         .hasAnyAuthority("ADMIN")
