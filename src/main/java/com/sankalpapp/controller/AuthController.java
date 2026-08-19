@@ -6,6 +6,7 @@ import com.sankalpapp.entity.User;
 import com.sankalpapp.security.CustomUserDetailsService;
 import com.sankalpapp.security.JwtUtil;
 import com.sankalpapp.service.UserService;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,15 +32,20 @@ public class AuthController {
 
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest request) {
-
-        User user = userService.getUserByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid Email"));
+        User user = null;
+        if (StringUtils.isNotBlank(request.getEmail())) {
+            user = userService.getUserByEmail(request.getEmail())
+                    .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+        } else if (StringUtils.isNotBlank(request.getMobile())) {
+            user = userService.getUserByMobile(request.getMobile())
+                    .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+        }
 
         System.out.println("RAW PASSWORD FROM REQUEST: [" + request.getPassword() + "]");
         System.out.println("HASH FROM DB: [" + user.getPassword() + "]");
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid Password");
+            throw new RuntimeException("Invalid credentials");
         }
 
         UserDetails userDetails =
