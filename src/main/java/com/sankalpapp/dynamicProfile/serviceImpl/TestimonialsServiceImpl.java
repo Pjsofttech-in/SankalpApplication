@@ -5,15 +5,12 @@ import com.sankalpapp.dynamicProfile.entity.WebTestimonials;
 import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.repository.TestimonialsRepository;
-import com.sankalpapp.dynamicProfile.service.PermissionService;
 import com.sankalpapp.dynamicProfile.service.S3Service;
 import com.sankalpapp.dynamicProfile.service.TestimonialsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -23,28 +20,18 @@ public class TestimonialsServiceImpl implements TestimonialsService {
     private TestimonialsRepository repository;
 
     @Autowired
-    private PermissionService permissionService;
-
-    @Autowired
     private SecurityUrlrepository securityUrlRepository;
 
     @Autowired
     private S3Service s3Service;
 
-    private void validateUrlExists(String url, String branchCode) {
+    private void validateUrlExists(String url) {
 
         String normalizedUrl = normalizeUrl(url);
-        if (branchCode == null || branchCode.isBlank()) {
-            securityUrlRepository.findByUrl(normalizedUrl)
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Provided URL [" + url + "] does not exist"
-                    ));
-            return;
-        }
 
-        securityUrlRepository.findByUrlAndBranchCode(normalizedUrl, branchCode)
+        securityUrlRepository.findByUrl(normalizedUrl)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed for branchCode [" + branchCode + "]"
+                        "URL [" + url + "] is not allowed"
                 ));
     }
 
@@ -55,13 +42,8 @@ public class TestimonialsServiceImpl implements TestimonialsService {
     }
 
     @Override
-    public WebTestimonials create(WebTestimonials webTestimonials, String role, String email, MultipartFile testimonialImage, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "POST")) {
-            throw new AccessDeniedException("No permission to create testimonial");
-        }
-
-        String branchCode = permissionService.fetchBranchCode(role, email);
+    public WebTestimonials create(WebTestimonials webTestimonials, MultipartFile testimonialImage, String url) {
+        validateUrlExists(url);
         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("URL not found in SecurityUrl table"));
 
@@ -71,42 +53,32 @@ public class TestimonialsServiceImpl implements TestimonialsService {
             webTestimonials.setTestimonialColor(existingTestimonials.get(0).getTestimonialColor());
         }
 
-        webTestimonials.setRole(role);
-        webTestimonials.setCreatedByEmail(email);
-        webTestimonials.setBranchCode(branchCode);
         webTestimonials.setUrl(url);
         webTestimonials.setWebSecurityUrl(webSecurityUrl);
 
-        if (testimonialImage != null && !testimonialImage.isEmpty()) {
-            try {
-                String imageUrl = s3Service.uploadImage(testimonialImage, branchCode);
-                webTestimonials.setTestimonialImage(imageUrl);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to upload testimonial image", e);
-            }
-        }
+//        if (testimonialImage != null && !testimonialImage.isEmpty()) {
+//            try {
+//                String imageUrl = s3Service.uploadImage(testimonialImage);
+//                webTestimonials.setTestimonialImage(imageUrl);
+//            } catch (IOException e) {
+//                throw new RuntimeException("Failed to upload testimonial image", e);
+//            }
+//        }
 
         return repository.save(webTestimonials);
     }
 
     @Override
-    public List<WebTestimonials> getAllByBranchCode(String role, String email, String branchCode, String url) {
-        validateUrlExists(url,branchCode);
+    public List<WebTestimonials> getAllByBranchCode(String url) {
+        validateUrlExists(url);
 
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view testimonials by branch code");
-        }
-
-        return repository.findAllByBranchCode(branchCode);
+        return repository.findAllOrderById();
     }
 
 
     @Override
-    public WebTestimonials update(Long id, WebTestimonials webTestimonials, String role, String email, MultipartFile testimonialImage, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "PUT")) {
-            throw new AccessDeniedException("No permission to update testimonial");
-        }
+    public WebTestimonials update(Long id, WebTestimonials webTestimonials, MultipartFile testimonialImage, String url) {
+        validateUrlExists(url);
 
         WebTestimonials existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Testimonial not found"));
@@ -133,30 +105,25 @@ public class TestimonialsServiceImpl implements TestimonialsService {
             existing.setTestimonialColor(webTestimonials.getTestimonialColor());
         }
 
-        String branchCode = permissionService.fetchBranchCode(role, email);
-
-        if (testimonialImage != null && !testimonialImage.isEmpty()) {
-            try {
-                String imageUrl = s3Service.uploadImage(testimonialImage, branchCode);
-                if (existing.getTestimonialImage() != null && existing.getTestimonialImage().contains("amazonaws.com")) {
-                    s3Service.deleteImage(existing.getTestimonialImage());
-                }
-                existing.setTestimonialImage(imageUrl);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to upload testimonial image", e);
-            }
-        }
+//        if (testimonialImage != null && !testimonialImage.isEmpty()) {
+//            try {
+//                String imageUrl = s3Service.uploadImage(testimonialImage);
+//                if (existing.getTestimonialImage() != null && existing.getTestimonialImage().contains("amazonaws.com")) {
+//                    s3Service.deleteImage(existing.getTestimonialImage());
+//                }
+//                existing.setTestimonialImage(imageUrl);
+//            } catch (IOException e) {
+//                throw new RuntimeException("Failed to upload testimonial image", e);
+//            }
+//        }
 
         return repository.save(existing);
     }
 
 
     @Override
-    public void delete(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "DELETE")) {
-            throw new AccessDeniedException("No permission to delete testimonial");
-        }
+    public void delete(Long id, String url) {
+        validateUrlExists(url);
 
         WebTestimonials testimonial = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Testimonial not found"));
@@ -169,11 +136,8 @@ public class TestimonialsServiceImpl implements TestimonialsService {
     }
 
     @Override
-    public WebTestimonials getById(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view testimonial");
-        }
+    public WebTestimonials getById(Long id, String url) {
+        validateUrlExists(url);
 
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Testimonial not found"));

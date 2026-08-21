@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(origins = "https://pjsofttech.in")
 public class SecurityUrlController {
 
     @Autowired
@@ -22,34 +21,26 @@ public class SecurityUrlController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/createSecurityUrl")
-    public ResponseEntity<WebSecurityUrl> create(@RequestBody WebSecurityUrl webSecurityUrl,
-                                                 @RequestParam String role,
-                                                 @RequestParam String email) {
-        return ResponseEntity.ok(service.create(webSecurityUrl,role,email));
+    public ResponseEntity<WebSecurityUrl> create(@RequestBody WebSecurityUrl webSecurityUrl) {
+        return ResponseEntity.ok(service.create(webSecurityUrl));
     }
 
     @GetMapping("/getAllSecurityUrls")
-    public ResponseEntity<List<WebSecurityUrl>> getAllByBranchCode(@RequestParam String role,
-                                                                   @RequestParam(required = false) String email,
-                                                                   @RequestParam String branchCode) {
-        return ResponseEntity.ok(service.getAllByBranchCode(role, email, branchCode));
+    public ResponseEntity<List<WebSecurityUrl>> getAllByBranchCode() {
+        return ResponseEntity.ok(service.getAll());
     }
     @PutMapping("/updateSecurityUrl/{id}")
     public ResponseEntity<WebSecurityUrl> update(@PathVariable long id,
-                                                 @RequestBody WebSecurityUrl webSecurityUrl,
-                                                 @RequestParam String role,
-                                                 @RequestParam String email) {
-        return ResponseEntity.ok(service.update(id, webSecurityUrl, role, email));
+                                                 @RequestBody WebSecurityUrl webSecurityUrl) {
+        return ResponseEntity.ok(service.update(id, webSecurityUrl));
     }
 
     @GetMapping("/getTokenForUser")
     public ResponseEntity<?> generateTokenByUrl(@RequestParam String url) {
         String token = jwtUtil.generateTokenFromUrl(url);
-        String branchCode = service.getBranchCodeByUrl(url);
 
         Map<String, String> response = new HashMap<>();
         response.put("token", token);
-        response.put("branchCode", branchCode);
 
         return ResponseEntity.ok(response);
     }

@@ -6,14 +6,11 @@ import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.FacultyRepository;
 import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.service.FacultyService;
-import com.sankalpapp.dynamicProfile.service.PermissionService;
 import com.sankalpapp.dynamicProfile.service.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -23,27 +20,17 @@ public class FacultyServiceImpl implements FacultyService {
     private FacultyRepository repository;
 
     @Autowired
-    private PermissionService permissionService;
-
-    @Autowired
     private SecurityUrlrepository securityUrlRepository;
 
     @Autowired
     private S3Service s3Service;
 
-    private void validateUrlExists(String url, String branchCode) {
+    private void validateUrlExists(String url) {
 
         String normalizedUrl = normalizeUrl(url);
-        if (branchCode == null || branchCode.isBlank()) {
-            securityUrlRepository.findByUrl(normalizedUrl)
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Provided URL [" + url + "] does not exist"
-                    ));
-            return;
-        }
-        securityUrlRepository.findByUrlAndBranchCode(normalizedUrl, branchCode)
+        securityUrlRepository.findByUrl(normalizedUrl)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed for branchCode [" + branchCode + "]"
+                        "URL [" + url + "] is not allowed"
                 ));
     }
 
@@ -53,14 +40,9 @@ public class FacultyServiceImpl implements FacultyService {
     }
 
     @Override
-    public WebFaculty createFacility(WebFaculty webFaculty, String role, String email, MultipartFile image, String url) {
-        validateUrlExists(url,null);
+    public WebFaculty createFacility(WebFaculty webFaculty, MultipartFile image, String url) {
+        validateUrlExists(url);
 
-        if (!permissionService.hasPermission(role, email, "POST")) {
-            throw new AccessDeniedException("No permission to create facility");
-        }
-
-        String branchCode = permissionService.fetchBranchCode(role, email);
         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
@@ -70,44 +52,32 @@ public class FacultyServiceImpl implements FacultyService {
             webFaculty.setFacilityColor(existing.get(0).getFacilityColor());
         }
 
-        webFaculty.setRole(role);
-        webFaculty.setCreatedByEmail(email);
-        webFaculty.setBranchCode(branchCode);
         webFaculty.setUrl(url);
         webFaculty.setWebSecurityUrl(webSecurityUrl);
 
-        if (image != null && !image.isEmpty()) {
-            try {
-                String imageUrl = s3Service.uploadImage(image, branchCode);
-                webFaculty.setFacilityImage(imageUrl);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to upload facility image", e);
-            }
-        }
+//        if (image != null && !image.isEmpty()) {
+//            try {
+//                String imageUrl = s3Service.uploadImage(image);
+//                webFaculty.setFacilityImage(imageUrl);
+//            } catch (IOException e) {
+//                throw new RuntimeException("Failed to upload facility image", e);
+//            }
+//        }
 
         return repository.save(webFaculty);
     }
 
 
     @Override
-    public List<WebFaculty> getAllFacilitiesByBranchCode(String role, String email, String url, String branchCode) {
-        validateUrlExists(url,branchCode);
-
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view facilities by branch");
-        }
-
-        return repository.findAllByBranchCode(branchCode);
+    public List<WebFaculty> getAllFacilitiesByBranchCode(String url) {
+        validateUrlExists(url);
+        return repository.findAllOrderById();
     }
 
 
     @Override
-    public WebFaculty updateFacility(Long id, WebFaculty webFaculty, String role, String email, MultipartFile image, String url) {
-        validateUrlExists(url,null);
-
-        if (!permissionService.hasPermission(role, email, "PUT")) {
-            throw new AccessDeniedException("No permission to update facility");
-        }
+    public WebFaculty updateFacility(Long id, WebFaculty webFaculty, MultipartFile image, String url) {
+        validateUrlExists(url);
 
         WebFaculty existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Facility not found"));
@@ -127,31 +97,25 @@ public class FacultyServiceImpl implements FacultyService {
             repository.saveAll(allFacilities);
         }
 
-        String branchCode = permissionService.fetchBranchCode(role, email);
-
-        if (image != null && !image.isEmpty()) {
-            try {
-                String imageUrl = s3Service.uploadImage(image, branchCode);
-                if (existing.getFacilityImage() != null && existing.getFacilityImage().contains("amazonaws.com")) {
-                    s3Service.deleteImage(existing.getFacilityImage());
-                }
-                existing.setFacilityImage(imageUrl);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to upload facility image", e);
-            }
-        }
+//        if (image != null && !image.isEmpty()) {
+//            try {
+//                String imageUrl = s3Service.uploadImage(image);
+//                if (existing.getFacilityImage() != null && existing.getFacilityImage().contains("amazonaws.com")) {
+//                    s3Service.deleteImage(existing.getFacilityImage());
+//                }
+//                existing.setFacilityImage(imageUrl);
+//            } catch (IOException e) {
+//                throw new RuntimeException("Failed to upload facility image", e);
+//            }
+//        }
 
         return repository.save(existing);
     }
 
 
     @Override
-    public void deleteFacility(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-
-        if (!permissionService.hasPermission(role, email, "DELETE")) {
-            throw new AccessDeniedException("No permission to delete facility");
-        }
+    public void deleteFacility(Long id, String url) {
+        validateUrlExists(url);
 
         WebFaculty webFaculty = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Facility not found"));
@@ -164,12 +128,8 @@ public class FacultyServiceImpl implements FacultyService {
     }
 
     @Override
-    public WebFaculty getFacilityById(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view facility");
-        }
+    public WebFaculty getFacilityById(Long id, String url) {
+        validateUrlExists(url);
 
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Facility not found"));

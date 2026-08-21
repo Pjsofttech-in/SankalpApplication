@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "https://pjsofttech.in")
 public class CounterController {
 
     @Autowired
@@ -20,16 +19,14 @@ public class CounterController {
                                                     @RequestParam String role,
                                                     @RequestParam String email,
                                                     @RequestParam String url) {
-        return ResponseEntity.ok(service.createCounter(webCounter, role, email, url));
+        return ResponseEntity.ok(service.createCounter(webCounter, url));
     }
 
     @GetMapping("/getAllCounters")
     public ResponseEntity<List<WebCounter>> getAllCountersByBranchCode(
-            @RequestParam String role,
-            @RequestParam(required = false) String email,
-            @RequestParam String url,
-            @RequestParam String branchCode) {
-        return ResponseEntity.ok(service.getAllByBranchCode(role, email, url, branchCode));
+            
+            @RequestParam String url) {
+        return ResponseEntity.ok(service.getAllByBranchCode(url));
     }
 
     @GetMapping("/getCounterById/{id}")
@@ -37,7 +34,7 @@ public class CounterController {
                                                      @RequestParam String role,
                                                      @RequestParam String email,
                                                      @RequestParam String url) {
-        return ResponseEntity.ok(service.getCounterById(id, role, email, url));
+        return ResponseEntity.ok(service.getCounterById(id, url));
     }
 
     @PutMapping("/updateCounter/{id}")
@@ -46,7 +43,7 @@ public class CounterController {
                                                     @RequestParam String role,
                                                     @RequestParam String email,
                                                     @RequestParam String url) {
-        return ResponseEntity.ok(service.updateCounter(id, webCounter, role, email, url));
+        return ResponseEntity.ok(service.updateCounter(id, webCounter, url));
     }
 
     @DeleteMapping("/deleteCounter/{id}")
@@ -54,7 +51,7 @@ public class CounterController {
                                                 @RequestParam String role,
                                                 @RequestParam String email,
                                                 @RequestParam String url) {
-        service.deleteCounter(id, role, email, url);
+        service.deleteCounter(id, url);
         return ResponseEntity.ok("Counter deleted successfully");
     }
 }

@@ -12,6 +12,7 @@ import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.Strings;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -61,7 +62,7 @@ public class StudentServiceImpl implements StudentService {
             user.setRole(rolerepository.findByRoleNameIgnoreCase("student").orElseThrow(() -> new RuntimeException("Student Role not found")));
             user.setEmail(request.getEmail());
             user.setActive(true);
-            user.setFullName(request.getStudentName());
+            user.setFullName(request.getStudentName() + " " + request.getFatherName() + " " + request.getLastName());
             user.setMobile(request.getMobile());
             user.setPassword(passwordEncoder.encode(request.getPassword()));
             userRepository.saveAndFlush(user);
@@ -108,6 +109,8 @@ public class StudentServiceImpl implements StudentService {
 
         Student student = Student.builder()
                 .studentName(request.getStudentName())
+                .fatherName(request.getFatherName())
+                .lastName(request.getLastName())
                 .mobile(request.getMobile())
                 .email(request.getEmail())
                 .gender(request.getGender())
@@ -210,6 +213,8 @@ public class StudentServiceImpl implements StudentService {
         return StudentDTO.builder()
                 .id(student.getId())
                 .studentName(student.getStudentName())
+                .fatherName(student.getFatherName())
+                .lastName(student.getLastName())
                 .mobile(student.getMobile())
                 .email(student.getEmail())
                 .gender(student.getGender())

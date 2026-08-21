@@ -11,10 +11,8 @@ import java.util.Optional;
 @Repository
 public interface MapAndImagesRepository extends JpaRepository<WebMapAndImages, Long> {
 
-    @Query("SELECT m FROM WebMapAndImages m WHERE m.branchCode = :branchCode ORDER BY m.id DESC")
-    List<WebMapAndImages> findAllByBranchCode(String branchCode);
-
-    Optional<WebMapAndImages> findFirstByBranchCode(String branchCode);
+    @Query("SELECT m FROM WebMapAndImages m ORDER BY m.id DESC")
+    List<WebMapAndImages> findAllOrderById();
 
     
 }

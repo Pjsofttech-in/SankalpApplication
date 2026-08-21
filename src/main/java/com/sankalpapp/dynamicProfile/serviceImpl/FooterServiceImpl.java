@@ -2,14 +2,11 @@ package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebFooter;
 import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
-import com.sankalpapp.exception.AlreadyExistsException;
 import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.FooterRepository;
 import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.service.FooterService;
-import com.sankalpapp.dynamicProfile.service.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,25 +18,15 @@ public class FooterServiceImpl implements FooterService {
     private FooterRepository repository;
 
     @Autowired
-    private PermissionService permissionService;
-
-    @Autowired
     private SecurityUrlrepository securityUrlRepository;
 
-    private void validateUrlExists(String url, String branchCode) {
+    private void validateUrlExists(String url) {
 
         String normalizedUrl = normalizeUrl(url);
-        if (branchCode == null || branchCode.isBlank()) {
-            securityUrlRepository.findByUrl(normalizedUrl)
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Provided URL [" + url + "] does not exist"
-                    ));
-            return;
-        }
 
-        securityUrlRepository.findByUrlAndBranchCode(normalizedUrl, branchCode)
+        securityUrlRepository.findByUrl(normalizedUrl)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed for branchCode [" + branchCode + "]"
+                        "URL [" + url + "] is not allowed for branchCode"
                 ));
     }
 
@@ -48,27 +35,13 @@ public class FooterServiceImpl implements FooterService {
         return url.split(",")[0].trim().toLowerCase();
     }
     @Override
-    public WebFooter createFooter(WebFooter webFooter, String role, String email, String url) {
-        validateUrlExists(url,null);
-
-        if (!permissionService.hasPermission(role, email, "POST")) {
-            throw new AccessDeniedException("No permission to create footer");
-        }
-
-        String branchCode = permissionService.fetchBranchCode(role, email);
-
-        // Check if a footer already exists for this branch
-        repository.findFirstByBranchCode(branchCode).ifPresent(existing -> {
-            throw new AlreadyExistsException("Footer already exists for this branch");
-        });
+    public WebFooter createFooter(WebFooter webFooter, String url) {
+        validateUrlExists(url);
 
         String normalizedUrl = normalizeUrl(url);
         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizedUrl)
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
-        webFooter.setRole(role);
-        webFooter.setCreatedByEmail(email);
-        webFooter.setBranchCode(branchCode);
         webFooter.setUrl(url);
         webFooter.setWebSecurityUrl(webSecurityUrl);
 
@@ -77,24 +50,16 @@ public class FooterServiceImpl implements FooterService {
 
 
     @Override
-    public List<WebFooter> getAllFootersByBranchCode(String role, String email, String url, String branchCode) {
-        validateUrlExists(url,branchCode);
+    public List<WebFooter> getAllFootersByBranchCode(String url) {
+        validateUrlExists(url);
 
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view footer by branch");
-        }
-
-        return repository.findAllByBranchCode(branchCode);
+        return repository.findAllOrderById();
     }
 
 
     @Override
-    public WebFooter updateFooter(Long id, WebFooter webFooter, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "PUT")) {
-            throw new AccessDeniedException("No permission to update footer");
-        }
-
+    public WebFooter updateFooter(Long id, WebFooter webFooter, String url) {
+        validateUrlExists(url);
         WebFooter existing = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Footer not found"));
 
@@ -114,11 +79,8 @@ public class FooterServiceImpl implements FooterService {
     }
 
     @Override
-    public void deleteFooter(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "DELETE")) {
-            throw new AccessDeniedException("No permission to delete footer");
-        }
+    public void deleteFooter(Long id, String url) {
+        validateUrlExists(url);
 
         repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Footer not found"));
@@ -127,11 +89,8 @@ public class FooterServiceImpl implements FooterService {
     }
 
     @Override
-    public WebFooter getFooterById(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view footer");
-        }
+    public WebFooter getFooterById(Long id, String url) {
+        validateUrlExists(url);
 
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Footer not found"));

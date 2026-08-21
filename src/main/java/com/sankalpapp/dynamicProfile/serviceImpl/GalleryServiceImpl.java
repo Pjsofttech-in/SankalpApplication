@@ -6,14 +6,11 @@ import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.GalleryRepository;
 import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.service.GalleryService;
-import com.sankalpapp.dynamicProfile.service.PermissionService;
 import com.sankalpapp.dynamicProfile.service.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,27 +22,17 @@ public class GalleryServiceImpl implements GalleryService {
     private GalleryRepository repository;
 
     @Autowired
-    private PermissionService permissionService;
-
-    @Autowired
     private SecurityUrlrepository securityUrlRepository;
 
     @Autowired
     private S3Service s3Service;
 
-    private void validateUrlExists(String url, String branchCode) {
+    private void validateUrlExists(String url) {
 
         String normalizedUrl = normalizeUrl(url);
-        if (branchCode == null || branchCode.isBlank()) {
-            securityUrlRepository.findByUrl(normalizedUrl)
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Provided URL [" + url + "] does not exist"
-                    ));
-            return;
-        }
-        securityUrlRepository.findByUrlAndBranchCode(normalizedUrl, branchCode)
+        securityUrlRepository.findByUrl(normalizedUrl)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed for branchCode [" + branchCode + "]"
+                        "URL [" + url + "] is not allowed for branchCode "
                 ));
     }
 
@@ -55,19 +42,12 @@ public class GalleryServiceImpl implements GalleryService {
     }
 
     @Override
-    public WebGallery createGallery(WebGallery webGallery, String role, String email, List<MultipartFile> images, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "POST"))
-            throw new AccessDeniedException("No permission to create gallery");
-
-        String branchCode = permissionService.fetchBranchCode(role, email);
+    public WebGallery createGallery(WebGallery webGallery, List<MultipartFile> images, String url) {
+        validateUrlExists(url);
 
         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("Security URL not found"));
 
-        webGallery.setBranchCode(branchCode);
-        webGallery.setCreatedByEmail(email);
-        webGallery.setRole(role);
         webGallery.setUrl(url);
         webGallery.setWebSecurityUrl(webSecurityUrl);
 
@@ -78,40 +58,34 @@ public class GalleryServiceImpl implements GalleryService {
         }
 
         // Upload images to S3
-        List<String> uploaded = new ArrayList<>();
-        if (images != null) {
-            for (MultipartFile image : images) {
-                try {
-                    String imageUrl = s3Service.uploadImage(image, branchCode);
-                    uploaded.add(imageUrl);
-                } catch (IOException e) {
-                    throw new RuntimeException("Image upload failed", e);
-                }
-            }
-        }
-        webGallery.setGalleryImages(uploaded);
+//        List<String> uploaded = new ArrayList<>();
+//        if (images != null) {
+//            for (MultipartFile image : images) {
+//                try {
+//                    String imageUrl = s3Service.uploadImage(image);
+//                    uploaded.add(imageUrl);
+//                } catch (IOException e) {
+//                    throw new RuntimeException("Image upload failed", e);
+//                }
+//            }
+//        }
+//        webGallery.setGalleryImages(uploaded);
 
         return repository.save(webGallery);
     }
 
 
     @Override
-    public List<WebGallery> getAllGalleriesByBranchCode(String role, String email, String url, String branchCode) {
-        validateUrlExists(url,branchCode);
-        if (!permissionService.hasPermission(role, email, "GET"))
-            throw new AccessDeniedException("No permission to view galleries by branch");
-
-        return repository.findAllByBranchCode(branchCode);
+    public List<WebGallery> getAllGalleriesByBranchCode(String url) {
+        validateUrlExists(url);
+        return repository.findAllOrderById();
     }
 
 
     @Override
-    public WebGallery updateGallery(Long id, WebGallery webGallery, String role, String email,
+    public WebGallery updateGallery(Long id, WebGallery webGallery,
                                     List<MultipartFile> newImages, List<String> deleteImages, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "PUT"))
-            throw new AccessDeniedException("No permission");
-
+        validateUrlExists(url);
         WebGallery existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found"));
 
@@ -142,17 +116,17 @@ public class GalleryServiceImpl implements GalleryService {
             });
         }
 
-        if (newImages != null) {
-            String branchCode = permissionService.fetchBranchCode(role, email);
-            for (MultipartFile image : newImages) {
-                try {
-                    String imageUrl = s3Service.uploadImage(image, branchCode);
-                    currentImages.add(imageUrl);
-                } catch (IOException e) {
-                    throw new RuntimeException("Image upload failed", e);
-                }
-            }
-        }
+//        if (newImages != null) {
+//            String branchCode = permissionService.fetchBranchCode(role, email);
+//            for (MultipartFile image : newImages) {
+//                try {
+//                    String imageUrl = s3Service.uploadImage(image);
+//                    currentImages.add(imageUrl);
+//                } catch (IOException e) {
+//                    throw new RuntimeException("Image upload failed", e);
+//                }
+//            }
+//        }
 
         existing.setGalleryImages(currentImages);
         return repository.save(existing);
@@ -164,10 +138,8 @@ public class GalleryServiceImpl implements GalleryService {
     }
 
     @Override
-    public void deleteGallery(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "DELETE"))
-            throw new AccessDeniedException("No permission");
+    public void deleteGallery(Long id, String url) {
+        validateUrlExists(url);
 
         WebGallery webGallery = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found"));
@@ -182,10 +154,8 @@ public class GalleryServiceImpl implements GalleryService {
     }
 
     @Override
-    public WebGallery getGalleryById(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "GET"))
-            throw new AccessDeniedException("No permission");
+    public WebGallery getGalleryById(Long id, String url) {
+        validateUrlExists(url);
 
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found"));

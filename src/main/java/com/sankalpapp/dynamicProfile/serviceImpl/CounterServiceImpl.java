@@ -6,9 +6,7 @@ import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.CounterRepository;
 import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.service.CounterService;
-import com.sankalpapp.dynamicProfile.service.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,24 +18,14 @@ public class CounterServiceImpl implements CounterService {
     private CounterRepository repository;
 
     @Autowired
-    private PermissionService permissionService;
-
-    @Autowired
     private SecurityUrlrepository securityUrlRepository;
 
-    private void validateUrlExists(String url, String branchCode) {
+    private void validateUrlExists(String url) {
 
         String normalizedUrl = normalizeUrl(url);
-        if (branchCode == null || branchCode.isBlank()) {
-            securityUrlRepository.findByUrl(normalizedUrl)
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Provided URL [" + url + "] does not exist"
-                    ));
-            return;
-        }
-        securityUrlRepository.findByUrlAndBranchCode(normalizedUrl, branchCode)
+        securityUrlRepository.findByUrl(normalizedUrl)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed for branchCode [" + branchCode + "]"
+                        "URL [" + url + "] is not allowed"
                 ));
     }
 
@@ -47,20 +35,12 @@ public class CounterServiceImpl implements CounterService {
     }
 
     @Override
-    public WebCounter createCounter(WebCounter webCounter, String role, String email, String url) {
-        validateUrlExists(url,null);
+    public WebCounter createCounter(WebCounter webCounter, String url) {
+        validateUrlExists(url);
 
-        if (!permissionService.hasPermission(role, email, "POST")) {
-            throw new AccessDeniedException("No permission to create counter");
-        }
-
-        String branchCode = permissionService.fetchBranchCode(role, email);
         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("URL not found"));
 
-        webCounter.setRole(role);
-        webCounter.setCreatedByEmail(email);
-        webCounter.setBranchCode(branchCode);
         webCounter.setWebSecurityUrl(webSecurityUrl);
         webCounter.setUrl(url);
 
@@ -68,24 +48,16 @@ public class CounterServiceImpl implements CounterService {
     }
 
     @Override
-    public List<WebCounter> getAllByBranchCode(String role, String email, String url, String branchCode) {
-        validateUrlExists(url,branchCode);
+    public List<WebCounter> getAllByBranchCode(String url) {
+        validateUrlExists(url);
 
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view counters");
-        }
-
-        return repository.findAllByBranchCode(branchCode);
+        return repository.findAllOrderById();
     }
 
 
     @Override
-    public WebCounter updateCounter(Long id, WebCounter webCounter, String role, String email, String url) {
-        validateUrlExists(url,null);
-
-        if (!permissionService.hasPermission(role, email, "PUT")) {
-            throw new AccessDeniedException("No permission to update counter");
-        }
+    public WebCounter updateCounter(Long id, WebCounter webCounter, String url) {
+        validateUrlExists(url);
 
         WebCounter existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Counter not found"));
@@ -109,12 +81,8 @@ public class CounterServiceImpl implements CounterService {
     }
 
     @Override
-    public void deleteCounter(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-
-        if (!permissionService.hasPermission(role, email, "DELETE")) {
-            throw new AccessDeniedException("No permission to delete counter");
-        }
+    public void deleteCounter(Long id, String url) {
+        validateUrlExists(url);
 
         WebCounter webCounter = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Counter not found"));
@@ -123,12 +91,8 @@ public class CounterServiceImpl implements CounterService {
     }
 
     @Override
-    public WebCounter getCounterById(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view counter");
-        }
+    public WebCounter getCounterById(Long id, String url) {
+        validateUrlExists(url);
 
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Counter not found"));

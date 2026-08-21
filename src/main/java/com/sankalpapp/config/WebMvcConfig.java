@@ -13,7 +13,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         configurer.addPathPrefix(
                 "/api2",
                 c -> c.getPackageName().startsWith(
-                        "com.sankalpapp.dynamicprofile"
+                        "com.sankalpapp.dynamicProfile"
                 )
         );
     }

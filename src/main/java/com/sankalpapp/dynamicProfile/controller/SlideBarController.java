@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "https://pjsofttech.in")
 public class SlideBarController {
 
     @Autowired
@@ -20,37 +19,28 @@ public class SlideBarController {
 
     @PostMapping("/createSlideBar")
     public ResponseEntity<WebSlideBar> createSlideBar(@RequestParam("slideBar") String slideBarJson,
-                                                      @RequestParam String role,
-                                                      @RequestParam String email,
                                                       @RequestParam String url,
                                                       @RequestParam(value = "slideBarImages", required = false) List<MultipartFile> slideBarImages)
             throws JsonProcessingException {
 
         WebSlideBar webSlideBar = new ObjectMapper().readValue(slideBarJson, WebSlideBar.class);
-        return ResponseEntity.ok(service.createSlideBar(webSlideBar, role, email, slideBarImages, url));
+        return ResponseEntity.ok(service.createSlideBar(webSlideBar, slideBarImages, url));
     }
 
     @GetMapping("/getAllSlideBars")
-    public ResponseEntity<List<WebSlideBar>> getAllSlideBarsByBranchCode(@RequestParam String role,
-                                                                         @RequestParam(required = false) String email,
-                                                                         @RequestParam String branchCode,
-                                                                         @RequestParam String url) {
-        return ResponseEntity.ok(service.getAllByBranchCode(role, email, branchCode, url));
+    public ResponseEntity<List<WebSlideBar>> getAllSlideBarsByBranchCode(@RequestParam String url) {
+        return ResponseEntity.ok(service.getAllByBranchCode(url));
     }
 
     @GetMapping("/getSlideBarById/{id}")
     public ResponseEntity<WebSlideBar> getSlideBarById(@PathVariable Long id,
-                                                       @RequestParam String role,
-                                                       @RequestParam String email,
                                                        @RequestParam String url) {
-        return ResponseEntity.ok(service.getSlideBarById(id, role, email, url));
+        return ResponseEntity.ok(service.getSlideBarById(id, url));
     }
 
     @PutMapping("/updateSlideBar/{id}")
     public ResponseEntity<WebSlideBar> updateSlideBar(@PathVariable Long id,
                                                       @RequestParam(value = "slideBar", required = false) String slideBarJson,
-                                                      @RequestParam String role,
-                                                      @RequestParam String email,
                                                       @RequestParam String url,
                                                       @RequestParam(value = "newImages", required = false) List<MultipartFile> newImages,
                                                       @RequestParam(value = "deleteImages", required = false) List<MultipartFile> deleteImageFiles)
@@ -69,16 +59,14 @@ public class SlideBarController {
                 .toList()
                 : null;
 
-        WebSlideBar updated = service.updateSlideBar(id, webSlideBar, role, email, newImages, deleteImageNames, url);
+        WebSlideBar updated = service.updateSlideBar(id, webSlideBar, newImages, deleteImageNames, url);
         return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/deleteSlideBar/{id}")
     public ResponseEntity<String> deleteSlideBar(@PathVariable Long id,
-                                                 @RequestParam String role,
-                                                 @RequestParam String email,
                                                  @RequestParam String url) {
-        service.deleteSlideBar(id, role, email, url);
+        service.deleteSlideBar(id, url);
         return ResponseEntity.ok("SlideBar deleted successfully");
     }
 }

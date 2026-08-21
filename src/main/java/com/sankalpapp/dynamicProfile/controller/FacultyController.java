@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "https://pjsofttech.in")
 public class FacultyController {
 
     @Autowired
@@ -22,52 +21,42 @@ public class FacultyController {
     @PostMapping(value = "/createFacility", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<WebFaculty> createFacility(
             @RequestPart("facility") String facilityJson,
-            @RequestParam String role,
-            @RequestParam String email,
             @RequestParam String url,
             @RequestPart("facilityImageName") MultipartFile imageFile) throws JsonProcessingException {
 
 
         WebFaculty webFaculty = new ObjectMapper().readValue(facilityJson, WebFaculty.class);
 
-        return ResponseEntity.ok(service.createFacility(webFaculty, role, email, imageFile, url));
+        return ResponseEntity.ok(service.createFacility(webFaculty, imageFile, url));
     }
 
     @GetMapping("/getAllFacilities")
     public ResponseEntity<List<WebFaculty>> getAllFacilitiesByBranchCode(
-            @RequestParam String role,
-            @RequestParam(required = false) String email,
-            @RequestParam String url,
-            @RequestParam String branchCode) {
-        return ResponseEntity.ok(service.getAllFacilitiesByBranchCode(role, email, url, branchCode));
+            
+            @RequestParam String url) {
+        return ResponseEntity.ok(service.getAllFacilitiesByBranchCode(url));
     }
 
     @GetMapping("/getFacilityById/{id}")
     public ResponseEntity<WebFaculty> getFacilityById(@PathVariable Long id,
-                                                      @RequestParam String role,
-                                                      @RequestParam String email,
                                                       @RequestParam String url) {
-        return ResponseEntity.ok(service.getFacilityById(id, role, email, url));
+        return ResponseEntity.ok(service.getFacilityById(id, url));
     }
 
     @PutMapping(value = "/updateFacility/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<WebFaculty> updateFacility(@PathVariable Long id,
                                                      @RequestPart("facility") String facilityJson,
                                                      @RequestPart(value = "facilityImage", required = false) MultipartFile image,
-                                                     @RequestParam String role,
-                                                     @RequestParam String email,
                                                      @RequestParam String url) throws JsonProcessingException {
 
         WebFaculty webFaculty = new ObjectMapper().readValue(facilityJson, WebFaculty.class);
-        return ResponseEntity.ok(service.updateFacility(id, webFaculty, role, email, image, url));
+        return ResponseEntity.ok(service.updateFacility(id, webFaculty, image, url));
     }
 
     @DeleteMapping("/deleteFacility/{id}")
     public ResponseEntity<String> deleteFacility(@PathVariable Long id,
-                                                 @RequestParam String role,
-                                                 @RequestParam String email,
                                                  @RequestParam String url) {
-        service.deleteFacility(id, role, email, url);
+        service.deleteFacility(id, url);
         return ResponseEntity.ok("Facility deleted successfully");
     }
 

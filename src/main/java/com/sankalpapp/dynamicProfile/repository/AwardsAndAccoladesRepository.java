@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface AwardsAndAccoladesRepository extends JpaRepository<WebAwardsAndAccolades, Long> {
 
-    @Query("SELECT a FROM WebAwardsAndAccolades a WHERE a.branchCode = :branchCode ORDER BY a.id DESC")
-    List<WebAwardsAndAccolades> findAllByBranchCode(String branchCode);
+    @Query("SELECT a FROM WebAwardsAndAccolades a ORDER BY a.id DESC")
+    List<WebAwardsAndAccolades> findAllOrderById();
 }

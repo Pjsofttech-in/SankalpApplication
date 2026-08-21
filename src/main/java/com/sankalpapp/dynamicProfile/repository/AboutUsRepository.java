@@ -11,9 +11,7 @@ import java.util.Optional;
 @Repository
 public interface AboutUsRepository extends JpaRepository<WebAboutUs, Integer> {
 
-    @Query("SELECT a FROM WebAboutUs a WHERE a.branchCode = :branchCode ORDER BY a.id DESC")
-    List<WebAboutUs> findAllByBranchCode(String branchCode);
-
-    Optional<WebAboutUs> findFirstByBranchCode(String branchCode);
+    @Query("SELECT a FROM WebAboutUs a ORDER BY a.id DESC")
+    List<WebAboutUs> findAllOrderById();
 
 }

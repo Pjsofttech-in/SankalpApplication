@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface WebHRDetailsRepository extends JpaRepository<WebHRDetails, Long> {
 
-    @Query("SELECT w FROM WebHRDetails w WHERE w.webSecurityUrl.branchCode = :branchCode ORDER BY w.id DESC")
-    List<WebHRDetails> findAllByBranchCode(String branchCode);
+    @Query("SELECT w FROM WebHRDetails w ORDER BY w.id DESC")
+    List<WebHRDetails> findAllOrderById();
 }

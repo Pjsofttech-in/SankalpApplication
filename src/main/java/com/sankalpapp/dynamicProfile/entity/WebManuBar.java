@@ -23,10 +23,9 @@ public class  WebManuBar {
     private String url;
     private String menubarName;
 
-    @Email
-    private String createdByEmail;
-    private String role;
-    private String branchCode;
+    
+    
+    
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")

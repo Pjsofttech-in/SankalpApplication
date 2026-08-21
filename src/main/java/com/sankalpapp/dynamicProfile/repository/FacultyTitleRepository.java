@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface FacultyTitleRepository extends JpaRepository<WebFacultyTitle, Long> {
-    @Query("SELECT f FROM WebFacultyTitle f WHERE f.branchCode = :branchCode ORDER BY f.id DESC")
-    List<WebFacultyTitle> findAllByBranchCode(String branchCode);
+    @Query("SELECT f FROM WebFacultyTitle f ORDER BY f.id DESC")
+    List<WebFacultyTitle> findAllOrderById();
 }

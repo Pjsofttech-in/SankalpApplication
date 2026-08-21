@@ -6,9 +6,7 @@ import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.FacultyTitleRepository;
 import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.service.FacultyTitleService;
-import com.sankalpapp.dynamicProfile.service.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,25 +18,15 @@ public class FacultyTitleServiceImpl implements FacultyTitleService {
     private FacultyTitleRepository repository;
 
     @Autowired
-    private PermissionService permissionService;
-
-    @Autowired
     private SecurityUrlrepository securityUrlRepository;
 
-    private void validateUrlExists(String url, String branchCode) {
+    private void validateUrlExists(String url) {
 
         String normalizedUrl = normalizeUrl(url);
-        if (branchCode == null || branchCode.isBlank()) {
-            securityUrlRepository.findByUrl(normalizedUrl)
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Provided URL [" + url + "] does not exist"
-                    ));
-            return;
-        }
 
-        securityUrlRepository.findByUrlAndBranchCode(normalizedUrl, branchCode)
+        securityUrlRepository.findByUrl(normalizedUrl)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed for branchCode [" + branchCode + "]"
+                        "URL [" + url + "] is not allowed for branchCode"
                 ));
     }
 
@@ -48,19 +36,11 @@ public class FacultyTitleServiceImpl implements FacultyTitleService {
     }
 
     @Override
-    public WebFacultyTitle createFacilityTitle(WebFacultyTitle webFacultyTitle, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "POST")) {
-            throw new AccessDeniedException("No permission to create facility title");
-        }
-
-        String branchCode = permissionService.fetchBranchCode(role, email);
+    public WebFacultyTitle createFacilityTitle(WebFacultyTitle webFacultyTitle, String url) {
+        validateUrlExists(url);
         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
-        webFacultyTitle.setRole(role);
-        webFacultyTitle.setCreatedByEmail(email);
-        webFacultyTitle.setBranchCode(branchCode);
         webFacultyTitle.setWebSecurityUrl(webSecurityUrl);
         webFacultyTitle.setUrl(url);
 
@@ -68,21 +48,15 @@ public class FacultyTitleServiceImpl implements FacultyTitleService {
     }
 
     @Override
-    public List<WebFacultyTitle> getAllFacilityTitlesByBranchCode(String role, String email, String url, String branchCode) {
-        validateUrlExists(url,branchCode);
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view facility titles by branch");
-        }
-        return repository.findAllByBranchCode(branchCode);
+    public List<WebFacultyTitle> getAllFacilityTitlesByBranchCode(String url) {
+        validateUrlExists(url);
+        return repository.findAllOrderById();
     }
 
 
     @Override
-    public WebFacultyTitle updateFacilityTitle(Long id, WebFacultyTitle updated, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "PUT")) {
-            throw new AccessDeniedException("No permission to update facility title");
-        }
+    public WebFacultyTitle updateFacilityTitle(Long id, WebFacultyTitle updated, String url) {
+        validateUrlExists(url);
 
         WebFacultyTitle existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("FacilityTitle not found"));
@@ -93,22 +67,16 @@ public class FacultyTitleServiceImpl implements FacultyTitleService {
     }
 
     @Override
-    public void deleteFacilityTitle(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "DELETE")) {
-            throw new AccessDeniedException("No permission to delete facility title");
-        }
+    public void deleteFacilityTitle(Long id, String url) {
+        validateUrlExists(url);
 
         repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("FacilityTitle not found"));
         repository.deleteById(id);
     }
 
     @Override
-    public WebFacultyTitle getFacilityTitleById(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view facility title");
-        }
+    public WebFacultyTitle getFacilityTitleById(Long id, String url) {
+        validateUrlExists(url);
 
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("FacilityTitle not found"));

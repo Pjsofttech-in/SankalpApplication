@@ -11,9 +11,7 @@ import java.util.Optional;
 @Repository
 public interface VisionMissionRepository extends JpaRepository<WebVisionMission, Long> {
 
-    @Query("SELECT v FROM WebVisionMission v WHERE v.branchCode = :branchCode ORDER BY v.id DESC")
-    List<WebVisionMission> findAllByBranchCode(String branchCode);
-
-    Optional<WebVisionMission> findFirstByBranchCode(String branchCode);
+    @Query("SELECT v FROM WebVisionMission v ORDER BY v.id DESC")
+    List<WebVisionMission> findAllOrderById();
 
 }

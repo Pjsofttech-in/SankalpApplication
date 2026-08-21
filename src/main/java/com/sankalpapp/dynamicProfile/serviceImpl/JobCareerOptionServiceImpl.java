@@ -9,7 +9,6 @@ import com.sankalpapp.dynamicProfile.repository.JobCareerOptionRepository;
 import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.repository.WebHRDetailsRepository;
 import com.sankalpapp.dynamicProfile.service.JobCareerOptionService;
-import com.sankalpapp.dynamicProfile.service.PermissionService;
 import com.sankalpapp.dynamicProfile.service.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -27,9 +26,6 @@ public class JobCareerOptionServiceImpl implements JobCareerOptionService {
     private JobCareerOptionRepository repository;
 
     @Autowired
-    private PermissionService permissionService;
-
-    @Autowired
     private SecurityUrlrepository securityUrlRepository;
 
     @Autowired
@@ -39,19 +35,12 @@ public class JobCareerOptionServiceImpl implements JobCareerOptionService {
     private S3Service s3Service;
 
 
-    private void validateUrlExists(String url, String branchCode) {
+    private void validateUrlExists(String url) {
 
         String normalizedUrl = normalizeUrl(url);
-        if (branchCode == null || branchCode.isBlank()) {
-            securityUrlRepository.findByUrl(normalizedUrl)
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Provided URL [" + url + "] does not exist"
-                    ));
-            return;
-        }
-        securityUrlRepository.findByUrlAndBranchCode(normalizedUrl, branchCode)
+        securityUrlRepository.findByUrl(normalizedUrl)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed for branchCode [" + branchCode + "]"
+                        "URL [" + url + "] is not allowed for branchCode"
                 ));
     }
 
@@ -61,13 +50,9 @@ public class JobCareerOptionServiceImpl implements JobCareerOptionService {
     }
 
     @Override
-    public WebJobCareerOptionDTO create(WebJobCareerOption option, String role, String email, MultipartFile resumeFile, String url, Long webHRDetailsId) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "POST")) {
-            throw new AccessDeniedException("No permission to create job post");
-        }
+    public WebJobCareerOptionDTO create(WebJobCareerOption option, MultipartFile resumeFile, String url, Long webHRDetailsId) {
+        validateUrlExists(url);
 
-        String branchCode = permissionService.fetchBranchCode(role, email);
         WebHRDetails webHRDetails = webHRDetailsRepository.findById(webHRDetailsId)
                 .orElseThrow(() -> new ResourceNotFoundException("HR not found by id: " + webHRDetailsId));
 
@@ -79,32 +64,26 @@ public class JobCareerOptionServiceImpl implements JobCareerOptionService {
             option.setJobColour(existingJobs.get(0).getJobColour());
         }
 
-        option.setRole(role);
-        option.setCreatedByEmail(email);
-        option.setBranchCode(branchCode);
         option.setUrl(url);
         option.setPostDate(LocalDate.now());
         option.setWebHRDetails(webHRDetails);
         option.setWebSecurityUrl(webSecurityUrl);
 
-        if (resumeFile != null && !resumeFile.isEmpty()) {
-            try {
-                String uploadedUrl = s3Service.uploadImage(resumeFile, branchCode);
-                option.setResumeUrl(uploadedUrl);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to upload resume PDF to S3", e);
-            }
-        }
+//        if (resumeFile != null && !resumeFile.isEmpty()) {
+//            try {
+//                String uploadedUrl = s3Service.uploadImage(resumeFile);
+//                option.setResumeUrl(uploadedUrl);
+//            } catch (IOException e) {
+//                throw new RuntimeException("Failed to upload resume PDF to S3", e);
+//            }
+//        }
 
         return mapToDTO(repository.save(option));
     }
 
     @Override
-    public WebJobCareerOptionDTO update(Long id, WebJobCareerOption option, String role, String email, MultipartFile resumeFile, String url, Long webHRDetailsId) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "PUT")) {
-            throw new AccessDeniedException("No permission to update job post");
-        }
+    public WebJobCareerOptionDTO update(Long id, WebJobCareerOption option, MultipartFile resumeFile, String url, Long webHRDetailsId) {
+        validateUrlExists(url);
 
         WebJobCareerOption existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Job post not found"));
@@ -119,11 +98,9 @@ public class JobCareerOptionServiceImpl implements JobCareerOptionService {
         existing.setUrl(option.getUrl() != null ? option.getUrl() : existing.getUrl());
         existing.setJobVacancy(option.getJobVacancy() != null ? option.getJobVacancy() : existing.getJobVacancy());
 
-        String branchCode = permissionService.fetchBranchCode(role, email);
-
         if (resumeFile != null && !resumeFile.isEmpty()) {
             try {
-                String uploadedUrl = s3Service.uploadImage(resumeFile, branchCode);
+                String uploadedUrl = s3Service.uploadImage(resumeFile);
                 existing.setResumeUrl(uploadedUrl);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to upload resume to S3", e);
@@ -151,24 +128,18 @@ public class JobCareerOptionServiceImpl implements JobCareerOptionService {
 
 
     @Override
-    public List<WebJobCareerOptionDTO> getAllByBranchCode(String role, String email, String url, String branchCode) {
-        validateUrlExists(url,branchCode);
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view job posts");
-        }
+    public List<WebJobCareerOptionDTO> getAllByBranchCode(String url) {
+        validateUrlExists(url);
 
-        return repository.findAllByBranchCode(branchCode)
+        return repository.findAllOrderById()
                 .stream()
                 .map(this::mapToDTO)
                 .toList();
     }
 
     @Override
-    public WebJobCareerOptionDTO getById(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view job post");
-        }
+    public WebJobCareerOptionDTO getById(Long id, String url) {
+        validateUrlExists(url);
 
         WebJobCareerOption job = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Job post not found"));
@@ -190,9 +161,6 @@ public class JobCareerOptionServiceImpl implements JobCareerOptionService {
         dto.setJobVacancy(option.getJobVacancy());
         dto.setUrl(option.getUrl());
         dto.setJobColour(option.getJobColour());
-        dto.setCreatedByEmail(option.getCreatedByEmail());
-        dto.setRole(option.getRole());
-        dto.setBranchCode(option.getBranchCode());
 
         if (option.getWebHRDetails() != null) {
             dto.setWebHRDetailsId(option.getWebHRDetails().getId());
@@ -203,12 +171,8 @@ public class JobCareerOptionServiceImpl implements JobCareerOptionService {
     }
 
     @Override
-    public void delete(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-
-        if (!permissionService.hasPermission(role, email, "DELETE")) {
-            throw new AccessDeniedException("No permission to delete job post");
-        }
+    public void delete(Long id, String url) {
+        validateUrlExists(url);
 
         WebJobCareerOption job = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Job post not found with ID: " + id));

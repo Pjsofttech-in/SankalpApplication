@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface CourseRepository extends JpaRepository<WebCourse, Integer> {
 
-    @Query("SELECT c FROM WebCourse c WHERE c.branchCode = :branchCode ORDER BY c.id DESC")
-    List<WebCourse> findAllByBranchCode(String branchCode);
+    @Query("SELECT c FROM WebCourse c ORDER BY c.id DESC")
+    List<WebCourse> findAllOrderById();
 }

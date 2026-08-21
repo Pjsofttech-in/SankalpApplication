@@ -6,14 +6,11 @@ import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.CourseRepository;
 import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.service.CourseService;
-import com.sankalpapp.dynamicProfile.service.PermissionService;
 import com.sankalpapp.dynamicProfile.service.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -23,28 +20,18 @@ public class CourseServiceImpl implements CourseService {
     private CourseRepository repository;
 
     @Autowired
-    private PermissionService permissionService;
-
-    @Autowired
     private SecurityUrlrepository securityUrlRepository;
 
     @Autowired
     private S3Service s3Service;
 
-    private void validateUrlExists(String url, String branchCode) {
+    private void validateUrlExists(String url) {
 
         String normalizedUrl = normalizeUrl(url);
-        if (branchCode == null || branchCode.isBlank()) {
-            securityUrlRepository.findByUrl(normalizedUrl)
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Provided URL [" + url + "] does not exist"
-                    ));
-            return;
-        }
 
-        securityUrlRepository.findByUrlAndBranchCode(normalizedUrl, branchCode)
+        securityUrlRepository.findByUrl(normalizedUrl)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed for branchCode [" + branchCode + "]"
+                        "URL [" + url + "] is not allowed"
                 ));
     }
 
@@ -54,15 +41,9 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public WebCourse createCourse(WebCourse webCourse, String role, String email, MultipartFile courseImage, String url) {
-        validateUrlExists(url, null);
+    public WebCourse createCourse(WebCourse webCourse, MultipartFile courseImage, String url) {
+        validateUrlExists(url);
 
-
-        if (!permissionService.hasPermission(role, email, "POST")) {
-            throw new AccessDeniedException("No permission to create course");
-        }
-
-        String branchCode = permissionService.fetchBranchCode(role, email);
         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
@@ -73,20 +54,17 @@ public class CourseServiceImpl implements CourseService {
         }
         // ✅ If it's the first course, use the color from the request (leave as-is)
 
-        webCourse.setRole(role);
-        webCourse.setCreatedByEmail(email);
-        webCourse.setBranchCode(branchCode);
         webCourse.setUrl(url);
         webCourse.setWebSecurityUrl(webSecurityUrl);
 
-        if (courseImage != null && !courseImage.isEmpty()) {
-            try {
-                String imageUrl = s3Service.uploadImage(courseImage, branchCode);
-                webCourse.setCourseImage(imageUrl);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to upload course image", e);
-            }
-        }
+//        if (courseImage != null && !courseImage.isEmpty()) {
+//            try {
+//                String imageUrl = s3Service.uploadImage(courseImage);
+//                webCourse.setCourseImage(imageUrl);
+//            } catch (IOException e) {
+//                throw new RuntimeException("Failed to upload course image", e);
+//            }
+//        }
 
         return repository.save(webCourse);
     }
@@ -94,24 +72,16 @@ public class CourseServiceImpl implements CourseService {
 
 
     @Override
-    public List<WebCourse> getAllCoursesByBranchCode(String role, String email, String branchCode, String url) {
-        validateUrlExists(url,branchCode);
+    public List<WebCourse> getAllCoursesByBranchCode(String url) {
+        validateUrlExists(url);
 
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view courses by branch code");
-        }
-
-        return repository.findAllByBranchCode(branchCode);
+        return repository.findAllOrderById();
     }
 
 
     @Override
-    public WebCourse updateCourse(int id, WebCourse webCourse, String role, String email, MultipartFile courseImage, String url) {
-        validateUrlExists(url,null);
-
-        if (!permissionService.hasPermission(role, email, "PUT")) {
-            throw new AccessDeniedException("No permission to update course");
-        }
+    public WebCourse updateCourse(int id, WebCourse webCourse, MultipartFile courseImage, String url) {
+        validateUrlExists(url);
 
         WebCourse existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
@@ -130,32 +100,27 @@ public class CourseServiceImpl implements CourseService {
             repository.saveAll(allCours);
         }
 
-        String branchCode = permissionService.fetchBranchCode(role, email);
-
-        if (courseImage != null && !courseImage.isEmpty()) {
-            try {
-                String newImageUrl = s3Service.uploadImage(courseImage, branchCode);
-
-                if (existing.getCourseImage() != null && existing.getCourseImage().contains("amazonaws.com")) {
-                    s3Service.deleteImage(existing.getCourseImage());
-                }
-
-                existing.setCourseImage(newImageUrl);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to upload course image", e);
-            }
-        }
+//        if (courseImage != null && !courseImage.isEmpty()) {
+//            try {
+//                String newImageUrl = s3Service.uploadImage(courseImage);
+//
+//                if (existing.getCourseImage() != null && existing.getCourseImage().contains("amazonaws.com")) {
+//                    s3Service.deleteImage(existing.getCourseImage());
+//                }
+//
+//                existing.setCourseImage(newImageUrl);
+//            } catch (IOException e) {
+//                throw new RuntimeException("Failed to upload course image", e);
+//            }
+//        }
 
         return repository.save(existing);
     }
 
 
     @Override
-    public void deleteCourse(int id, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "DELETE")) {
-            throw new AccessDeniedException("No permission to delete course");
-        }
+    public void deleteCourse(int id, String url) {
+        validateUrlExists(url);
 
         WebCourse webCourse = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
@@ -168,11 +133,8 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public WebCourse getCourseById(int id, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view course");
-        }
+    public WebCourse getCourseById(int id, String url) {
+        validateUrlExists(url);
 
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));

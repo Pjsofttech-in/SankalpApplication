@@ -2,19 +2,15 @@ package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebAboutUs;
 import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
-import com.sankalpapp.exception.AlreadyExistsException;
 import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.AboutUsRepository;
 import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.service.AboutUsService;
-import com.sankalpapp.dynamicProfile.service.PermissionService;
 import com.sankalpapp.dynamicProfile.service.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -24,28 +20,18 @@ public class AboutUsServiceImpl implements AboutUsService {
     private AboutUsRepository repository;
 
     @Autowired
-    private PermissionService permissionService;
-
-    @Autowired
     private SecurityUrlrepository securityUrlRepository;
 
     @Autowired
     private S3Service s3Service;
 
-    private void validateUrlExists(String url, String branchCode) {
+    private void validateUrlExists(String url) {
 
         String normalizedUrl = normalizeUrl(url);
-        if (branchCode == null || branchCode.isBlank()) {
-            securityUrlRepository.findByUrl(normalizedUrl)
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Provided URL [" + url + "] does not exist"
-                    ));
-            return;
-        }
 
-        securityUrlRepository.findByUrlAndBranchCode(normalizedUrl, branchCode)
+        securityUrlRepository.findByUrl(normalizedUrl)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed for branchCode [" + branchCode + "]"
+                        "URL [" + url + "] is not allowed"
                 ));
     }
 
@@ -55,37 +41,23 @@ public class AboutUsServiceImpl implements AboutUsService {
     }
 
     @Override
-    public WebAboutUs createAboutUs(WebAboutUs webAboutUs, String role, String email, MultipartFile aboutUsImage, String url) {
-        validateUrlExists(url,null);
-
-        if (!permissionService.hasPermission(role, email, "POST")) {
-            throw new AccessDeniedException("No permission to create AboutUs");
-        }
-
-        String branchCode = permissionService.fetchBranchCode(role, email);
-
-        // ✅ Prevent duplicate creation
-        repository.findFirstByBranchCode(branchCode).ifPresent(existing -> {
-            throw new AlreadyExistsException("AboutUs content already exists for this branch");
-        });
+    public WebAboutUs createAboutUs(WebAboutUs webAboutUs, MultipartFile aboutUsImage, String url) {
+        validateUrlExists(url);
 
         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
-        webAboutUs.setRole(role);
-        webAboutUs.setCreatedByEmail(email);
-        webAboutUs.setBranchCode(branchCode);
         webAboutUs.setUrl(url);
         webAboutUs.setWebSecurityUrl(webSecurityUrl);
 
-        if (aboutUsImage != null && !aboutUsImage.isEmpty()) {
-            try {
-                String imageUrl = s3Service.uploadImage(aboutUsImage, branchCode);
-                webAboutUs.setAboutUsImage(imageUrl);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to upload AboutUs image", e);
-            }
-        }
+//        if (aboutUsImage != null && !aboutUsImage.isEmpty()) {
+//            try {
+//                String imageUrl = s3Service.uploadImage(aboutUsImage);
+//                webAboutUs.setAboutUsImage(imageUrl);
+//            } catch (IOException e) {
+//                throw new RuntimeException("Failed to upload AboutUs image", e);
+//            }
+//        }
 
         return repository.save(webAboutUs);
     }
@@ -93,21 +65,15 @@ public class AboutUsServiceImpl implements AboutUsService {
 
 
     @Override
-    public List<WebAboutUs> getAllAboutUsByBranchCode(String role, String email, String url, String branchCode) {
-        validateUrlExists(url,branchCode);
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view AboutUs");
-        }
+    public List<WebAboutUs> getAllAboutUsByBranchCode(String url) {
+        validateUrlExists(url);
 
-        return repository.findAllByBranchCode(branchCode);
+        return repository.findAllOrderById();
     }
 
     @Override
-    public WebAboutUs updateAboutUs(int id, WebAboutUs webAboutUs, String role, String email, MultipartFile aboutUsImage, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "PUT")) {
-            throw new AccessDeniedException("No permission to update AboutUs");
-        }
+    public WebAboutUs updateAboutUs(int id, WebAboutUs webAboutUs, MultipartFile aboutUsImage, String url) {
+        validateUrlExists(url);
 
         WebAboutUs existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("AboutUs not found"));
@@ -116,33 +82,28 @@ public class AboutUsServiceImpl implements AboutUsService {
         existing.setAboutUsDescription(webAboutUs.getAboutUsDescription() != null ? webAboutUs.getAboutUsDescription() : existing.getAboutUsDescription());
         existing.setUrl(webAboutUs.getUrl() != null ? webAboutUs.getUrl() : existing.getUrl());
 
-        String branchCode = permissionService.fetchBranchCode(role, email);
-
-        if (aboutUsImage != null && !aboutUsImage.isEmpty()) {
-            try {
-                // Upload new image
-                String imageUrl = s3Service.uploadImage(aboutUsImage, branchCode);
-
-                // Optional: delete old image if exists
-                if (existing.getAboutUsImage() != null && existing.getAboutUsImage().contains("amazonaws.com")) {
-                    s3Service.deleteImage(existing.getAboutUsImage());
-                }
-
-                existing.setAboutUsImage(imageUrl);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to upload AboutUs image", e);
-            }
-        }
+//        if (aboutUsImage != null && !aboutUsImage.isEmpty()) {
+//            try {
+//                // Upload new image
+//                String imageUrl = s3Service.uploadImage(aboutUsImage);
+//
+//                // Optional: delete old image if exists
+//                if (existing.getAboutUsImage() != null && existing.getAboutUsImage().contains("amazonaws.com")) {
+//                    s3Service.deleteImage(existing.getAboutUsImage());
+//                }
+//
+//                existing.setAboutUsImage(imageUrl);
+//            } catch (IOException e) {
+//                throw new RuntimeException("Failed to upload AboutUs image", e);
+//            }
+//        }
 
         return repository.save(existing);
     }
 
     @Override
-    public void deleteAboutUs(int id, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "DELETE")) {
-            throw new AccessDeniedException("No permission to delete AboutUs");
-        }
+    public void deleteAboutUs(int id, String url) {
+        validateUrlExists(url);
 
         WebAboutUs webAboutUs = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("AboutUs not found"));
@@ -156,11 +117,8 @@ public class AboutUsServiceImpl implements AboutUsService {
     }
 
     @Override
-    public WebAboutUs getAboutUsById(int id, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view AboutUs");
-        }
+    public WebAboutUs getAboutUsById(int id, String url) {
+        validateUrlExists(url);
 
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("AboutUs not found"));

@@ -30,10 +30,7 @@ public class S3Service {
     }
 
     // ✅ Upload a single image to 'doct/' folder with UUID file name
-    public String uploadImage(MultipartFile file, String branchCode) throws IOException {
-        if (branchCode == null || branchCode.isBlank()) {
-            throw new IllegalArgumentException("Branch code is required");
-        }
+    public String uploadImage(MultipartFile file) throws IOException {
 
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("File is missing or empty");
@@ -45,7 +42,7 @@ public class S3Service {
         }
 
         // Use original file name
-        String fileKey = branchCode + "/webclient-sys/doct/" + originalFilename;
+        String fileKey = "/webclient-sys/doct/" + originalFilename;
 
         // Save file temporarily
         java.nio.file.Path tempPath = Files.createTempFile("upload-", originalFilename);

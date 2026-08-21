@@ -2,19 +2,15 @@ package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
 import com.sankalpapp.dynamicProfile.entity.WebSlideBar;
-import com.sankalpapp.exception.AlreadyExistsException;
 import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.repository.SlideBarRepository;
-import com.sankalpapp.dynamicProfile.service.PermissionService;
 import com.sankalpapp.dynamicProfile.service.S3Service;
 import com.sankalpapp.dynamicProfile.service.SlideBarService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -26,28 +22,18 @@ public class SlideBarServiceImpl implements SlideBarService {
     private SlideBarRepository repository;
 
     @Autowired
-    private PermissionService permissionService;
-
-    @Autowired
     private SecurityUrlrepository securityUrlRepository;
 
     @Autowired
     private S3Service s3Service;
 
-    private void validateUrlExists(String url, String branchCode) {
+    private void validateUrlExists(String url) {
 
         String normalizedUrl = normalizeUrl(url);
-        if (branchCode == null || branchCode.isBlank()) {
-            securityUrlRepository.findByUrl(normalizedUrl)
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Provided URL [" + url + "] does not exist"
-                    ));
-            return;
-        }
 
-        securityUrlRepository.findByUrlAndBranchCode(normalizedUrl, branchCode)
+        securityUrlRepository.findByUrl(normalizedUrl)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed for branchCode [" + branchCode + "]"
+                        "URL [" + url + "] is not allowed for branchCode"
                 ));
     }
 
@@ -57,43 +43,30 @@ public class SlideBarServiceImpl implements SlideBarService {
     }
 
     @Override
-    public WebSlideBar createSlideBar(WebSlideBar webSlideBar, String role, String email, List<MultipartFile> slideBarImages, String url) {
-        validateUrlExists(url,null);
-
-        if (!permissionService.hasPermission(role, email, "POST"))
-            throw new AccessDeniedException("No permission to create slide bar");
-
-        String branchCode = permissionService.fetchBranchCode(role, email);
-
-        // Prevent duplicate SlideBar per branch
-        repository.findFirstByBranchCode(branchCode).ifPresent(existing -> {
-            throw new AlreadyExistsException("SlideBar already exists for this branch");
-        });
+    public WebSlideBar createSlideBar(WebSlideBar webSlideBar, List<MultipartFile> slideBarImages, String url) {
+        validateUrlExists(url);
 
         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
-        webSlideBar.setBranchCode(branchCode);
-        webSlideBar.setCreatedByEmail(email);
-        webSlideBar.setRole(role);
         webSlideBar.setUrl(url);
         webSlideBar.setWebSecurityUrl(webSecurityUrl);
 
-        List<String> uploadedUrls = new ArrayList<>();
-        if (slideBarImages != null && !slideBarImages.isEmpty()) {
-            for (MultipartFile imageFile : slideBarImages) {
-                if (!imageFile.isEmpty()) {
-                    try {
-                        String imageUrl = s3Service.uploadImage(imageFile, branchCode);
-                        uploadedUrls.add(imageUrl);
-                    } catch (IOException e) {
-                        throw new RuntimeException("Failed to upload slide bar image", e);
-                    }
-                }
-            }
-        }
+//        List<String> uploadedUrls = new ArrayList<>();
+//        if (slideBarImages != null && !slideBarImages.isEmpty()) {
+//            for (MultipartFile imageFile : slideBarImages) {
+//                if (!imageFile.isEmpty()) {
+//                    try {
+//                        String imageUrl = s3Service.uploadImage(imageFile);
+//                        uploadedUrls.add(imageUrl);
+//                    } catch (IOException e) {
+//                        throw new RuntimeException("Failed to upload slide bar image", e);
+//                    }
+//                }
+//            }
+//        }
 
-        webSlideBar.setSlideImages(uploadedUrls); // ✅ ensure it's a mutable list
+//        webSlideBar.setSlideImages(uploadedUrls); // ✅ ensure it's a mutable list
 
         return repository.save(webSlideBar);
     }
@@ -102,25 +75,18 @@ public class SlideBarServiceImpl implements SlideBarService {
 
 
     @Override
-    public List<WebSlideBar> getAllByBranchCode(String role, String email, String branchCode, String url) {
-        validateUrlExists(url,branchCode);
+    public List<WebSlideBar> getAllByBranchCode(String url) {
+        validateUrlExists(url);
 
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to get SlideBar by branch code");
-        }
-
-        return repository.findAllByBranchCode(branchCode);
+        return repository.findAllOrderById();
     }
 
 
 
     @Override
-    public WebSlideBar updateSlideBar(Long id, WebSlideBar webSlideBar, String role, String email,
+    public WebSlideBar updateSlideBar(Long id, WebSlideBar webSlideBar,
                                       List<MultipartFile> newImages, List<String> deleteImages, String url) {
-        validateUrlExists(url,null);
-
-        if (!permissionService.hasPermission(role, email, "PUT"))
-            throw new AccessDeniedException("No permission to update slide bar");
+        validateUrlExists(url);
 
         WebSlideBar existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("SlideBar not found"));
@@ -158,20 +124,19 @@ public class SlideBarServiceImpl implements SlideBarService {
         }
 
         // Upload and add new images
-        if (newImages != null && !newImages.isEmpty()) {
-            String branchCode = permissionService.fetchBranchCode(role, email);
-            for (MultipartFile imageFile : newImages) {
-                if (!imageFile.isEmpty()) {
-                    try {
-                        String imageUrl = s3Service.uploadImage(imageFile, branchCode);
-                        currentImages.add(imageUrl);
-                    } catch (IOException e) {
-                        throw new RuntimeException("Failed to upload slide bar image", e);
-                    }
-                }
-            }
-            existing.setSlideImages(currentImages); // update list after addition
-        }
+//        if (newImages != null && !newImages.isEmpty()) {
+//            for (MultipartFile imageFile : newImages) {
+//                if (!imageFile.isEmpty()) {
+//                    try {
+//                        String imageUrl = s3Service.uploadImage(imageFile);
+//                        currentImages.add(imageUrl);
+//                    } catch (IOException e) {
+//                        throw new RuntimeException("Failed to upload slide bar image", e);
+//                    }
+//                }
+//            }
+//            existing.setSlideImages(currentImages); // update list after addition
+//        }
 
         return repository.save(existing);
     }
@@ -184,10 +149,8 @@ public class SlideBarServiceImpl implements SlideBarService {
 
 
     @Override
-    public void deleteSlideBar(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "DELETE"))
-            throw new AccessDeniedException("No permission to delete slide bar");
+    public void deleteSlideBar(Long id, String url) {
+        validateUrlExists(url);
 
         WebSlideBar webSlideBar = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("SlideBar not found"));
@@ -206,10 +169,8 @@ public class SlideBarServiceImpl implements SlideBarService {
 
 
     @Override
-    public WebSlideBar getSlideBarById(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "GET"))
-            throw new AccessDeniedException("No permission to view slide bar");
+    public WebSlideBar getSlideBarById(Long id, String url) {
+        validateUrlExists(url);
 
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("SlideBar not found"));

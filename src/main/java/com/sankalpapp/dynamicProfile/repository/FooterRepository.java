@@ -11,9 +11,7 @@ import java.util.Optional;
 @Repository
 public interface FooterRepository extends JpaRepository<WebFooter, Long> {
 
-    @Query("SELECT f FROM WebFooter f WHERE f.branchCode = :branchCode ORDER BY f.id DESC")
-    List<WebFooter> findAllByBranchCode(String branchCode);
-
-    Optional<WebFooter> findFirstByBranchCode(String branchCode);
+    @Query("SELECT f FROM WebFooter f ORDER BY f.id DESC")
+    List<WebFooter> findAllOrderById();
 
 }

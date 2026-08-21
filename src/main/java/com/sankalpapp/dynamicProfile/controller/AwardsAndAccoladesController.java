@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "https://pjsofttech.in")
 public class AwardsAndAccoladesController {
 
     @Autowired
@@ -22,53 +21,42 @@ public class AwardsAndAccoladesController {
     @PostMapping(value = "/createAward", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<WebAwardsAndAccolades> createAward(
             @RequestPart("award") String awardJson,
-            @RequestParam String role,
-            @RequestParam String email,
             @RequestParam String url,
             @RequestParam("awardImageName") MultipartFile awardImageFile) throws JsonProcessingException {
 
 
         WebAwardsAndAccolades award = new ObjectMapper().readValue(awardJson, WebAwardsAndAccolades.class);
 
-        return ResponseEntity.ok(service.createAward(award, role, email, awardImageFile, url));
+        return ResponseEntity.ok(service.createAward(award, awardImageFile, url));
     }
 
     @GetMapping("/getAllAwards")
     public ResponseEntity<List<WebAwardsAndAccolades>> getAllAwardsByBranchCode(
-            @RequestParam String role,
-            @RequestParam(required = false) String email,
-            @RequestParam String url,
-            @RequestParam String branchCode) {
+            @RequestParam String url) {
 
-        return ResponseEntity.ok(service.getAllAwardsByBranchCode(role, email, url, branchCode));
+        return ResponseEntity.ok(service.getAllAwardsByBranchCode(url));
     }
 
     @GetMapping("/getAwardById/{id}")
     public ResponseEntity<WebAwardsAndAccolades> getAwardById(@PathVariable Long id,
-                                                              @RequestParam String role,
-                                                              @RequestParam String email,
                                                               @RequestParam String url) {
-        return ResponseEntity.ok(service.getAwardById(id, role, email, url));
+        return ResponseEntity.ok(service.getAwardById(id, url));
     }
 
     @PutMapping(value = "/updateAward/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<WebAwardsAndAccolades> updateAward(@PathVariable Long id,
                                                              @RequestPart("award") String awardJson,
                                                              @RequestPart(value = "awardImage", required = false) MultipartFile awardImage,
-                                                             @RequestParam String role,
-                                                             @RequestParam String email,
                                                              @RequestParam String url) throws JsonProcessingException {
 
         WebAwardsAndAccolades award = new ObjectMapper().readValue(awardJson, WebAwardsAndAccolades.class);
-        return ResponseEntity.ok(service.updateAward(id, award, role, email, awardImage, url));
+        return ResponseEntity.ok(service.updateAward(id, award, awardImage, url));
     }
 
     @DeleteMapping("/deleteAward/{id}")
     public ResponseEntity<String> deleteAward(@PathVariable Long id,
-                                              @RequestParam String role,
-                                              @RequestParam String email,
                                               @RequestParam String url) {
-        service.deleteAward(id, role, email, url);
+        service.deleteAward(id, url);
         return ResponseEntity.ok("Award deleted successfully");
     }
 

@@ -6,9 +6,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface AwardsAndAccoladesService {
-    WebAwardsAndAccolades createAward(WebAwardsAndAccolades award, String role, String email, MultipartFile awardImage, String url);
-    List<WebAwardsAndAccolades> getAllAwardsByBranchCode(String role, String email, String url, String branchCode);
-    WebAwardsAndAccolades updateAward(Long id, WebAwardsAndAccolades award, String role, String email, MultipartFile awardImage, String url);
-    void deleteAward(Long id, String role, String email, String url);
-    WebAwardsAndAccolades getAwardById(Long id, String role, String email, String url);
+    WebAwardsAndAccolades createAward(WebAwardsAndAccolades award, MultipartFile awardImage, String url);
+    List<WebAwardsAndAccolades> getAllAwardsByBranchCode(String url);
+    WebAwardsAndAccolades updateAward(Long id, WebAwardsAndAccolades award, MultipartFile awardImage, String url);
+    void deleteAward(Long id, String url);
+    WebAwardsAndAccolades getAwardById(Long id, String url);
 }

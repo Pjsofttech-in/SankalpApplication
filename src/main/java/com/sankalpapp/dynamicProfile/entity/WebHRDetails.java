@@ -26,10 +26,9 @@ public class WebHRDetails {
     private String contact;
     private String url;
 
-    @Email
-    private String createdByEmail;
-    private String role;
-    private String branchCode;
+    
+    
+    
 
     @OneToMany(mappedBy = "webHRDetails",cascade = CascadeType.ALL)
     @JsonIgnore

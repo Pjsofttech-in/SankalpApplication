@@ -28,10 +28,9 @@ public class WebAwardsAndAccolades {
     private String url;
     private String awardColour;
 
-    @Email
-    private String createdByEmail;
-    private String role;
-    private String branchCode;
+    
+    
+    
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")

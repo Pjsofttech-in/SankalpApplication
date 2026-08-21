@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface CounterRepository extends JpaRepository<WebCounter, Long> {
 
-    @Query("SELECT c FROM WebCounter c WHERE c.branchCode = :branchCode ORDER BY c.id DESC")
-    List<WebCounter> findAllByBranchCode(String branchCode);
+    @Query("SELECT c FROM WebCounter c ORDER BY c.id DESC")
+    List<WebCounter> findAllOrderById();
 }

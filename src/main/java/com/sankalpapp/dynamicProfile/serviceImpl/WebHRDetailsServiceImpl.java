@@ -2,13 +2,11 @@ package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebHRDetails;
 import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
-import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.repository.WebHRDetailsRepository;
-import com.sankalpapp.dynamicProfile.service.PermissionService;
 import com.sankalpapp.dynamicProfile.service.WebHRDetailsService;
+import com.sankalpapp.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,23 +20,13 @@ public class WebHRDetailsServiceImpl implements WebHRDetailsService {
     @Autowired
     private SecurityUrlrepository securityUrlRepository;
 
-    @Autowired
-    private PermissionService permissionService;
-
-    private void validateUrlExists(String url, String branchCode) {
+    private void validateUrlExists(String url) {
 
         String normalizedUrl = normalizeUrl(url);
-        if (branchCode == null || branchCode.isBlank()) {
-            securityUrlRepository.findByUrl(normalizedUrl)
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Provided URL [" + url + "] does not exist"
-                    ));
-            return;
-        }
 
-        securityUrlRepository.findByUrlAndBranchCode(normalizedUrl, branchCode)
+        securityUrlRepository.findByUrl(normalizedUrl)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed for branchCode [" + branchCode + "]"
+                        "URL [" + url + "] is not allowed"
                 ));
     }
 
@@ -49,56 +37,36 @@ public class WebHRDetailsServiceImpl implements WebHRDetailsService {
     }
 
     @Override
-    public WebHRDetails create(WebHRDetails webHRDetails, String role, String email, String url) {
-        validateUrlExists(url,null);
-
-        if (!permissionService.hasPermission(role, email, "POST")) {
-            throw new AccessDeniedException("No permission to create WebHRDetails");
-        }
-
-        String branchCode = permissionService.fetchBranchCode(role,email);
+    public WebHRDetails create(WebHRDetails webHRDetails, String url) {
+        validateUrlExists(url);
 
         String normalizedUrl = normalizeUrl(url);
         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizedUrl)
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist"));
 
         webHRDetails.setWebSecurityUrl(webSecurityUrl);
-        webHRDetails.setCreatedByEmail(email);
-        webHRDetails.setRole(role);
-        webHRDetails.setBranchCode(branchCode);
         webHRDetails.setUrl(url);
         return repository.save(webHRDetails);
     }
 
     @Override
-    public List<WebHRDetails> getAllByBranchCode(String role, String email, String url, String branchCode) {
-        validateUrlExists(url,branchCode);
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view WebHRDetails");
-        }
-        return repository.findAllByBranchCode(branchCode);
+    public List<WebHRDetails> getAllByBranchCode(String url) {
+        validateUrlExists(url);
+        return repository.findAllOrderById();
     }
 
 
     @Override
-    public WebHRDetails getById(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view WebHRDetails");
-        }
+    public WebHRDetails getById(Long id, String url) {
+        validateUrlExists(url);
 
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("WebHRDetails not found"));
     }
 
     @Override
-    public WebHRDetails update(Long id, WebHRDetails webHRDetails, String role, String email, String url) {
-        validateUrlExists(url,null);
-
-        if (!permissionService.hasPermission(role, email, "PUT")) {
-            throw new AccessDeniedException("No permission to update WebHRDetails");
-        }
+    public WebHRDetails update(Long id, WebHRDetails webHRDetails, String url) {
+        validateUrlExists(url);
 
         WebHRDetails existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("WebHRDetails not found"));
@@ -111,12 +79,8 @@ public class WebHRDetailsServiceImpl implements WebHRDetailsService {
     }
 
     @Override
-    public void delete(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-
-        if (!permissionService.hasPermission(role, email, "DELETE")) {
-            throw new AccessDeniedException("No permission to delete WebHRDetails");
-        }
+    public void delete(Long id, String url) {
+        validateUrlExists(url);
 
         repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("WebHRDetails not found"));

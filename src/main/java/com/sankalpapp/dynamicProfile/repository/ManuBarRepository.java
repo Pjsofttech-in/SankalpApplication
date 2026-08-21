@@ -11,9 +11,7 @@ import java.util.Optional;
 @Repository
 public interface ManuBarRepository extends JpaRepository<WebManuBar, Long> {
 
-    @Query("SELECT m FROM WebManuBar m WHERE m.branchCode = :branchCode ORDER BY m.id DESC")
-    List<WebManuBar> findAllByBranchCode(String branchCode);
-
-    Optional<WebManuBar> findFirstByBranchCode(String branchCode);
+    @Query("SELECT m FROM WebManuBar m ORDER BY m.id DESC")
+    List<WebManuBar> findAllOrderById();
 
 }

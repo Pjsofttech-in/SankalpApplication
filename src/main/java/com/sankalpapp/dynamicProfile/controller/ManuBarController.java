@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "https://pjsofttech.in")
 public class ManuBarController {
 
     @Autowired
@@ -22,51 +21,40 @@ public class ManuBarController {
     @PostMapping(value = "/createManuBar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<WebManuBar> createManuBar(
             @RequestPart("manuBar") String manuBarJson,
-            @RequestParam String role,
-            @RequestParam String email,
             @RequestParam String url,
             @RequestParam("menubarImageName") MultipartFile imageFile) throws JsonProcessingException {
 
 
         WebManuBar webManuBar = new ObjectMapper().readValue(manuBarJson, WebManuBar.class);
 
-        return ResponseEntity.ok(service.createManuBar(webManuBar, role, email, imageFile, url));
+        return ResponseEntity.ok(service.createManuBar(webManuBar, imageFile, url));
     }
 
     @GetMapping("/getAllManuBars")
-    public ResponseEntity<List<WebManuBar>> getAllByBranchCode(@RequestParam String role,
-                                                               @RequestParam(required = false) String email,
-                                                               @RequestParam String url,
-                                                               @RequestParam String branchCode) {
-        return ResponseEntity.ok(service.getAllByBranchCode(role, email, url, branchCode));
+    public ResponseEntity<List<WebManuBar>> getAllByBranchCode(@RequestParam String url) {
+        return ResponseEntity.ok(service.getAllByBranchCode(url));
     }
 
     @GetMapping("/getManuBarById/{id}")
     public ResponseEntity<WebManuBar> getManuBarById(@PathVariable Long id,
-                                                     @RequestParam String role,
-                                                     @RequestParam String email,
                                                      @RequestParam String url) {
-        return ResponseEntity.ok(service.getManuBarById(id, role, email, url));
+        return ResponseEntity.ok(service.getManuBarById(id, url));
     }
 
     @PutMapping(value = "/updateManuBar/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<WebManuBar> updateManuBar(@PathVariable Long id,
                                                     @RequestPart("manuBar") String manuBarJson,
                                                     @RequestPart(value = "menubarImage", required = false) MultipartFile menubarImage,
-                                                    @RequestParam String role,
-                                                    @RequestParam String email,
                                                     @RequestParam String url) throws JsonProcessingException {
 
         WebManuBar webManuBar = new ObjectMapper().readValue(manuBarJson, WebManuBar.class);
-        return ResponseEntity.ok(service.updateManuBar(id, webManuBar, role, email, menubarImage, url));
+        return ResponseEntity.ok(service.updateManuBar(id, webManuBar, menubarImage, url));
     }
 
     @DeleteMapping("/deleteManuBar/{id}")
     public ResponseEntity<String> deleteManuBar(@PathVariable Long id,
-                                                @RequestParam String role,
-                                                @RequestParam String email,
                                                 @RequestParam String url) {
-        service.deleteManuBar(id, role, email, url);
+        service.deleteManuBar(id, url);
         return ResponseEntity.ok("ManuBar deleted successfully");
     }
 }

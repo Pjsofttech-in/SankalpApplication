@@ -19,14 +19,13 @@ public class WebSecurityUrl {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     private String url;
 
-    @Email
-    private String createdByEmail;
-    private String role;
-    private String branchCode;
+    
+    
+    
 
     @OneToMany(mappedBy = "webSecurityUrl", cascade = CascadeType.ALL)
     @JsonIgnore

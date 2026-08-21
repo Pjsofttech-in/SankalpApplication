@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface JobCareerOptionRepository extends JpaRepository<WebJobCareerOption, Long> {
 
-    @Query("SELECT j FROM WebJobCareerOption j WHERE j.branchCode = :branchCode ORDER BY j.id DESC")
-    List<WebJobCareerOption> findAllByBranchCode(String branchCode);
+    @Query("SELECT j FROM WebJobCareerOption j ORDER BY j.id DESC")
+    List<WebJobCareerOption> findAllOrderById();
 }

@@ -2,19 +2,15 @@ package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
 import com.sankalpapp.dynamicProfile.entity.WebVisionMission;
-import com.sankalpapp.exception.AlreadyExistsException;
 import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.repository.VisionMissionRepository;
-import com.sankalpapp.dynamicProfile.service.PermissionService;
 import com.sankalpapp.dynamicProfile.service.S3Service;
 import com.sankalpapp.dynamicProfile.service.VisionMissionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -24,28 +20,18 @@ public class VisionMissionServiceImpl implements VisionMissionService {
     private VisionMissionRepository repository;
 
     @Autowired
-    private PermissionService permissionService;
-
-    @Autowired
     private SecurityUrlrepository securityUrlRepository;
 
     @Autowired
     private S3Service s3Service;
 
-    private void validateUrlExists(String url, String branchCode) {
+    private void validateUrlExists(String url) {
 
         String normalizedUrl = normalizeUrl(url);
-        if (branchCode == null || branchCode.isBlank()) {
-            securityUrlRepository.findByUrl(normalizedUrl)
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Provided URL [" + url + "] does not exist"
-                    ));
-            return;
-        }
 
-        securityUrlRepository.findByUrlAndBranchCode(normalizedUrl, branchCode)
+        securityUrlRepository.findByUrl(normalizedUrl)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed for branchCode [" + branchCode + "]"
+                        "URL [" + url + "] is not allowed"
                 ));
     }
 
@@ -55,35 +41,23 @@ public class VisionMissionServiceImpl implements VisionMissionService {
     }
 
     @Override
-    public WebVisionMission create(WebVisionMission vm, String role, String email, MultipartFile directorImage, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "POST")) {
-            throw new AccessDeniedException("No permission to create vision/mission");
-        }
-
-        String branchCode = permissionService.fetchBranchCode(role, email);
-
+    public WebVisionMission create(WebVisionMission vm, MultipartFile directorImage, String url) {
+        validateUrlExists(url);
         // ❗ Prevent duplicate creation per branch
-        repository.findFirstByBranchCode(branchCode).ifPresent(existing -> {
-            throw new AlreadyExistsException("Vision/Mission already exists for this branch");
-        });
 
         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
-        vm.setCreatedByEmail(email);
-        vm.setRole(role);
-        vm.setBranchCode(branchCode);
         vm.setUrl(url);
         vm.setWebSecurityUrl(webSecurityUrl);
 
         if (directorImage != null && !directorImage.isEmpty()) {
-            try {
-                String imageUrl = s3Service.uploadImage(directorImage, branchCode);
-                vm.setDirectorImage(imageUrl);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to upload director image", e);
-            }
+//            try {
+//                String imageUrl = s3Service.uploadImage(directorImage);
+//                vm.setDirectorImage(imageUrl);
+//            } catch (IOException e) {
+//                throw new RuntimeException("Failed to upload director image", e);
+//            }
         }
 
         return repository.save(vm);
@@ -91,24 +65,16 @@ public class VisionMissionServiceImpl implements VisionMissionService {
 
 
     @Override
-    public List<WebVisionMission> getAllByBranchCode(String role, String email, String branchCode, String url) {
-        validateUrlExists(url,branchCode);
+    public List<WebVisionMission> getAllByBranchCode(String url) {
+        validateUrlExists(url);
 
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view vision/mission by branch code");
-        }
-
-        return repository.findAllByBranchCode(branchCode);
+        return repository.findAllOrderById();
     }
 
 
     @Override
-    public WebVisionMission update(Long id, WebVisionMission vm, String role, String email, MultipartFile directorImage, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "PUT")) {
-            throw new AccessDeniedException("No permission to update vision/mission");
-        }
-
+    public WebVisionMission update(Long id, WebVisionMission vm, MultipartFile directorImage, String url) {
+        validateUrlExists(url);
         WebVisionMission existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("VisionMission not found"));
 
@@ -120,33 +86,28 @@ public class VisionMissionServiceImpl implements VisionMissionService {
         existing.setVisionmissionColor(vm.getVisionmissionColor() != null ? vm.getVisionmissionColor() : existing.getVisionmissionColor());
         existing.setUrl(vm.getUrl() != null ? vm.getUrl() : existing.getUrl());
 
-        String branchCode = permissionService.fetchBranchCode(role, email);
-
         if (directorImage != null && !directorImage.isEmpty()) {
-            try {
-                // Upload new image
-                String imageUrl = s3Service.uploadImage(directorImage, branchCode);
-
-                // Delete old image if exists and was uploaded to S3
-                if (existing.getDirectorImage() != null && existing.getDirectorImage().contains("amazonaws.com")) {
-                    s3Service.deleteImage(existing.getDirectorImage());
-                }
-
-                existing.setDirectorImage(imageUrl);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to upload director image", e);
-            }
+//            try {
+//                // Upload new image
+//                String imageUrl = s3Service.uploadImage(directorImage);
+//
+//                // Delete old image if exists and was uploaded to S3
+//                if (existing.getDirectorImage() != null && existing.getDirectorImage().contains("amazonaws.com")) {
+//                    s3Service.deleteImage(existing.getDirectorImage());
+//                }
+//
+//                existing.setDirectorImage(imageUrl);
+//            } catch (IOException e) {
+//                throw new RuntimeException("Failed to upload director image", e);
+//            }
         }
 
         return repository.save(existing);
     }
 
     @Override
-    public void delete(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "DELETE")) {
-            throw new AccessDeniedException("No permission to delete vision/mission");
-        }
+    public void delete(Long id, String url) {
+        validateUrlExists(url);
 
         WebVisionMission vm = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("VisionMission not found"));
@@ -160,11 +121,8 @@ public class VisionMissionServiceImpl implements VisionMissionService {
     }
 
     @Override
-    public WebVisionMission getById(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view vision/mission");
-        }
+    public WebVisionMission getById(Long id, String url) {
+        validateUrlExists(url);
 
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("VisionMission not found"));

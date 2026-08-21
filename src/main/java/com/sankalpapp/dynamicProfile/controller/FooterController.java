@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "https://pjsofttech.in")
 public class FooterController {
 
     @Autowired
@@ -17,43 +16,32 @@ public class FooterController {
 
     @PostMapping("/createFooter")
     public ResponseEntity<WebFooter> createFooter(@RequestBody WebFooter webFooter,
-                                                  @RequestParam String role,
-                                                  @RequestParam String email,
                                                   @RequestParam String url) {
-        return ResponseEntity.ok(service.createFooter(webFooter, role, email, url));
+        return ResponseEntity.ok(service.createFooter(webFooter, url));
     }
 
     @GetMapping("/getAllFooters")
-    public ResponseEntity<List<WebFooter>> getAllFootersByBranchCode(@RequestParam String role,
-                                                                     @RequestParam(required = false) String email,
-                                                                     @RequestParam String url,
-                                                                     @RequestParam String branchCode) {
-        return ResponseEntity.ok(service.getAllFootersByBranchCode(role, email, url, branchCode));
+    public ResponseEntity<List<WebFooter>> getAllFootersByBranchCode(@RequestParam String url) {
+        return ResponseEntity.ok(service.getAllFootersByBranchCode(url));
     }
 
     @GetMapping("/getFooterById/{id}")
     public ResponseEntity<WebFooter> getFooterById(@PathVariable Long id,
-                                                   @RequestParam String role,
-                                                   @RequestParam String email,
                                                    @RequestParam String url) {
-        return ResponseEntity.ok(service.getFooterById(id, role, email, url));
+        return ResponseEntity.ok(service.getFooterById(id, url));
     }
 
     @PutMapping("/updateFooter/{id}")
     public ResponseEntity<WebFooter> updateFooter(@PathVariable Long id,
                                                   @RequestBody WebFooter webFooter,
-                                                  @RequestParam String role,
-                                                  @RequestParam String email,
                                                   @RequestParam String url) {
-        return ResponseEntity.ok(service.updateFooter(id, webFooter, role, email, url));
+        return ResponseEntity.ok(service.updateFooter(id, webFooter, url));
     }
 
     @DeleteMapping("/deleteFooter/{id}")
     public ResponseEntity<String> deleteFooter(@PathVariable Long id,
-                                               @RequestParam String role,
-                                               @RequestParam String email,
                                                @RequestParam String url) {
-        service.deleteFooter(id, role, email, url);
+        service.deleteFooter(id, url);
         return ResponseEntity.ok("Footer deleted successfully");
     }
 

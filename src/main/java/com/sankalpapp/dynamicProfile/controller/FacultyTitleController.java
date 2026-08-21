@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "https://pjsofttech.in")
 public class FacultyTitleController {
 
     @Autowired
@@ -17,43 +16,32 @@ public class FacultyTitleController {
 
     @PostMapping("/createFacilityTitle")
     public ResponseEntity<WebFacultyTitle> createFacilityTitle(@RequestBody WebFacultyTitle webFacultyTitle,
-                                                               @RequestParam String role,
-                                                               @RequestParam String email,
                                                                @RequestParam String url) {
-        return ResponseEntity.ok(service.createFacilityTitle(webFacultyTitle, role, email, url));
+        return ResponseEntity.ok(service.createFacilityTitle(webFacultyTitle, url));
     }
 
     @GetMapping("/getAllFacilityTitles")
-    public ResponseEntity<List<WebFacultyTitle>> getAllFacilityTitlesByBranchCode(@RequestParam String role,
-                                                                                  @RequestParam(required = false) String email,
-                                                                                  @RequestParam String url,
-                                                                                  @RequestParam String branchCode) {
-        return ResponseEntity.ok(service.getAllFacilityTitlesByBranchCode(role, email, url, branchCode));
+    public ResponseEntity<List<WebFacultyTitle>> getAllFacilityTitlesByBranchCode(@RequestParam String url) {
+        return ResponseEntity.ok(service.getAllFacilityTitlesByBranchCode(url));
     }
 
     @GetMapping("/getFacilityTitleById/{id}")
     public ResponseEntity<WebFacultyTitle> getFacilityTitleById(@PathVariable Long id,
-                                                                @RequestParam String role,
-                                                                @RequestParam String email,
                                                                 @RequestParam String url) {
-        return ResponseEntity.ok(service.getFacilityTitleById(id, role, email, url));
+        return ResponseEntity.ok(service.getFacilityTitleById(id, url));
     }
 
     @PutMapping("/updateFacilityTitle/{id}")
     public ResponseEntity<WebFacultyTitle> updateFacilityTitle(@PathVariable Long id,
                                                                @RequestBody WebFacultyTitle webFacultyTitle,
-                                                               @RequestParam String role,
-                                                               @RequestParam String email,
                                                                @RequestParam String url) {
-        return ResponseEntity.ok(service.updateFacilityTitle(id, webFacultyTitle, role, email, url));
+        return ResponseEntity.ok(service.updateFacilityTitle(id, webFacultyTitle, url));
     }
 
     @DeleteMapping("/deleteFacilityTitle/{id}")
     public ResponseEntity<String> deleteFacilityTitle(@PathVariable Long id,
-                                                      @RequestParam String role,
-                                                      @RequestParam String email,
                                                       @RequestParam String url) {
-        service.deleteFacilityTitle(id, role, email, url);
+        service.deleteFacilityTitle(id, url);
         return ResponseEntity.ok("Facility title deleted successfully");
     }
 }

@@ -62,6 +62,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/api/students")
                         .permitAll()
 
+                        .requestMatchers(HttpMethod.POST,"/api2/**")
+                        .hasAuthority("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET,"/api2/**")
+                        .permitAll()
+
                         // Admin APIs
                         .requestMatchers("/api/users/**")
                         .hasAnyAuthority("ADMIN")

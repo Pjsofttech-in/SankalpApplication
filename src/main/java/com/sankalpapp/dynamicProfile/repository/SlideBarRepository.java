@@ -11,9 +11,7 @@ import java.util.Optional;
 @Repository
 public interface SlideBarRepository extends JpaRepository<WebSlideBar, Long> {
 
-    @Query("SELECT s FROM WebSlideBar s WHERE s.branchCode = :branchCode ORDER BY s.id DESC")
-    List<WebSlideBar> findAllByBranchCode(String branchCode);
-
-    Optional<WebSlideBar> findFirstByBranchCode(String branchCode);
+    @Query("SELECT s FROM WebSlideBar s ORDER BY s.id DESC")
+    List<WebSlideBar> findAllOrderById();
 
 }

@@ -31,10 +31,9 @@ public class WebSlideBar {
     @Column(name = "image_url")
     private List<String> slideImages;
 
-    @Email
-    private String createdByEmail;
-    private String role;
-    private String branchCode;
+    
+    
+    
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")

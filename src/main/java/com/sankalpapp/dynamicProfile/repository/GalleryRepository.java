@@ -10,8 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface GalleryRepository extends JpaRepository<WebGallery, Long> {
-    @Query("SELECT g FROM WebGallery g WHERE g.branchCode = :branchCode ORDER BY g.galleryId DESC")
-    List<WebGallery> findAllByBranchCode(String branchCode);
-
-    Optional<WebGallery> findFirstByBranchCode(String branchCode);
+    @Query("SELECT g FROM WebGallery g ORDER BY g.galleryId DESC")
+    List<WebGallery> findAllOrderById();
 }

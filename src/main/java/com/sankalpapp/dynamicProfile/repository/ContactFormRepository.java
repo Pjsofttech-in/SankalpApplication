@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface ContactFormRepository extends JpaRepository<WebContactForm, Long> {
 
-    @Query("SELECT c FROM WebContactForm c WHERE c.branchCode = :branchCode ORDER BY c.id DESC")
-    List<WebContactForm> findAllByBranchCode(@Param("branchCode") String branchCode);
+    @Query("SELECT c FROM WebContactForm c ORDER BY c.id DESC")
+    List<WebContactForm> findAllOrderById();
 
 }

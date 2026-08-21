@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "https://pjsofttech.in")
 public class CourseController {
 
     @Autowired
@@ -22,30 +21,23 @@ public class CourseController {
     @PostMapping(value = "/createCourse", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<WebCourse> createCourse(
             @RequestPart("course") String courseJson,
-            @RequestParam String role,
-            @RequestParam String email,
             @RequestParam String url,
             @RequestParam("courseImage") MultipartFile courseImageFile) throws JsonProcessingException {
 
         WebCourse webCourse = new ObjectMapper().readValue(courseJson, WebCourse.class);
 
-        return ResponseEntity.ok(service.createCourse(webCourse, role, email, courseImageFile, url));
+        return ResponseEntity.ok(service.createCourse(webCourse, courseImageFile, url));
     }
 
     @GetMapping("/getAllCourses")
-    public ResponseEntity<List<WebCourse>> getAllCoursesByBranchCode(@RequestParam String role,
-                                                                     @RequestParam(required = false) String email,
-                                                                     @RequestParam String branchCode,
-                                                                     @RequestParam String url) {
-        return ResponseEntity.ok(service.getAllCoursesByBranchCode(role, email, branchCode, url));
+    public ResponseEntity<List<WebCourse>> getAllCoursesByBranchCode(@RequestParam String url) {
+        return ResponseEntity.ok(service.getAllCoursesByBranchCode(url));
     }
 
     @GetMapping("/getCourseById/{id}")
     public ResponseEntity<WebCourse> getCourseById(@PathVariable int id,
-                                                   @RequestParam String role,
-                                                   @RequestParam String email,
                                                    @RequestParam String url) {
-        return ResponseEntity.ok(service.getCourseById(id, role, email, url));
+        return ResponseEntity.ok(service.getCourseById(id, url));
     }
 
     @PutMapping(value = "/updateCourse/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -53,21 +45,17 @@ public class CourseController {
             @PathVariable int id,
             @RequestPart("course") String courseJson,
             @RequestPart(value = "courseImage", required = false) MultipartFile courseImage,
-            @RequestParam String role,
-            @RequestParam String email,
             @RequestParam String url) throws JsonProcessingException {
 
         WebCourse webCourse = new ObjectMapper().readValue(courseJson, WebCourse.class);
-        WebCourse updated = service.updateCourse(id, webCourse, role, email, courseImage, url);
+        WebCourse updated = service.updateCourse(id, webCourse, courseImage, url);
         return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/deleteCourse/{id}")
     public ResponseEntity<String> deleteCourse(@PathVariable int id,
-                                               @RequestParam String role,
-                                               @RequestParam String email,
                                                @RequestParam String url) {
-        service.deleteCourse(id, role, email, url);
+        service.deleteCourse(id, url);
         return ResponseEntity.ok("Course deleted successfully");
     }
 

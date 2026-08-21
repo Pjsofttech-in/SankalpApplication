@@ -27,10 +27,9 @@ public class WebTestimonials {
     private String testimonialColor;
     private String url;
 
-    @Email
-    private String createdByEmail;
-    private String role;
-    private String branchCode;
+    
+    
+    
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")

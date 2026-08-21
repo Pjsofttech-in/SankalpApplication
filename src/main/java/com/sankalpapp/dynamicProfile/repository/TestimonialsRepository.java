@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface TestimonialsRepository extends JpaRepository<WebTestimonials, Long> {
 
-    @Query("SELECT t FROM WebTestimonials t WHERE t.branchCode = :branchCode ORDER BY t.testimonialId DESC")
-    List<WebTestimonials> findAllByBranchCode(String branchCode);
+    @Query("SELECT t FROM WebTestimonials t ORDER BY t.testimonialId DESC")
+    List<WebTestimonials> findAllOrderById();
 }

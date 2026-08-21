@@ -2,13 +2,11 @@ package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebContactForm;
 import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
-import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.ContactFormRepository;
 import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.service.ContactFormService;
-import com.sankalpapp.dynamicProfile.service.PermissionService;
+import com.sankalpapp.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,24 +18,14 @@ public class ContactFormServiceImpl implements ContactFormService {
     private ContactFormRepository repository;
 
     @Autowired
-    private PermissionService permissionService;
-
-    @Autowired
     private SecurityUrlrepository securityUrlRepository;
 
-    private void validateUrlExists(String url, String branchCode) {
+    private void validateUrlExists(String url) {
 
         String normalizedUrl = normalizeUrl(url);
-        if (branchCode == null || branchCode.isBlank()) {
-            securityUrlRepository.findByUrl(normalizedUrl)
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Provided URL [" + url + "] does not exist"
-                    ));
-            return;
-        }
-        securityUrlRepository.findByUrlAndBranchCode(normalizedUrl, branchCode)
+        securityUrlRepository.findByUrl(normalizedUrl)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed for branchCode [" + branchCode + "]"
+                        "URL [" + url + "] is not allowed"
                 ));
     }
 
@@ -47,55 +35,30 @@ public class ContactFormServiceImpl implements ContactFormService {
     }
 
     @Override
-    public WebContactForm create(WebContactForm webContactForm, String role, String email, String url, String branchCodeFromRequest) {
-        validateUrlExists(url,null);
+    public WebContactForm create(WebContactForm webContactForm, String urlFromRequest) {
+        validateUrlExists(urlFromRequest);
 
-        role = role.trim().toUpperCase();
-        if (!permissionService.hasPermission(role, email, "POST")) {
-            throw new AccessDeniedException("No permission to create contact form");
-        }
-
-        String branchCode;
-        if ("USER".equals(role)) {
-            if (branchCodeFromRequest == null || branchCodeFromRequest.isBlank()) {
-                throw new IllegalArgumentException("BranchCode must be provided for USER role");
-            }
-            branchCode = branchCodeFromRequest;
-        } else {
-            branchCode = permissionService.fetchBranchCode(role, email);
-        }
-
-        WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
+        WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(urlFromRequest))
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
-        webContactForm.setRole(role);
-        webContactForm.setCreatedByEmail(email);
-        webContactForm.setBranchCode(branchCode);
         webContactForm.setWebSecurityUrl(webSecurityUrl);
-        webContactForm.setUrl(url);
+        webContactForm.setUrl(urlFromRequest);
 
         return repository.save(webContactForm);
     }
 
 
-
     @Override
-    public List<WebContactForm> getAllByBranchCode(String role, String email, String url, String branchCode) {
-        validateUrlExists(url,branchCode);
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view contact forms");
-        }
+    public List<WebContactForm> getAllByBranchCode(String url) {
+        validateUrlExists(url);
 
-        return repository.findAllByBranchCode(branchCode);
+        return repository.findAllOrderById();
     }
 
 
     @Override
-    public WebContactForm update(Long id, WebContactForm webContactForm, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "PUT")) {
-            throw new AccessDeniedException("No permission to update contact form");
-        }
+    public WebContactForm update(Long id, WebContactForm webContactForm, String url) {
+        validateUrlExists(url);
 
         WebContactForm existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ContactForm not found"));
@@ -111,22 +74,16 @@ public class ContactFormServiceImpl implements ContactFormService {
     }
 
     @Override
-    public void delete(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "DELETE")) {
-            throw new AccessDeniedException("No permission to delete contact form");
-        }
+    public void delete(Long id, String url) {
+        validateUrlExists(url);
 
         repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("ContactForm not found"));
         repository.deleteById(id);
     }
 
     @Override
-    public WebContactForm getById(Long id, String role, String email, String url) {
-        validateUrlExists(url,null);
-        if (!permissionService.hasPermission(role, email, "GET")) {
-            throw new AccessDeniedException("No permission to view contact form");
-        }
+    public WebContactForm getById(Long id, String url) {
+        validateUrlExists(url);
 
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ContactForm not found"));
