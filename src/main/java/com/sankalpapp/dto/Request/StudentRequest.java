@@ -12,6 +12,8 @@ import java.time.LocalDate;
 public class StudentRequest {
 
     private String studentName;
+    private String fatherName;
+    private String lastName;
     private String mobile;
     private String email;
     private String password;

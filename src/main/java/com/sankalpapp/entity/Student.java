@@ -22,6 +22,12 @@ public class Student {
     @Column(nullable = false)
     private String studentName;
 
+    @Column(nullable = false)
+    private String fatherName;
+
+    @Column(nullable = false)
+    private String lastName;
+
     @Column(nullable = false, unique = true, length = 10)
     private String mobile;
 

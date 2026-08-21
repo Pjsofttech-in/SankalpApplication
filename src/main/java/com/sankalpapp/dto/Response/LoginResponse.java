@@ -2,6 +2,8 @@ package com.sankalpapp.dto.Response;
 
 import lombok.*;
 
+import java.util.Map;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,4 +17,5 @@ public class LoginResponse {
     private String role;
     private String token;
     private String message;
+    private Map<String, Object> data;
 }
