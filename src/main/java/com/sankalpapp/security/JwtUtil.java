@@ -2,13 +2,12 @@ package com.sankalpapp.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -23,7 +22,7 @@ public class JwtUtil {
     private static final long JWT_EXPIRATION = 1000 * 60 * 60 * 24;
 
     // Generate Secret Key
-    private Key getSigningKey() {
+    private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
@@ -31,11 +30,9 @@ public class JwtUtil {
     // Generate JWT Token
     public String generateToken(UserDetails userDetails) {
 
-        return Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+        return Jwts.builder().subject(userDetails.getUsername()).issuedAt(new Date()).
+                expiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
+                .signWith(getSigningKey())
                 .compact();
     }
 
@@ -60,11 +57,9 @@ public class JwtUtil {
     // Extract All Claims
     private Claims extractAllClaims(String token) {
 
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build().parseSignedClaims(token).getPayload();
     }
 
     // Check Token Expiry
@@ -80,5 +75,14 @@ public class JwtUtil {
 
         return username.equals(userDetails.getUsername())
                 && !isTokenExpired(token);
+    }
+
+    public String generateTokenFromUrl(String url) {
+        return Jwts.builder()
+                .subject(url)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
+                .signWith(getSigningKey())
+                .compact();
     }
 }
