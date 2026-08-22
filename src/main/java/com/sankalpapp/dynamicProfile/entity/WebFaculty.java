@@ -19,7 +19,7 @@ public class WebFaculty {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String facilityName;
-    private Byte experienceInYear;
+    private String experienceInYear;
     private String subject;
     private String facilityEducation;
     private String facilityImage;
