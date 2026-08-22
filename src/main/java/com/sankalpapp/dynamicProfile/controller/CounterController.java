@@ -18,14 +18,14 @@ public class CounterController {
     public ResponseEntity<WebCounter> createCounter(@RequestBody WebCounter webCounter,
                                                     @RequestParam String role,
                                                     @RequestParam String email,
-                                                    @RequestParam String url) {
+                                                    @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.createCounter(webCounter, url));
     }
 
     @GetMapping("/getAllCounters")
     public ResponseEntity<List<WebCounter>> getAllCountersByBranchCode(
-            
-            @RequestParam String url) {
+
+            @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getAllByBranchCode(url));
     }
 
@@ -33,7 +33,7 @@ public class CounterController {
     public ResponseEntity<WebCounter> getCounterById(@PathVariable Long id,
                                                      @RequestParam String role,
                                                      @RequestParam String email,
-                                                     @RequestParam String url) {
+                                                     @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getCounterById(id, url));
     }
 
@@ -42,7 +42,7 @@ public class CounterController {
                                                     @RequestBody WebCounter webCounter,
                                                     @RequestParam String role,
                                                     @RequestParam String email,
-                                                    @RequestParam String url) {
+                                                    @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.updateCounter(id, webCounter, url));
     }
 
@@ -50,7 +50,7 @@ public class CounterController {
     public ResponseEntity<String> deleteCounter(@PathVariable Long id,
                                                 @RequestParam String role,
                                                 @RequestParam String email,
-                                                @RequestParam String url) {
+                                                @RequestParam(required = false) String url) {
         service.deleteCounter(id, url);
         return ResponseEntity.ok("Counter deleted successfully");
     }

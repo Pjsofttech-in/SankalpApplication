@@ -21,7 +21,7 @@ public class TestimonialsController {
     @PostMapping(value = "/createTestimonial", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<WebTestimonials> create(
             @RequestPart("testimonial") String testimonialJson,
-            @RequestParam String url,
+            @RequestParam(required = false) String url,
             @RequestParam("testimonialImage") MultipartFile testimonialImage) throws JsonProcessingException {
 
         WebTestimonials webTestimonials = new ObjectMapper().readValue(testimonialJson, WebTestimonials.class);
@@ -30,13 +30,13 @@ public class TestimonialsController {
     }
 
     @GetMapping("/getAllTestimonials")
-    public ResponseEntity<List<WebTestimonials>> getAllByBranchCode(@RequestParam String url) {
+    public ResponseEntity<List<WebTestimonials>> getAllByBranchCode(@RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getAllByBranchCode(url));
     }
 
     @GetMapping("/getTestimonialById/{id}")
     public ResponseEntity<WebTestimonials> getById(@PathVariable Long id,
-                                                   @RequestParam String url) {
+                                                   @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getById(id, url));
     }
 
@@ -45,7 +45,7 @@ public class TestimonialsController {
             @PathVariable Long id,
             @RequestPart("testimonial") String testimonialJson,
             @RequestPart(value = "testimonialImage", required = false) MultipartFile testimonialImage,
-            @RequestParam String url) throws JsonProcessingException {
+            @RequestParam(required = false) String url) throws JsonProcessingException {
 
         WebTestimonials webTestimonials = new ObjectMapper().readValue(testimonialJson, WebTestimonials.class);
         return ResponseEntity.ok(service.update(id, webTestimonials, testimonialImage, url));
@@ -53,7 +53,7 @@ public class TestimonialsController {
 
     @DeleteMapping("/deleteTestimonial/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id,
-                                         @RequestParam String url) {
+                                         @RequestParam(required = false) String url) {
         service.delete(id, url);
         return ResponseEntity.ok("Testimonial deleted successfully");
     }

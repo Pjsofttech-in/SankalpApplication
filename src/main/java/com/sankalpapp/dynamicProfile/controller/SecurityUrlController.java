@@ -1,8 +1,8 @@
 package com.sankalpapp.dynamicProfile.controller;
 
 import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
-import com.sankalpapp.security.JwtUtil;
 import com.sankalpapp.dynamicProfile.service.SecurityUrlService;
+import com.sankalpapp.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +29,7 @@ public class SecurityUrlController {
     public ResponseEntity<List<WebSecurityUrl>> getAllByBranchCode() {
         return ResponseEntity.ok(service.getAll());
     }
+
     @PutMapping("/updateSecurityUrl/{id}")
     public ResponseEntity<WebSecurityUrl> update(@PathVariable long id,
                                                  @RequestBody WebSecurityUrl webSecurityUrl) {
@@ -36,7 +37,7 @@ public class SecurityUrlController {
     }
 
     @GetMapping("/getTokenForUser")
-    public ResponseEntity<?> generateTokenByUrl(@RequestParam String url) {
+    public ResponseEntity<?> generateTokenByUrl(@RequestParam(required = false) String url) {
         String token = jwtUtil.generateTokenFromUrl(url);
 
         Map<String, String> response = new HashMap<>();

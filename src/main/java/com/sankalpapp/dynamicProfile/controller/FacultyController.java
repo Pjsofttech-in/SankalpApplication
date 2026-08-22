@@ -21,7 +21,7 @@ public class FacultyController {
     @PostMapping(value = "/createFacility", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<WebFaculty> createFacility(
             @RequestPart("facility") String facilityJson,
-            @RequestParam String url,
+            @RequestParam(required = false) String url,
             @RequestPart("facilityImageName") MultipartFile imageFile) throws JsonProcessingException {
 
 
@@ -32,14 +32,14 @@ public class FacultyController {
 
     @GetMapping("/getAllFacilities")
     public ResponseEntity<List<WebFaculty>> getAllFacilitiesByBranchCode(
-            
-            @RequestParam String url) {
+
+            @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getAllFacilitiesByBranchCode(url));
     }
 
     @GetMapping("/getFacilityById/{id}")
     public ResponseEntity<WebFaculty> getFacilityById(@PathVariable Long id,
-                                                      @RequestParam String url) {
+                                                      @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getFacilityById(id, url));
     }
 
@@ -47,7 +47,7 @@ public class FacultyController {
     public ResponseEntity<WebFaculty> updateFacility(@PathVariable Long id,
                                                      @RequestPart("facility") String facilityJson,
                                                      @RequestPart(value = "facilityImage", required = false) MultipartFile image,
-                                                     @RequestParam String url) throws JsonProcessingException {
+                                                     @RequestParam(required = false) String url) throws JsonProcessingException {
 
         WebFaculty webFaculty = new ObjectMapper().readValue(facilityJson, WebFaculty.class);
         return ResponseEntity.ok(service.updateFacility(id, webFaculty, image, url));
@@ -55,7 +55,7 @@ public class FacultyController {
 
     @DeleteMapping("/deleteFacility/{id}")
     public ResponseEntity<String> deleteFacility(@PathVariable Long id,
-                                                 @RequestParam String url) {
+                                                 @RequestParam(required = false) String url) {
         service.deleteFacility(id, url);
         return ResponseEntity.ok("Facility deleted successfully");
     }

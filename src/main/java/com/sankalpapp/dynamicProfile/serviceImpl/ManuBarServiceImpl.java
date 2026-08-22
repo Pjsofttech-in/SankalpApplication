@@ -42,9 +42,7 @@ public class ManuBarServiceImpl implements ManuBarService {
 
     @Override
     public WebManuBar createManuBar(WebManuBar webManuBar, MultipartFile menubarImage, String url) {
-        validateUrlExists(url);
-
-        WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
+         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
         webManuBar.setUrl(url);
@@ -66,17 +64,13 @@ public class ManuBarServiceImpl implements ManuBarService {
 
     @Override
     public List<WebManuBar> getAllByBranchCode(String url) {
-        validateUrlExists(url);
-
-        return repository.findAllOrderById();
+         return repository.findAllOrderById();
     }
 
 
     @Override
     public WebManuBar updateManuBar(Long id, WebManuBar webManuBar, MultipartFile menubarImage, String url) {
-        validateUrlExists(url);
-
-        WebManuBar existing = repository.findById(id)
+         WebManuBar existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ManuBar not found"));
 
         existing.setManuBarColor(webManuBar.getManuBarColor() != null ? webManuBar.getManuBarColor() : existing.getManuBarColor());
@@ -102,9 +96,7 @@ public class ManuBarServiceImpl implements ManuBarService {
 
     @Override
     public void deleteManuBar(Long id, String url) {
-        validateUrlExists(url);
-
-        WebManuBar webManuBar = repository.findById(id)
+         WebManuBar webManuBar = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ManuBar not found"));
 
         if (webManuBar.getMenubarImage() != null && webManuBar.getMenubarImage().contains("amazonaws.com")) {
@@ -116,9 +108,7 @@ public class ManuBarServiceImpl implements ManuBarService {
 
     @Override
     public WebManuBar getManuBarById(Long id, String url) {
-        validateUrlExists(url);
-
-        return repository.findById(id)
+         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ManuBar not found"));
     }
 }

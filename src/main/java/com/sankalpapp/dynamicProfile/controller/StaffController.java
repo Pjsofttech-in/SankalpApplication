@@ -12,8 +12,7 @@ import java.util.Map;
 
 @RestController
 //@CrossOrigin(origins = "http://localhost:3000")
-public class StaffController
-{
+public class StaffController {
     @Autowired
     private StaffService staffLoginService;
 

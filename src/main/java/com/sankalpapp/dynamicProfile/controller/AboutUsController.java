@@ -21,7 +21,7 @@ public class AboutUsController {
     @PostMapping(value = "/createAboutUs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<WebAboutUs> createAboutUs(
             @RequestPart("aboutUs") String aboutUsJson,
-            @RequestParam String url,
+            @RequestParam(required = false) String url,
             @RequestParam("aboutUsImageName") MultipartFile aboutUsImage) throws JsonProcessingException {
 
 
@@ -32,26 +32,22 @@ public class AboutUsController {
 
     @GetMapping("/getAllAboutUs")
     public ResponseEntity<List<WebAboutUs>> getAllAboutUsByBranchCode(
-            
-            @RequestParam String url) {
+
+            @RequestParam(required = false) String url) {
 
         return ResponseEntity.ok(service.getAllAboutUsByBranchCode(url));
     }
 
     @GetMapping("/getAboutUsById/{id}")
     public ResponseEntity<WebAboutUs> getAboutUsById(@PathVariable int id,
-                                                     @RequestParam String role,
-                                                     @RequestParam String email,
-                                                     @RequestParam String url) {
+                                                     @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getAboutUsById(id, url));
     }
 
     @PutMapping(value = "/updateAboutUs/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<WebAboutUs> updateAboutUs(@PathVariable int id,
                                                     @RequestPart("aboutUs") String aboutUsJson,
-                                                    @RequestParam String role,
-                                                    @RequestParam String email,
-                                                    @RequestParam String url,
+                                                    @RequestParam(required = false) String url,
                                                     @RequestPart(value = "aboutUsImage", required = false) MultipartFile aboutUsImage) throws JsonProcessingException {
 
         WebAboutUs webAboutUs = new ObjectMapper().readValue(aboutUsJson, WebAboutUs.class);
@@ -62,7 +58,7 @@ public class AboutUsController {
     public ResponseEntity<String> deleteAboutUs(@PathVariable int id,
                                                 @RequestParam String role,
                                                 @RequestParam String email,
-                                                @RequestParam String url) {
+                                                @RequestParam(required = false) String url) {
         service.deleteAboutUs(id, url);
         return ResponseEntity.ok("AboutUs deleted successfully");
     }

@@ -37,7 +37,7 @@ public class FacultyTitleServiceImpl implements FacultyTitleService {
 
     @Override
     public WebFacultyTitle createFacilityTitle(WebFacultyTitle webFacultyTitle, String url) {
-        validateUrlExists(url);
+        //validateUrlExists;
         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
@@ -49,16 +49,14 @@ public class FacultyTitleServiceImpl implements FacultyTitleService {
 
     @Override
     public List<WebFacultyTitle> getAllFacilityTitlesByBranchCode(String url) {
-        validateUrlExists(url);
+        //validateUrlExists;
         return repository.findAllOrderById();
     }
 
 
     @Override
     public WebFacultyTitle updateFacilityTitle(Long id, WebFacultyTitle updated, String url) {
-        validateUrlExists(url);
-
-        WebFacultyTitle existing = repository.findById(id)
+         WebFacultyTitle existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("FacilityTitle not found"));
 
         existing.setFacilityTitle(updated.getFacilityTitle() != null ? updated.getFacilityTitle() : existing.getFacilityTitle());
@@ -68,17 +66,13 @@ public class FacultyTitleServiceImpl implements FacultyTitleService {
 
     @Override
     public void deleteFacilityTitle(Long id, String url) {
-        validateUrlExists(url);
-
-        repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("FacilityTitle not found"));
+         repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("FacilityTitle not found"));
         repository.deleteById(id);
     }
 
     @Override
     public WebFacultyTitle getFacilityTitleById(Long id, String url) {
-        validateUrlExists(url);
-
-        return repository.findById(id)
+         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("FacilityTitle not found"));
     }
 }

@@ -42,7 +42,7 @@ public class VisionMissionServiceImpl implements VisionMissionService {
 
     @Override
     public WebVisionMission create(WebVisionMission vm, MultipartFile directorImage, String url) {
-        validateUrlExists(url);
+        //validateUrlExists;
         // ❗ Prevent duplicate creation per branch
 
         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
@@ -66,15 +66,13 @@ public class VisionMissionServiceImpl implements VisionMissionService {
 
     @Override
     public List<WebVisionMission> getAllByBranchCode(String url) {
-        validateUrlExists(url);
-
-        return repository.findAllOrderById();
+         return repository.findAllOrderById();
     }
 
 
     @Override
     public WebVisionMission update(Long id, WebVisionMission vm, MultipartFile directorImage, String url) {
-        validateUrlExists(url);
+        //validateUrlExists;
         WebVisionMission existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("VisionMission not found"));
 
@@ -107,9 +105,7 @@ public class VisionMissionServiceImpl implements VisionMissionService {
 
     @Override
     public void delete(Long id, String url) {
-        validateUrlExists(url);
-
-        WebVisionMission vm = repository.findById(id)
+         WebVisionMission vm = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("VisionMission not found"));
 
         // Delete image from S3 if exists
@@ -122,9 +118,7 @@ public class VisionMissionServiceImpl implements VisionMissionService {
 
     @Override
     public WebVisionMission getById(Long id, String url) {
-        validateUrlExists(url);
-
-        return repository.findById(id)
+         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("VisionMission not found"));
     }
 }

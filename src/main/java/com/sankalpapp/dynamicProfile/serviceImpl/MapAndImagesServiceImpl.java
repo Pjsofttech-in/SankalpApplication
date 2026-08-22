@@ -41,9 +41,7 @@ public class MapAndImagesServiceImpl implements MapAndImagesService {
 
     @Override
     public WebMapAndImages create(WebMapAndImages entity, MultipartFile imageFile, String url) {
-        validateUrlExists(url);
-
-        WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
+         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
         entity.setUrl(url);
@@ -64,17 +62,13 @@ public class MapAndImagesServiceImpl implements MapAndImagesService {
 
     @Override
     public List<WebMapAndImages> getAllByBranchCode(String url) {
-        validateUrlExists(url);
-
-        return repository.findAllOrderById();
+         return repository.findAllOrderById();
     }
 
 
     @Override
     public WebMapAndImages update(Long id, WebMapAndImages updated, MultipartFile imageFile, String url) {
-        validateUrlExists(url);
-
-        WebMapAndImages existing = repository.findById(id)
+         WebMapAndImages existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("MapAndImages not found"));
 
         existing.setMaps(updated.getMaps() != null ? updated.getMaps() : existing.getMaps());
@@ -100,9 +94,7 @@ public class MapAndImagesServiceImpl implements MapAndImagesService {
 
     @Override
     public void delete(Long id, String url) {
-        validateUrlExists(url);
-
-        WebMapAndImages entity = repository.findById(id)
+         WebMapAndImages entity = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("MapAndImages not found"));
 
         if (entity.getContactImage() != null && entity.getContactImage().contains("amazonaws.com")) {
@@ -114,9 +106,7 @@ public class MapAndImagesServiceImpl implements MapAndImagesService {
 
     @Override
     public WebMapAndImages getById(Long id, String url) {
-        validateUrlExists(url);
-
-        return repository.findById(id)
+         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("MapAndImages not found"));
     }
 }

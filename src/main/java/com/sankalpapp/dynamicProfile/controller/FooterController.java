@@ -16,31 +16,31 @@ public class FooterController {
 
     @PostMapping("/createFooter")
     public ResponseEntity<WebFooter> createFooter(@RequestBody WebFooter webFooter,
-                                                  @RequestParam String url) {
+                                                  @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.createFooter(webFooter, url));
     }
 
     @GetMapping("/getAllFooters")
-    public ResponseEntity<List<WebFooter>> getAllFootersByBranchCode(@RequestParam String url) {
+    public ResponseEntity<List<WebFooter>> getAllFootersByBranchCode(@RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getAllFootersByBranchCode(url));
     }
 
     @GetMapping("/getFooterById/{id}")
     public ResponseEntity<WebFooter> getFooterById(@PathVariable Long id,
-                                                   @RequestParam String url) {
+                                                   @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getFooterById(id, url));
     }
 
     @PutMapping("/updateFooter/{id}")
     public ResponseEntity<WebFooter> updateFooter(@PathVariable Long id,
                                                   @RequestBody WebFooter webFooter,
-                                                  @RequestParam String url) {
+                                                  @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.updateFooter(id, webFooter, url));
     }
 
     @DeleteMapping("/deleteFooter/{id}")
     public ResponseEntity<String> deleteFooter(@PathVariable Long id,
-                                               @RequestParam String url) {
+                                               @RequestParam(required = false) String url) {
         service.deleteFooter(id, url);
         return ResponseEntity.ok("Footer deleted successfully");
     }

@@ -21,7 +21,7 @@ public class MapAndImagesController {
     @PostMapping(value = "/createMapAndImages", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<WebMapAndImages> create(
             @RequestPart("mapAndImages") String mapAndImagesJson,
-            @RequestParam String url,
+            @RequestParam(required = false) String url,
             @RequestParam("contactImage") MultipartFile imageFile) throws JsonProcessingException {
 
         WebMapAndImages webMapAndImages = new ObjectMapper().readValue(mapAndImagesJson, WebMapAndImages.class);
@@ -29,13 +29,13 @@ public class MapAndImagesController {
     }
 
     @GetMapping("/getAllMapAndImages")
-    public ResponseEntity<List<WebMapAndImages>> getAllByBranchCode(@RequestParam String url) {
+    public ResponseEntity<List<WebMapAndImages>> getAllByBranchCode(@RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getAllByBranchCode(url));
     }
 
     @GetMapping("/getMapAndImagesById/{id}")
     public ResponseEntity<WebMapAndImages> getById(@PathVariable Long id,
-                                                   @RequestParam String url) {
+                                                   @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getById(id, url));
     }
 
@@ -44,7 +44,7 @@ public class MapAndImagesController {
             @PathVariable Long id,
             @RequestPart("mapAndImages") String mapAndImagesJson,
             @RequestPart(value = "contactImage", required = false) MultipartFile imageFile,
-            @RequestParam String url) throws JsonProcessingException {
+            @RequestParam(required = false) String url) throws JsonProcessingException {
 
         WebMapAndImages updated = new ObjectMapper().readValue(mapAndImagesJson, WebMapAndImages.class);
         return ResponseEntity.ok(service.update(id, updated, imageFile, url));
@@ -52,7 +52,7 @@ public class MapAndImagesController {
 
     @DeleteMapping("/deleteMapAndImages/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id,
-                                         @RequestParam String url) {
+                                         @RequestParam(required = false) String url) {
         service.delete(id, url);
         return ResponseEntity.ok("MapAndImages deleted successfully");
     }

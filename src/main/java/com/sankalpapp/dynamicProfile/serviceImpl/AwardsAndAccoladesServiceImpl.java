@@ -25,16 +25,6 @@ public class AwardsAndAccoladesServiceImpl implements AwardsAndAccoladesService 
     @Autowired
     private S3Service s3Service;
 
-    private void validateUrlExists(String url)
-    {
-        String normalizedUrl = normalizeUrl(url);
-
-        securityUrlRepository.findByUrl(normalizedUrl)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed"
-                ));
-    }
-
 
     private String normalizeUrl(String url) {
         return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
@@ -42,9 +32,7 @@ public class AwardsAndAccoladesServiceImpl implements AwardsAndAccoladesService 
 
     @Override
     public WebAwardsAndAccolades createAward(WebAwardsAndAccolades award, MultipartFile awardImage, String url) {
-        validateUrlExists(url);
-
-        WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
+         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
         // Static color logic: Use color from first record if exists
@@ -71,16 +59,14 @@ public class AwardsAndAccoladesServiceImpl implements AwardsAndAccoladesService 
 
     @Override
     public List<WebAwardsAndAccolades> getAllAwardsByBranchCode(String url) {
-        validateUrlExists(url);
+        //validateUrlExists;
         return repository.findAllOrderById();
     }
 
 
     @Override
     public WebAwardsAndAccolades updateAward(Long id, WebAwardsAndAccolades award, MultipartFile awardImage, String url) {
-        validateUrlExists(url);
-
-        WebAwardsAndAccolades existing = repository.findById(id)
+         WebAwardsAndAccolades existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Award not found"));
 
         existing.setAwardName(award.getAwardName() != null ? award.getAwardName() : existing.getAwardName());
@@ -119,9 +105,7 @@ public class AwardsAndAccoladesServiceImpl implements AwardsAndAccoladesService 
 
     @Override
     public void deleteAward(Long id, String url) {
-        validateUrlExists(url);
-
-        WebAwardsAndAccolades award = repository.findById(id)
+         WebAwardsAndAccolades award = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Award not found"));
 
         if (award.getAwardImage() != null && award.getAwardImage().contains("amazonaws.com")) {
@@ -133,9 +117,7 @@ public class AwardsAndAccoladesServiceImpl implements AwardsAndAccoladesService 
 
     @Override
     public WebAwardsAndAccolades getAwardById(Long id, String url) {
-        validateUrlExists(url);
-
-        return repository.findById(id)
+         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Award not found"));
     }
 }

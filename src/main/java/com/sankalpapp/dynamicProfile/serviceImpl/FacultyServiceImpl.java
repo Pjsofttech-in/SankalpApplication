@@ -41,9 +41,7 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public WebFaculty createFacility(WebFaculty webFaculty, MultipartFile image, String url) {
-        validateUrlExists(url);
-
-        WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
+         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
         // Apply static color logic
@@ -70,16 +68,14 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public List<WebFaculty> getAllFacilitiesByBranchCode(String url) {
-        validateUrlExists(url);
+        //validateUrlExists;
         return repository.findAllOrderById();
     }
 
 
     @Override
     public WebFaculty updateFacility(Long id, WebFaculty webFaculty, MultipartFile image, String url) {
-        validateUrlExists(url);
-
-        WebFaculty existing = repository.findById(id)
+         WebFaculty existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Facility not found"));
 
         existing.setFacilityName(webFaculty.getFacilityName() != null ? webFaculty.getFacilityName() : existing.getFacilityName());
@@ -115,9 +111,7 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public void deleteFacility(Long id, String url) {
-        validateUrlExists(url);
-
-        WebFaculty webFaculty = repository.findById(id)
+         WebFaculty webFaculty = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Facility not found"));
 
         if (webFaculty.getFacilityImage() != null && webFaculty.getFacilityImage().contains("amazonaws.com")) {
@@ -129,9 +123,7 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public WebFaculty getFacilityById(Long id, String url) {
-        validateUrlExists(url);
-
-        return repository.findById(id)
+         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Facility not found"));
     }
 }

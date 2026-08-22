@@ -21,7 +21,7 @@ public class ManuBarController {
     @PostMapping(value = "/createManuBar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<WebManuBar> createManuBar(
             @RequestPart("manuBar") String manuBarJson,
-            @RequestParam String url,
+            @RequestParam(required = false) String url,
             @RequestParam("menubarImageName") MultipartFile imageFile) throws JsonProcessingException {
 
 
@@ -31,13 +31,13 @@ public class ManuBarController {
     }
 
     @GetMapping("/getAllManuBars")
-    public ResponseEntity<List<WebManuBar>> getAllByBranchCode(@RequestParam String url) {
+    public ResponseEntity<List<WebManuBar>> getAllByBranchCode(@RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getAllByBranchCode(url));
     }
 
     @GetMapping("/getManuBarById/{id}")
     public ResponseEntity<WebManuBar> getManuBarById(@PathVariable Long id,
-                                                     @RequestParam String url) {
+                                                     @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getManuBarById(id, url));
     }
 
@@ -45,7 +45,7 @@ public class ManuBarController {
     public ResponseEntity<WebManuBar> updateManuBar(@PathVariable Long id,
                                                     @RequestPart("manuBar") String manuBarJson,
                                                     @RequestPart(value = "menubarImage", required = false) MultipartFile menubarImage,
-                                                    @RequestParam String url) throws JsonProcessingException {
+                                                    @RequestParam(required = false) String url) throws JsonProcessingException {
 
         WebManuBar webManuBar = new ObjectMapper().readValue(manuBarJson, WebManuBar.class);
         return ResponseEntity.ok(service.updateManuBar(id, webManuBar, menubarImage, url));
@@ -53,7 +53,7 @@ public class ManuBarController {
 
     @DeleteMapping("/deleteManuBar/{id}")
     public ResponseEntity<String> deleteManuBar(@PathVariable Long id,
-                                                @RequestParam String url) {
+                                                @RequestParam(required = false) String url) {
         service.deleteManuBar(id, url);
         return ResponseEntity.ok("ManuBar deleted successfully");
     }

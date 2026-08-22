@@ -51,9 +51,7 @@ public class JobCareerOptionServiceImpl implements JobCareerOptionService {
 
     @Override
     public WebJobCareerOptionDTO create(WebJobCareerOption option, MultipartFile resumeFile, String url, Long webHRDetailsId) {
-        validateUrlExists(url);
-
-        WebHRDetails webHRDetails = webHRDetailsRepository.findById(webHRDetailsId)
+         WebHRDetails webHRDetails = webHRDetailsRepository.findById(webHRDetailsId)
                 .orElseThrow(() -> new ResourceNotFoundException("HR not found by id: " + webHRDetailsId));
 
         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
@@ -83,9 +81,7 @@ public class JobCareerOptionServiceImpl implements JobCareerOptionService {
 
     @Override
     public WebJobCareerOptionDTO update(Long id, WebJobCareerOption option, MultipartFile resumeFile, String url, Long webHRDetailsId) {
-        validateUrlExists(url);
-
-        WebJobCareerOption existing = repository.findById(id)
+         WebJobCareerOption existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Job post not found"));
 
         existing.setTitle(option.getTitle() != null ? option.getTitle() : existing.getTitle());
@@ -129,9 +125,7 @@ public class JobCareerOptionServiceImpl implements JobCareerOptionService {
 
     @Override
     public List<WebJobCareerOptionDTO> getAllByBranchCode(String url) {
-        validateUrlExists(url);
-
-        return repository.findAllOrderById()
+         return repository.findAllOrderById()
                 .stream()
                 .map(this::mapToDTO)
                 .toList();
@@ -139,9 +133,7 @@ public class JobCareerOptionServiceImpl implements JobCareerOptionService {
 
     @Override
     public WebJobCareerOptionDTO getById(Long id, String url) {
-        validateUrlExists(url);
-
-        WebJobCareerOption job = repository.findById(id)
+         WebJobCareerOption job = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Job post not found"));
 
         return mapToDTO(job);
@@ -172,9 +164,7 @@ public class JobCareerOptionServiceImpl implements JobCareerOptionService {
 
     @Override
     public void delete(Long id, String url) {
-        validateUrlExists(url);
-
-        WebJobCareerOption job = repository.findById(id)
+         WebJobCareerOption job = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Job post not found with ID: " + id));
 
         repository.delete(job);

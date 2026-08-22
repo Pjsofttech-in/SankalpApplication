@@ -42,9 +42,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public WebCourse createCourse(WebCourse webCourse, MultipartFile courseImage, String url) {
-        validateUrlExists(url);
-
-        WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
+         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
         // ✅ If it's not the first course, apply color from the first course
@@ -73,17 +71,13 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<WebCourse> getAllCoursesByBranchCode(String url) {
-        validateUrlExists(url);
-
-        return repository.findAllOrderById();
+         return repository.findAllOrderById();
     }
 
 
     @Override
     public WebCourse updateCourse(int id, WebCourse webCourse, MultipartFile courseImage, String url) {
-        validateUrlExists(url);
-
-        WebCourse existing = repository.findById(id)
+         WebCourse existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         existing.setCourseName(webCourse.getCourseName() != null ? webCourse.getCourseName() : existing.getCourseName());
@@ -122,9 +116,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void deleteCourse(int id, String url) {
-        validateUrlExists(url);
-
-        WebCourse webCourse = repository.findById(id)
+         WebCourse webCourse = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         if (webCourse.getCourseImage() != null && webCourse.getCourseImage().contains("amazonaws.com")) {
@@ -136,9 +128,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public WebCourse getCourseById(int id, String url) {
-        validateUrlExists(url);
-
-        return repository.findById(id)
+         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
     }
 }

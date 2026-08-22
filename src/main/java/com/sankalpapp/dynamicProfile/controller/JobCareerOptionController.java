@@ -23,7 +23,7 @@ public class JobCareerOptionController {
     public ResponseEntity<WebJobCareerOptionDTO> create(
             @RequestPart("job") String jobJson,
             @RequestPart("resumeFile") MultipartFile resumeFile,
-            @RequestParam String url,
+            @RequestParam(required = false) String url,
             @RequestParam Long webHRDetailsId) throws JsonProcessingException {
 
         WebJobCareerOption job = new ObjectMapper().readValue(jobJson, WebJobCareerOption.class);
@@ -32,15 +32,15 @@ public class JobCareerOptionController {
 
     @GetMapping("/getAllJobCareerOptions")
     public ResponseEntity<List<WebJobCareerOptionDTO>> getAllByBranchCode(
-            
-            @RequestParam String url) {
+
+            @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getAllByBranchCode(url));
     }
 
     @GetMapping("/getJobCareerOptionById/{id}")
     public ResponseEntity<WebJobCareerOptionDTO> getById(
             @PathVariable Long id,
-            @RequestParam String url) {
+            @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getById(id, url));
     }
 
@@ -49,7 +49,7 @@ public class JobCareerOptionController {
             @PathVariable Long id,
             @RequestPart("job") String jobJson,
             @RequestPart(value = "resumeFile", required = false) MultipartFile resumeFile,
-            @RequestParam String url,
+            @RequestParam(required = false) String url,
             @RequestParam(required = false) Long webHRDetailsId) throws Exception {
 
         WebJobCareerOption job = new ObjectMapper().readValue(jobJson, WebJobCareerOption.class);
@@ -59,7 +59,7 @@ public class JobCareerOptionController {
     @DeleteMapping("/deleteJobCareerOption/{id}")
     public ResponseEntity<String> delete(
             @PathVariable Long id,
-            @RequestParam String url) {
+            @RequestParam(required = false) String url) {
         service.delete(id, url);
         return ResponseEntity.ok("Job post deleted successfully");
     }
