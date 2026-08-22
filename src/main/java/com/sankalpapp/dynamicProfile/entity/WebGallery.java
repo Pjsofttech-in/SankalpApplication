@@ -24,6 +24,8 @@ public class WebGallery {
 
     private String eventName;
     private String month;
+    private String title;
+    private String link;
     private Integer year;
     private String galleryColor;
     private String url;

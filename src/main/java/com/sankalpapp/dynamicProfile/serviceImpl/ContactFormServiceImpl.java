@@ -66,6 +66,7 @@ public class ContactFormServiceImpl implements ContactFormService {
         existing.setName(webContactForm.getName() != null ? webContactForm.getName() : existing.getName());
         existing.setMobileNo(webContactForm.getMobileNo() != null ? webContactForm.getMobileNo() : existing.getMobileNo());
         existing.setCourse(webContactForm.getCourse() != null ? webContactForm.getCourse() : existing.getCourse());
+        existing.setSubject(webContactForm.getSubject() != null ? webContactForm.getSubject() : existing.getSubject());
         existing.setDescription(webContactForm.getDescription() != null ? webContactForm.getDescription() : existing.getDescription());
         existing.setAcademicYear(webContactForm.getAcademicYear() != null ? webContactForm.getAcademicYear() : existing.getAcademicYear());
         existing.setEmail(webContactForm.getEmail() != null ? webContactForm.getEmail() : existing.getEmail());

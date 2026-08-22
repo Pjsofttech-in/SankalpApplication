@@ -50,7 +50,7 @@ public class TestimonialsServiceImpl implements TestimonialsService {
         // Static color logic
         List<WebTestimonials> existingTestimonials = repository.findAll();
         if (!existingTestimonials.isEmpty()) {
-            webTestimonials.setTestimonialColor(existingTestimonials.get(0).getTestimonialColor());
+            webTestimonials.setTestimonialColor(existingTestimonials.getFirst().getTestimonialColor());
         }
 
         webTestimonials.setUrl(url);
@@ -91,6 +91,8 @@ public class TestimonialsServiceImpl implements TestimonialsService {
             existing.setExam(webTestimonials.getExam());
         if (webTestimonials.getPost() != null)
             existing.setPost(webTestimonials.getPost());
+        if (webTestimonials.getRank() != null)
+            existing.setRank(webTestimonials.getRank());
         if (webTestimonials.getDescription() != null)
             existing.setDescription(webTestimonials.getDescription());
 

@@ -25,6 +25,7 @@ public class WebContactForm {
     @Pattern(regexp = "^\\d{10}$", message = "Mobile number must be exactly 10 digits")
     private String mobileNo;
     private String course;
+    private String subject;
     private String description;
     @Email
     private String email;

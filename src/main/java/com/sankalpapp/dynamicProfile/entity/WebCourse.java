@@ -23,6 +23,8 @@ public class WebCourse {
     private String courseDescription;
     private String courseImage;
     private String courseColor;
+    private String duration;
+    private Double price;
     private String url;
 
     

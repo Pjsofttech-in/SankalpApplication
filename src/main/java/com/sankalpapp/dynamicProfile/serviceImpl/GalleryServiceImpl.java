@@ -92,6 +92,7 @@ public class GalleryServiceImpl implements GalleryService {
         if (webGallery.getEventName() != null) existing.setEventName(webGallery.getEventName());
         if (webGallery.getYear() != null) existing.setYear(webGallery.getYear());
         if (webGallery.getUrl() != null) existing.setUrl(webGallery.getUrl());
+        if (webGallery.getTitle() != null) existing.setTitle(webGallery.getTitle());
 
         // Static color update logic
         if (webGallery.getGalleryColor() != null && !webGallery.getGalleryColor().equals(existing.getGalleryColor())) {
