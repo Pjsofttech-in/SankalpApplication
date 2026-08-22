@@ -22,6 +22,7 @@ public class WebTestimonials {
     private String testimonialName;
     private String exam;
     private String post;
+    @Column(name = "`rank`")
     private String rank;
     private String testimonialImage;
     private String description;
