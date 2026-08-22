@@ -22,6 +22,7 @@ public class WebTestimonials {
     private String testimonialName;
     private String exam;
     private String post;
+    private String rank;
     private String testimonialImage;
     private String description;
     private String testimonialColor;

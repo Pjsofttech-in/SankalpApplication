@@ -23,6 +23,7 @@ public class WebTopper {
 
     private String name;
     private String totalMarks;
+    private String className;
     private String post;
 
     @Column(name = "`rank`")

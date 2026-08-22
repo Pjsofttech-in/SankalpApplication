@@ -81,6 +81,10 @@ public class AboutUsServiceImpl implements AboutUsService {
         existing.setAboutUsTitle(webAboutUs.getAboutUsTitle() != null ? webAboutUs.getAboutUsTitle() : existing.getAboutUsTitle());
         existing.setAboutUsDescription(webAboutUs.getAboutUsDescription() != null ? webAboutUs.getAboutUsDescription() : existing.getAboutUsDescription());
         existing.setUrl(webAboutUs.getUrl() != null ? webAboutUs.getUrl() : existing.getUrl());
+        existing.setTotalExamCenters(webAboutUs.getTotalExamCenters());
+        existing.setTotalFaculties(webAboutUs.getTotalFaculties());
+        existing.setTotalStudents(webAboutUs.getTotalStudents());
+        existing.setTotalYearsOfExcellence(webAboutUs.getTotalYearsOfExcellence());
 
 //        if (aboutUsImage != null && !aboutUsImage.isEmpty()) {
 //            try {

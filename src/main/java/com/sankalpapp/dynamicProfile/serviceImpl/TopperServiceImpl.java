@@ -84,6 +84,7 @@ public class TopperServiceImpl implements TopperService {
                 .orElseThrow(() -> new ResourceNotFoundException("Topper not found"));
 
         existing.setName(updatedWebTopper.getName() != null ? updatedWebTopper.getName() : existing.getName());
+        existing.setClassName(updatedWebTopper.getClassName() != null ? updatedWebTopper.getClassName() : existing.getClassName());
         existing.setPost(updatedWebTopper.getPost() != null ? updatedWebTopper.getPost() : existing.getPost());
         existing.setTotalMarks(updatedWebTopper.getTotalMarks() != null ? updatedWebTopper.getTotalMarks() : existing.getTotalMarks());
         existing.setRank(updatedWebTopper.getRank() != null ? updatedWebTopper.getRank() : existing.getRank());

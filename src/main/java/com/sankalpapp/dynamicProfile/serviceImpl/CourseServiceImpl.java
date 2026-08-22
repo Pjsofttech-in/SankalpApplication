@@ -89,6 +89,8 @@ public class CourseServiceImpl implements CourseService {
         existing.setCourseName(webCourse.getCourseName() != null ? webCourse.getCourseName() : existing.getCourseName());
         existing.setCourseDescription(webCourse.getCourseDescription() != null ? webCourse.getCourseDescription() : existing.getCourseDescription());
         existing.setUrl(webCourse.getUrl() != null ? webCourse.getUrl() : existing.getUrl());
+        existing.setDuration(webCourse.getDuration() != null ? webCourse.getDuration() : existing.getDuration());
+        existing.setPrice(webCourse.getPrice() != null ? webCourse.getPrice() : existing.getPrice());
 
         // If course color is updated, propagate to all courses
         String newColor = webCourse.getCourseColor();

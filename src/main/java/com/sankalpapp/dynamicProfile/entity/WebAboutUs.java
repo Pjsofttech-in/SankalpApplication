@@ -23,8 +23,11 @@ public class WebAboutUs {
     private String aboutUsDescription;
     private String aboutUsImage;
     private String url;
+    private String totalYearsOfExcellence;
+    private String totalExamCenters;
+    private String totalFaculties;
+    private String totalStudents;
 
-    
     
     
 
