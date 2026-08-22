@@ -50,17 +50,13 @@ public class ContactFormServiceImpl implements ContactFormService {
 
     @Override
     public List<WebContactForm> getAllByBranchCode(String url) {
-        validateUrlExists(url);
-
-        return repository.findAllOrderById();
+         return repository.findAllOrderById();
     }
 
 
     @Override
     public WebContactForm update(Long id, WebContactForm webContactForm, String url) {
-        validateUrlExists(url);
-
-        WebContactForm existing = repository.findById(id)
+         WebContactForm existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ContactForm not found"));
 
         existing.setName(webContactForm.getName() != null ? webContactForm.getName() : existing.getName());
@@ -76,17 +72,13 @@ public class ContactFormServiceImpl implements ContactFormService {
 
     @Override
     public void delete(Long id, String url) {
-        validateUrlExists(url);
-
-        repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("ContactForm not found"));
+         repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("ContactForm not found"));
         repository.deleteById(id);
     }
 
     @Override
     public WebContactForm getById(Long id, String url) {
-        validateUrlExists(url);
-
-        return repository.findById(id)
+         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ContactForm not found"));
     }
 }

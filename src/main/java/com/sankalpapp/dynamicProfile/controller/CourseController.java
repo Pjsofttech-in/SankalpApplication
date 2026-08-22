@@ -21,7 +21,7 @@ public class CourseController {
     @PostMapping(value = "/createCourse", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<WebCourse> createCourse(
             @RequestPart("course") String courseJson,
-            @RequestParam String url,
+            @RequestParam(required = false) String url,
             @RequestParam("courseImage") MultipartFile courseImageFile) throws JsonProcessingException {
 
         WebCourse webCourse = new ObjectMapper().readValue(courseJson, WebCourse.class);
@@ -30,13 +30,13 @@ public class CourseController {
     }
 
     @GetMapping("/getAllCourses")
-    public ResponseEntity<List<WebCourse>> getAllCoursesByBranchCode(@RequestParam String url) {
+    public ResponseEntity<List<WebCourse>> getAllCoursesByBranchCode(@RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getAllCoursesByBranchCode(url));
     }
 
     @GetMapping("/getCourseById/{id}")
     public ResponseEntity<WebCourse> getCourseById(@PathVariable int id,
-                                                   @RequestParam String url) {
+                                                   @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getCourseById(id, url));
     }
 
@@ -45,7 +45,7 @@ public class CourseController {
             @PathVariable int id,
             @RequestPart("course") String courseJson,
             @RequestPart(value = "courseImage", required = false) MultipartFile courseImage,
-            @RequestParam String url) throws JsonProcessingException {
+            @RequestParam(required = false) String url) throws JsonProcessingException {
 
         WebCourse webCourse = new ObjectMapper().readValue(courseJson, WebCourse.class);
         WebCourse updated = service.updateCourse(id, webCourse, courseImage, url);
@@ -54,7 +54,7 @@ public class CourseController {
 
     @DeleteMapping("/deleteCourse/{id}")
     public ResponseEntity<String> deleteCourse(@PathVariable int id,
-                                               @RequestParam String url) {
+                                               @RequestParam(required = false) String url) {
         service.deleteCourse(id, url);
         return ResponseEntity.ok("Course deleted successfully");
     }

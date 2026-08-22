@@ -21,7 +21,7 @@ public class VisionMissionController {
     @PostMapping(value = "/createVisionMission", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<WebVisionMission> createVisionMission(
             @RequestPart("vm") String vmJson,
-            @RequestParam String url,
+            @RequestParam(required = false) String url,
             @RequestPart(value = "directorImage", required = false) MultipartFile directorImageFile
     ) throws JsonProcessingException {
 
@@ -30,13 +30,13 @@ public class VisionMissionController {
     }
 
     @GetMapping("/getAllVisionMissions")
-    public ResponseEntity<List<WebVisionMission>> getAllByBranchCode(@RequestParam String url) {
+    public ResponseEntity<List<WebVisionMission>> getAllByBranchCode(@RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getAllByBranchCode(url));
     }
 
     @GetMapping("/getVisionMissionById/{id}")
     public ResponseEntity<WebVisionMission> getVisionMissionById(@PathVariable Long id,
-                                                                 @RequestParam String url) {
+                                                                 @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getById(id, url));
     }
 
@@ -45,7 +45,7 @@ public class VisionMissionController {
             @PathVariable Long id,
             @RequestPart("vm") String vmJson,
             @RequestPart(value = "directorImage", required = false) MultipartFile directorImage,
-            @RequestParam String url) throws JsonProcessingException {
+            @RequestParam(required = false) String url) throws JsonProcessingException {
 
         WebVisionMission vm = new ObjectMapper().readValue(vmJson, WebVisionMission.class);
         return ResponseEntity.ok(service.update(id, vm, directorImage, url));
@@ -53,7 +53,7 @@ public class VisionMissionController {
 
     @DeleteMapping("/deleteVisionMission/{id}")
     public ResponseEntity<String> deleteVisionMission(@PathVariable Long id,
-                                                      @RequestParam String url) {
+                                                      @RequestParam(required = false) String url) {
         service.delete(id, url);
         return ResponseEntity.ok("VisionMission deleted successfully");
     }

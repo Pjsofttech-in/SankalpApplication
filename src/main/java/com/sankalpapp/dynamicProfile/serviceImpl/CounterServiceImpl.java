@@ -36,9 +36,7 @@ public class CounterServiceImpl implements CounterService {
 
     @Override
     public WebCounter createCounter(WebCounter webCounter, String url) {
-        validateUrlExists(url);
-
-        WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
+         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("URL not found"));
 
         webCounter.setWebSecurityUrl(webSecurityUrl);
@@ -49,17 +47,13 @@ public class CounterServiceImpl implements CounterService {
 
     @Override
     public List<WebCounter> getAllByBranchCode(String url) {
-        validateUrlExists(url);
-
-        return repository.findAllOrderById();
+         return repository.findAllOrderById();
     }
 
 
     @Override
     public WebCounter updateCounter(Long id, WebCounter webCounter, String url) {
-        validateUrlExists(url);
-
-        WebCounter existing = repository.findById(id)
+         WebCounter existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Counter not found"));
 
         // Update values
@@ -82,9 +76,7 @@ public class CounterServiceImpl implements CounterService {
 
     @Override
     public void deleteCounter(Long id, String url) {
-        validateUrlExists(url);
-
-        WebCounter webCounter = repository.findById(id)
+         WebCounter webCounter = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Counter not found"));
 
         repository.delete(webCounter);
@@ -92,9 +84,7 @@ public class CounterServiceImpl implements CounterService {
 
     @Override
     public WebCounter getCounterById(Long id, String url) {
-        validateUrlExists(url);
-
-        return repository.findById(id)
+         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Counter not found"));
     }
 }

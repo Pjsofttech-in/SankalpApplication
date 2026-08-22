@@ -44,9 +44,7 @@ public class SlideBarServiceImpl implements SlideBarService {
 
     @Override
     public WebSlideBar createSlideBar(WebSlideBar webSlideBar, List<MultipartFile> slideBarImages, String url) {
-        validateUrlExists(url);
-
-        WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
+         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
         webSlideBar.setUrl(url);
@@ -76,9 +74,7 @@ public class SlideBarServiceImpl implements SlideBarService {
 
     @Override
     public List<WebSlideBar> getAllByBranchCode(String url) {
-        validateUrlExists(url);
-
-        return repository.findAllOrderById();
+         return repository.findAllOrderById();
     }
 
 
@@ -86,9 +82,7 @@ public class SlideBarServiceImpl implements SlideBarService {
     @Override
     public WebSlideBar updateSlideBar(Long id, WebSlideBar webSlideBar,
                                       List<MultipartFile> newImages, List<String> deleteImages, String url) {
-        validateUrlExists(url);
-
-        WebSlideBar existing = repository.findById(id)
+         WebSlideBar existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("SlideBar not found"));
 
         // Update optional fields
@@ -150,9 +144,7 @@ public class SlideBarServiceImpl implements SlideBarService {
 
     @Override
     public void deleteSlideBar(Long id, String url) {
-        validateUrlExists(url);
-
-        WebSlideBar webSlideBar = repository.findById(id)
+         WebSlideBar webSlideBar = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("SlideBar not found"));
 
         // ✅ Delete all images
@@ -170,9 +162,7 @@ public class SlideBarServiceImpl implements SlideBarService {
 
     @Override
     public WebSlideBar getSlideBarById(Long id, String url) {
-        validateUrlExists(url);
-
-        return repository.findById(id)
+         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("SlideBar not found"));
     }
 }

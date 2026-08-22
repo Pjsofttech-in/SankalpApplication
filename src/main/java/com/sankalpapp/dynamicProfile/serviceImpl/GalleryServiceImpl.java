@@ -43,9 +43,7 @@ public class GalleryServiceImpl implements GalleryService {
 
     @Override
     public WebGallery createGallery(WebGallery webGallery, List<MultipartFile> images, String url) {
-        validateUrlExists(url);
-
-        WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
+         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("Security URL not found"));
 
         webGallery.setUrl(url);
@@ -77,7 +75,7 @@ public class GalleryServiceImpl implements GalleryService {
 
     @Override
     public List<WebGallery> getAllGalleriesByBranchCode(String url) {
-        validateUrlExists(url);
+        //validateUrlExists;
         return repository.findAllOrderById();
     }
 
@@ -85,7 +83,7 @@ public class GalleryServiceImpl implements GalleryService {
     @Override
     public WebGallery updateGallery(Long id, WebGallery webGallery,
                                     List<MultipartFile> newImages, List<String> deleteImages, String url) {
-        validateUrlExists(url);
+        //validateUrlExists;
         WebGallery existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found"));
 
@@ -140,9 +138,7 @@ public class GalleryServiceImpl implements GalleryService {
 
     @Override
     public void deleteGallery(Long id, String url) {
-        validateUrlExists(url);
-
-        WebGallery webGallery = repository.findById(id)
+         WebGallery webGallery = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found"));
 
         if (webGallery.getGalleryImages() != null) {
@@ -156,9 +152,7 @@ public class GalleryServiceImpl implements GalleryService {
 
     @Override
     public WebGallery getGalleryById(Long id, String url) {
-        validateUrlExists(url);
-
-        return repository.findById(id)
+         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found"));
     }
 

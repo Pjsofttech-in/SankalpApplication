@@ -21,7 +21,7 @@ public class AwardsAndAccoladesController {
     @PostMapping(value = "/createAward", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<WebAwardsAndAccolades> createAward(
             @RequestPart("award") String awardJson,
-            @RequestParam String url,
+            @RequestParam(required = false) String url,
             @RequestParam("awardImageName") MultipartFile awardImageFile) throws JsonProcessingException {
 
 
@@ -32,14 +32,14 @@ public class AwardsAndAccoladesController {
 
     @GetMapping("/getAllAwards")
     public ResponseEntity<List<WebAwardsAndAccolades>> getAllAwardsByBranchCode(
-            @RequestParam String url) {
+            @RequestParam(required = false) String url) {
 
         return ResponseEntity.ok(service.getAllAwardsByBranchCode(url));
     }
 
     @GetMapping("/getAwardById/{id}")
     public ResponseEntity<WebAwardsAndAccolades> getAwardById(@PathVariable Long id,
-                                                              @RequestParam String url) {
+                                                              @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getAwardById(id, url));
     }
 
@@ -47,7 +47,7 @@ public class AwardsAndAccoladesController {
     public ResponseEntity<WebAwardsAndAccolades> updateAward(@PathVariable Long id,
                                                              @RequestPart("award") String awardJson,
                                                              @RequestPart(value = "awardImage", required = false) MultipartFile awardImage,
-                                                             @RequestParam String url) throws JsonProcessingException {
+                                                             @RequestParam(required = false) String url) throws JsonProcessingException {
 
         WebAwardsAndAccolades award = new ObjectMapper().readValue(awardJson, WebAwardsAndAccolades.class);
         return ResponseEntity.ok(service.updateAward(id, award, awardImage, url));
@@ -55,7 +55,7 @@ public class AwardsAndAccoladesController {
 
     @DeleteMapping("/deleteAward/{id}")
     public ResponseEntity<String> deleteAward(@PathVariable Long id,
-                                              @RequestParam String url) {
+                                              @RequestParam(required = false) String url) {
         service.deleteAward(id, url);
         return ResponseEntity.ok("Award deleted successfully");
     }

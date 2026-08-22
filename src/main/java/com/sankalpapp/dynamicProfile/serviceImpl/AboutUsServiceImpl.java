@@ -42,9 +42,7 @@ public class AboutUsServiceImpl implements AboutUsService {
 
     @Override
     public WebAboutUs createAboutUs(WebAboutUs webAboutUs, MultipartFile aboutUsImage, String url) {
-        validateUrlExists(url);
-
-        WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
+         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
         webAboutUs.setUrl(url);
@@ -66,16 +64,12 @@ public class AboutUsServiceImpl implements AboutUsService {
 
     @Override
     public List<WebAboutUs> getAllAboutUsByBranchCode(String url) {
-        validateUrlExists(url);
-
-        return repository.findAllOrderById();
+         return repository.findAllOrderById();
     }
 
     @Override
     public WebAboutUs updateAboutUs(int id, WebAboutUs webAboutUs, MultipartFile aboutUsImage, String url) {
-        validateUrlExists(url);
-
-        WebAboutUs existing = repository.findById(id)
+         WebAboutUs existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("AboutUs not found"));
 
         existing.setAboutUsTitle(webAboutUs.getAboutUsTitle() != null ? webAboutUs.getAboutUsTitle() : existing.getAboutUsTitle());
@@ -107,9 +101,7 @@ public class AboutUsServiceImpl implements AboutUsService {
 
     @Override
     public void deleteAboutUs(int id, String url) {
-        validateUrlExists(url);
-
-        WebAboutUs webAboutUs = repository.findById(id)
+         WebAboutUs webAboutUs = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("AboutUs not found"));
 
         // Delete image from S3 if exists
@@ -122,9 +114,7 @@ public class AboutUsServiceImpl implements AboutUsService {
 
     @Override
     public WebAboutUs getAboutUsById(int id, String url) {
-        validateUrlExists(url);
-
-        return repository.findById(id)
+         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("AboutUs not found"));
     }
 }

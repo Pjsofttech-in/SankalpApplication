@@ -16,34 +16,34 @@ public class ContactFormController {
 
     @PostMapping("/createContactForm")
     public ResponseEntity<WebContactForm> createContactForm(@RequestBody WebContactForm webContactForm,
-                                                            @RequestParam String url) {
+                                                            @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.create(webContactForm, url));
     }
 
     @GetMapping("/getAllContactForms")
     public ResponseEntity<List<WebContactForm>> getAllContactFormsByBranchCode(
-            
-            @RequestParam String url) {
+
+            @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getAllByBranchCode(url));
     }
 
     @GetMapping("/getContactFormById/{id}")
     public ResponseEntity<WebContactForm> getContactFormById(@PathVariable Long id,
-                                                             
-                                                             @RequestParam String url) {
+
+                                                             @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getById(id, url));
     }
 
     @PutMapping("/updateContactForm/{id}")
     public ResponseEntity<WebContactForm> updateContactForm(@PathVariable Long id,
                                                             @RequestBody WebContactForm webContactForm,
-                                                            @RequestParam String url) {
+                                                            @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.update(id, webContactForm, url));
     }
 
     @DeleteMapping("/deleteContactForm/{id}")
     public ResponseEntity<String> deleteContactForm(@PathVariable Long id,
-                                                    @RequestParam String url) {
+                                                    @RequestParam(required = false) String url) {
         service.delete(id, url);
         return ResponseEntity.ok("ContactForm deleted successfully");
     }

@@ -38,9 +38,7 @@ public class WebHRDetailsServiceImpl implements WebHRDetailsService {
 
     @Override
     public WebHRDetails create(WebHRDetails webHRDetails, String url) {
-        validateUrlExists(url);
-
-        String normalizedUrl = normalizeUrl(url);
+         String normalizedUrl = normalizeUrl(url);
         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizedUrl)
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist"));
 
@@ -51,24 +49,20 @@ public class WebHRDetailsServiceImpl implements WebHRDetailsService {
 
     @Override
     public List<WebHRDetails> getAllByBranchCode(String url) {
-        validateUrlExists(url);
+        //validateUrlExists;
         return repository.findAllOrderById();
     }
 
 
     @Override
     public WebHRDetails getById(Long id, String url) {
-        validateUrlExists(url);
-
-        return repository.findById(id)
+         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("WebHRDetails not found"));
     }
 
     @Override
     public WebHRDetails update(Long id, WebHRDetails webHRDetails, String url) {
-        validateUrlExists(url);
-
-        WebHRDetails existing = repository.findById(id)
+         WebHRDetails existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("WebHRDetails not found"));
 
         existing.setHrName(webHRDetails.getHrName() != null ? webHRDetails.getHrName() : existing.getHrName());
@@ -80,9 +74,7 @@ public class WebHRDetailsServiceImpl implements WebHRDetailsService {
 
     @Override
     public void delete(Long id, String url) {
-        validateUrlExists(url);
-
-        repository.findById(id)
+         repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("WebHRDetails not found"));
         repository.deleteById(id);
     }

@@ -36,9 +36,7 @@ public class FooterServiceImpl implements FooterService {
     }
     @Override
     public WebFooter createFooter(WebFooter webFooter, String url) {
-        validateUrlExists(url);
-
-        String normalizedUrl = normalizeUrl(url);
+         String normalizedUrl = normalizeUrl(url);
         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizedUrl)
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
@@ -51,15 +49,13 @@ public class FooterServiceImpl implements FooterService {
 
     @Override
     public List<WebFooter> getAllFootersByBranchCode(String url) {
-        validateUrlExists(url);
-
-        return repository.findAllOrderById();
+         return repository.findAllOrderById();
     }
 
 
     @Override
     public WebFooter updateFooter(Long id, WebFooter webFooter, String url) {
-        validateUrlExists(url);
+        //validateUrlExists;
         WebFooter existing = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Footer not found"));
 
@@ -80,9 +76,7 @@ public class FooterServiceImpl implements FooterService {
 
     @Override
     public void deleteFooter(Long id, String url) {
-        validateUrlExists(url);
-
-        repository.findById(id)
+         repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Footer not found"));
 
         repository.deleteById(id);
@@ -90,9 +84,7 @@ public class FooterServiceImpl implements FooterService {
 
     @Override
     public WebFooter getFooterById(Long id, String url) {
-        validateUrlExists(url);
-
-        return repository.findById(id)
+         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Footer not found"));
     }
 }

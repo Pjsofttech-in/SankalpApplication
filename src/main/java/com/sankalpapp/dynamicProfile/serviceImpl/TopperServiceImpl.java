@@ -42,9 +42,7 @@ public class TopperServiceImpl implements TopperService {
 
     @Override
     public WebTopper createTopper(WebTopper webTopper, MultipartFile topperImage, String url) {
-        validateUrlExists(url);
-
-        WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
+         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
         // Apply static color from first record if exists
@@ -71,16 +69,12 @@ public class TopperServiceImpl implements TopperService {
 
     @Override
     public List<WebTopper> getAllToppersByBranchCode(String url) {
-        validateUrlExists(url);
-
-        return repository.findAllOrderById();
+         return repository.findAllOrderById();
     }
 
     @Override
     public WebTopper updateTopper(Long id, WebTopper updatedWebTopper, MultipartFile topperImage, String url) {
-        validateUrlExists(url);
-
-        WebTopper existing = repository.findById(id)
+         WebTopper existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Topper not found"));
 
         existing.setName(updatedWebTopper.getName() != null ? updatedWebTopper.getName() : existing.getName());
@@ -122,9 +116,7 @@ public class TopperServiceImpl implements TopperService {
 
     @Override
     public void deleteTopper(Long id, String url) {
-        validateUrlExists(url);
-
-        WebTopper webTopper = repository.findById(id)
+         WebTopper webTopper = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Topper not found"));
 
         if (webTopper.getTopperImage() != null && webTopper.getTopperImage().contains("amazonaws.com")) {
@@ -136,9 +128,7 @@ public class TopperServiceImpl implements TopperService {
 
     @Override
     public WebTopper getTopperById(Long id, String url) {
-        validateUrlExists(url);
-
-        return repository.findById(id)
+         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Topper not found"));
     }
 }

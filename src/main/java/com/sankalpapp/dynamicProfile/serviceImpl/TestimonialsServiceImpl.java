@@ -43,7 +43,7 @@ public class TestimonialsServiceImpl implements TestimonialsService {
 
     @Override
     public WebTestimonials create(WebTestimonials webTestimonials, MultipartFile testimonialImage, String url) {
-        validateUrlExists(url);
+        //validateUrlExists;
         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
                 .orElseThrow(() -> new ResourceNotFoundException("URL not found in SecurityUrl table"));
 
@@ -70,17 +70,13 @@ public class TestimonialsServiceImpl implements TestimonialsService {
 
     @Override
     public List<WebTestimonials> getAllByBranchCode(String url) {
-        validateUrlExists(url);
-
-        return repository.findAllOrderById();
+         return repository.findAllOrderById();
     }
 
 
     @Override
     public WebTestimonials update(Long id, WebTestimonials webTestimonials, MultipartFile testimonialImage, String url) {
-        validateUrlExists(url);
-
-        WebTestimonials existing = repository.findById(id)
+         WebTestimonials existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Testimonial not found"));
 
         if (webTestimonials.getTestimonialTitle() != null)
@@ -125,9 +121,7 @@ public class TestimonialsServiceImpl implements TestimonialsService {
 
     @Override
     public void delete(Long id, String url) {
-        validateUrlExists(url);
-
-        WebTestimonials testimonial = repository.findById(id)
+         WebTestimonials testimonial = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Testimonial not found"));
 
         if (testimonial.getTestimonialImage() != null && testimonial.getTestimonialImage().contains("amazonaws.com")) {
@@ -139,9 +133,7 @@ public class TestimonialsServiceImpl implements TestimonialsService {
 
     @Override
     public WebTestimonials getById(Long id, String url) {
-        validateUrlExists(url);
-
-        return repository.findById(id)
+         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Testimonial not found"));
     }
 }

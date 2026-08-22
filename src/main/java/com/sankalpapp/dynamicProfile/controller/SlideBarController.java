@@ -19,7 +19,7 @@ public class SlideBarController {
 
     @PostMapping("/createSlideBar")
     public ResponseEntity<WebSlideBar> createSlideBar(@RequestParam("slideBar") String slideBarJson,
-                                                      @RequestParam String url,
+                                                      @RequestParam(required = false) String url,
                                                       @RequestParam(value = "slideBarImages", required = false) List<MultipartFile> slideBarImages)
             throws JsonProcessingException {
 
@@ -28,20 +28,20 @@ public class SlideBarController {
     }
 
     @GetMapping("/getAllSlideBars")
-    public ResponseEntity<List<WebSlideBar>> getAllSlideBarsByBranchCode(@RequestParam String url) {
+    public ResponseEntity<List<WebSlideBar>> getAllSlideBarsByBranchCode(@RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getAllByBranchCode(url));
     }
 
     @GetMapping("/getSlideBarById/{id}")
     public ResponseEntity<WebSlideBar> getSlideBarById(@PathVariable Long id,
-                                                       @RequestParam String url) {
+                                                       @RequestParam(required = false) String url) {
         return ResponseEntity.ok(service.getSlideBarById(id, url));
     }
 
     @PutMapping("/updateSlideBar/{id}")
     public ResponseEntity<WebSlideBar> updateSlideBar(@PathVariable Long id,
                                                       @RequestParam(value = "slideBar", required = false) String slideBarJson,
-                                                      @RequestParam String url,
+                                                      @RequestParam(required = false) String url,
                                                       @RequestParam(value = "newImages", required = false) List<MultipartFile> newImages,
                                                       @RequestParam(value = "deleteImages", required = false) List<MultipartFile> deleteImageFiles)
             throws JsonProcessingException {
@@ -65,7 +65,7 @@ public class SlideBarController {
 
     @DeleteMapping("/deleteSlideBar/{id}")
     public ResponseEntity<String> deleteSlideBar(@PathVariable Long id,
-                                                 @RequestParam String url) {
+                                                 @RequestParam(required = false) String url) {
         service.deleteSlideBar(id, url);
         return ResponseEntity.ok("SlideBar deleted successfully");
     }
