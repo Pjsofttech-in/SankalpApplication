@@ -3,7 +3,6 @@ package com.sankalpapp.dynamicProfile.serviceImpl;
 import com.sankalpapp.dynamicProfile.entity.WebMapAndImages;
 import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
 import com.sankalpapp.dynamicProfile.repository.MapAndImagesRepository;
-import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.service.MapAndImagesService;
 import com.sankalpapp.dynamicProfile.service.S3Service;
 import com.sankalpapp.exception.ResourceNotFoundException;
@@ -20,20 +19,7 @@ public class MapAndImagesServiceImpl implements MapAndImagesService {
     private MapAndImagesRepository repository;
 
     @Autowired
-    private SecurityUrlrepository securityUrlRepository;
-
-    @Autowired
     private S3Service s3Service;
-
-    private void validateUrlExists(String url) {
-
-        String normalizedUrl = normalizeUrl(url);
-        securityUrlRepository.findByUrl(normalizedUrl)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Provided URL [" + url + "] does not exist"
-                ));
-    }
-
 
     private String normalizeUrl(String url) {
         return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
@@ -41,11 +27,8 @@ public class MapAndImagesServiceImpl implements MapAndImagesService {
 
     @Override
     public WebMapAndImages create(WebMapAndImages entity, MultipartFile imageFile, String url) {
-         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
-                .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
         entity.setUrl(url);
-        entity.setWebSecurityUrl(webSecurityUrl);
 
 //        if (imageFile != null && !imageFile.isEmpty()) {
 //            try {
@@ -62,13 +45,13 @@ public class MapAndImagesServiceImpl implements MapAndImagesService {
 
     @Override
     public List<WebMapAndImages> getAllByBranchCode(String url) {
-         return repository.findAllOrderById();
+        return repository.findAllOrderById();
     }
 
 
     @Override
     public WebMapAndImages update(Long id, WebMapAndImages updated, MultipartFile imageFile, String url) {
-         WebMapAndImages existing = repository.findById(id)
+        WebMapAndImages existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("MapAndImages not found"));
 
         existing.setMaps(updated.getMaps() != null ? updated.getMaps() : existing.getMaps());
@@ -94,7 +77,7 @@ public class MapAndImagesServiceImpl implements MapAndImagesService {
 
     @Override
     public void delete(Long id, String url) {
-         WebMapAndImages entity = repository.findById(id)
+        WebMapAndImages entity = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("MapAndImages not found"));
 
         if (entity.getContactImage() != null && entity.getContactImage().contains("amazonaws.com")) {
@@ -106,7 +89,7 @@ public class MapAndImagesServiceImpl implements MapAndImagesService {
 
     @Override
     public WebMapAndImages getById(Long id, String url) {
-         return repository.findById(id)
+        return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("MapAndImages not found"));
     }
 }

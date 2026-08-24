@@ -2,11 +2,10 @@ package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
 import com.sankalpapp.dynamicProfile.entity.WebSlideBar;
-import com.sankalpapp.exception.ResourceNotFoundException;
-import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.repository.SlideBarRepository;
 import com.sankalpapp.dynamicProfile.service.S3Service;
 import com.sankalpapp.dynamicProfile.service.SlideBarService;
+import com.sankalpapp.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,21 +21,7 @@ public class SlideBarServiceImpl implements SlideBarService {
     private SlideBarRepository repository;
 
     @Autowired
-    private SecurityUrlrepository securityUrlRepository;
-
-    @Autowired
     private S3Service s3Service;
-
-    private void validateUrlExists(String url) {
-
-        String normalizedUrl = normalizeUrl(url);
-
-        securityUrlRepository.findByUrl(normalizedUrl)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed for branchCode"
-                ));
-    }
-
 
     private String normalizeUrl(String url) {
         return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
@@ -44,11 +29,8 @@ public class SlideBarServiceImpl implements SlideBarService {
 
     @Override
     public WebSlideBar createSlideBar(WebSlideBar webSlideBar, List<MultipartFile> slideBarImages, String url) {
-         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
-                .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
         webSlideBar.setUrl(url);
-        webSlideBar.setWebSecurityUrl(webSecurityUrl);
 
 //        List<String> uploadedUrls = new ArrayList<>();
 //        if (slideBarImages != null && !slideBarImages.isEmpty()) {
@@ -70,19 +52,16 @@ public class SlideBarServiceImpl implements SlideBarService {
     }
 
 
-
-
     @Override
     public List<WebSlideBar> getAllByBranchCode(String url) {
-         return repository.findAllOrderById();
+        return repository.findAllOrderById();
     }
-
 
 
     @Override
     public WebSlideBar updateSlideBar(Long id, WebSlideBar webSlideBar,
                                       List<MultipartFile> newImages, List<String> deleteImages, String url) {
-         WebSlideBar existing = repository.findById(id)
+        WebSlideBar existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("SlideBar not found"));
 
         // Update optional fields
@@ -141,10 +120,9 @@ public class SlideBarServiceImpl implements SlideBarService {
     }
 
 
-
     @Override
     public void deleteSlideBar(Long id, String url) {
-         WebSlideBar webSlideBar = repository.findById(id)
+        WebSlideBar webSlideBar = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("SlideBar not found"));
 
         // ✅ Delete all images
@@ -162,7 +140,7 @@ public class SlideBarServiceImpl implements SlideBarService {
 
     @Override
     public WebSlideBar getSlideBarById(Long id, String url) {
-         return repository.findById(id)
+        return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("SlideBar not found"));
     }
 }

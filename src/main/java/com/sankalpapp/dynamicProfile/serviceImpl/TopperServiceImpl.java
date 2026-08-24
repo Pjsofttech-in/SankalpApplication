@@ -2,11 +2,10 @@ package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
 import com.sankalpapp.dynamicProfile.entity.WebTopper;
-import com.sankalpapp.exception.ResourceNotFoundException;
-import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.repository.TopperRepository;
 import com.sankalpapp.dynamicProfile.service.S3Service;
 import com.sankalpapp.dynamicProfile.service.TopperService;
+import com.sankalpapp.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,21 +19,7 @@ public class TopperServiceImpl implements TopperService {
     private TopperRepository repository;
 
     @Autowired
-    private SecurityUrlrepository securityUrlRepository;
-
-    @Autowired
     private S3Service s3Service;
-
-    private void validateUrlExists(String url) {
-
-        String normalizedUrl = normalizeUrl(url);
-
-        securityUrlRepository.findByUrl(normalizedUrl)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed"
-                ));
-    }
-
 
     private String normalizeUrl(String url) {
         return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
@@ -42,9 +27,6 @@ public class TopperServiceImpl implements TopperService {
 
     @Override
     public WebTopper createTopper(WebTopper webTopper, MultipartFile topperImage, String url) {
-         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
-                .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
-
         // Apply static color from first record if exists
         List<WebTopper> existingWebToppers = repository.findAll();
         if (!existingWebToppers.isEmpty()) {
@@ -52,7 +34,6 @@ public class TopperServiceImpl implements TopperService {
         }
 
         webTopper.setUrl(url);
-        webTopper.setWebSecurityUrl(webSecurityUrl);
 
 //        if (topperImage != null && !topperImage.isEmpty()) {
 //            try {
@@ -69,12 +50,12 @@ public class TopperServiceImpl implements TopperService {
 
     @Override
     public List<WebTopper> getAllToppersByBranchCode(String url) {
-         return repository.findAllOrderById();
+        return repository.findAllOrderById();
     }
 
     @Override
     public WebTopper updateTopper(Long id, WebTopper updatedWebTopper, MultipartFile topperImage, String url) {
-         WebTopper existing = repository.findById(id)
+        WebTopper existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Topper not found"));
 
         existing.setName(updatedWebTopper.getName() != null ? updatedWebTopper.getName() : existing.getName());
@@ -116,7 +97,7 @@ public class TopperServiceImpl implements TopperService {
 
     @Override
     public void deleteTopper(Long id, String url) {
-         WebTopper webTopper = repository.findById(id)
+        WebTopper webTopper = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Topper not found"));
 
         if (webTopper.getTopperImage() != null && webTopper.getTopperImage().contains("amazonaws.com")) {
@@ -128,7 +109,7 @@ public class TopperServiceImpl implements TopperService {
 
     @Override
     public WebTopper getTopperById(Long id, String url) {
-         return repository.findById(id)
+        return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Topper not found"));
     }
 }

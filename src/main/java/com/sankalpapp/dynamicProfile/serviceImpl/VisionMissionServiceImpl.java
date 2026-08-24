@@ -2,11 +2,10 @@ package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
 import com.sankalpapp.dynamicProfile.entity.WebVisionMission;
-import com.sankalpapp.exception.ResourceNotFoundException;
-import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.repository.VisionMissionRepository;
 import com.sankalpapp.dynamicProfile.service.S3Service;
 import com.sankalpapp.dynamicProfile.service.VisionMissionService;
+import com.sankalpapp.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,21 +19,7 @@ public class VisionMissionServiceImpl implements VisionMissionService {
     private VisionMissionRepository repository;
 
     @Autowired
-    private SecurityUrlrepository securityUrlRepository;
-
-    @Autowired
     private S3Service s3Service;
-
-    private void validateUrlExists(String url) {
-
-        String normalizedUrl = normalizeUrl(url);
-
-        securityUrlRepository.findByUrl(normalizedUrl)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed"
-                ));
-    }
-
 
     private String normalizeUrl(String url) {
         return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
@@ -45,12 +30,7 @@ public class VisionMissionServiceImpl implements VisionMissionService {
         //validateUrlExists;
         // ❗ Prevent duplicate creation per branch
 
-        WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
-                .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
-
         vm.setUrl(url);
-        vm.setWebSecurityUrl(webSecurityUrl);
-
         if (directorImage != null && !directorImage.isEmpty()) {
 //            try {
 //                String imageUrl = s3Service.uploadImage(directorImage);
@@ -66,7 +46,7 @@ public class VisionMissionServiceImpl implements VisionMissionService {
 
     @Override
     public List<WebVisionMission> getAllByBranchCode(String url) {
-         return repository.findAllOrderById();
+        return repository.findAllOrderById();
     }
 
 
@@ -105,7 +85,7 @@ public class VisionMissionServiceImpl implements VisionMissionService {
 
     @Override
     public void delete(Long id, String url) {
-         WebVisionMission vm = repository.findById(id)
+        WebVisionMission vm = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("VisionMission not found"));
 
         // Delete image from S3 if exists
@@ -118,7 +98,7 @@ public class VisionMissionServiceImpl implements VisionMissionService {
 
     @Override
     public WebVisionMission getById(Long id, String url) {
-         return repository.findById(id)
+        return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("VisionMission not found"));
     }
 }

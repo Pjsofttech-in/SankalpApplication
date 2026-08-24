@@ -16,8 +16,7 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 @Service
-public class StaffService
-{
+public class StaffService {
     private final WebClient webClient;
 
     @Autowired
@@ -52,7 +51,8 @@ public class StaffService
                         .build())
                 .header(HttpHeaders.AUTHORIZATION, token)  // pass it as-is
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Map<String, Boolean>>() {})
+                .bodyToMono(new ParameterizedTypeReference<Map<String, Boolean>>() {
+                })
                 .block();
     }
 
@@ -68,7 +68,8 @@ public class StaffService
                         .build())
                 .header(HttpHeaders.AUTHORIZATION, token)  // Pass token directly
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
+                })
                 .block();
 
     }

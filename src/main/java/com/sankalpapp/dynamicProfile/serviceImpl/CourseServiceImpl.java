@@ -2,11 +2,10 @@ package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebCourse;
 import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
-import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.CourseRepository;
-import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.service.CourseService;
 import com.sankalpapp.dynamicProfile.service.S3Service;
+import com.sankalpapp.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,21 +19,7 @@ public class CourseServiceImpl implements CourseService {
     private CourseRepository repository;
 
     @Autowired
-    private SecurityUrlrepository securityUrlRepository;
-
-    @Autowired
     private S3Service s3Service;
-
-    private void validateUrlExists(String url) {
-
-        String normalizedUrl = normalizeUrl(url);
-
-        securityUrlRepository.findByUrl(normalizedUrl)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed"
-                ));
-    }
-
 
     private String normalizeUrl(String url) {
         return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
@@ -42,8 +27,6 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public WebCourse createCourse(WebCourse webCourse, MultipartFile courseImage, String url) {
-         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
-                .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
 
         // ✅ If it's not the first course, apply color from the first course
         List<WebCourse> allCours = repository.findAll();
@@ -53,7 +36,6 @@ public class CourseServiceImpl implements CourseService {
         // ✅ If it's the first course, use the color from the request (leave as-is)
 
         webCourse.setUrl(url);
-        webCourse.setWebSecurityUrl(webSecurityUrl);
 
 //        if (courseImage != null && !courseImage.isEmpty()) {
 //            try {
@@ -68,16 +50,15 @@ public class CourseServiceImpl implements CourseService {
     }
 
 
-
     @Override
     public List<WebCourse> getAllCoursesByBranchCode(String url) {
-         return repository.findAllOrderById();
+        return repository.findAllOrderById();
     }
 
 
     @Override
     public WebCourse updateCourse(int id, WebCourse webCourse, MultipartFile courseImage, String url) {
-         WebCourse existing = repository.findById(id)
+        WebCourse existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         existing.setCourseName(webCourse.getCourseName() != null ? webCourse.getCourseName() : existing.getCourseName());
@@ -116,7 +97,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void deleteCourse(int id, String url) {
-         WebCourse webCourse = repository.findById(id)
+        WebCourse webCourse = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         if (webCourse.getCourseImage() != null && webCourse.getCourseImage().contains("amazonaws.com")) {
@@ -128,7 +109,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public WebCourse getCourseById(int id, String url) {
-         return repository.findById(id)
+        return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
     }
 }

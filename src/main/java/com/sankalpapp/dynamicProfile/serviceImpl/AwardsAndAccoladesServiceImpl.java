@@ -1,12 +1,10 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebAwardsAndAccolades;
-import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
-import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.AwardsAndAccoladesRepository;
-import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.service.AwardsAndAccoladesService;
 import com.sankalpapp.dynamicProfile.service.S3Service;
+import com.sankalpapp.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,21 +18,16 @@ public class AwardsAndAccoladesServiceImpl implements AwardsAndAccoladesService 
     private AwardsAndAccoladesRepository repository;
 
     @Autowired
-    private SecurityUrlrepository securityUrlRepository;
-
-    @Autowired
     private S3Service s3Service;
 
 
     private String normalizeUrl(String url) {
+
         return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
     }
 
     @Override
     public WebAwardsAndAccolades createAward(WebAwardsAndAccolades award, MultipartFile awardImage, String url) {
-         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
-                .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
-
         // Static color logic: Use color from first record if exists
         List<WebAwardsAndAccolades> existing = repository.findAll();
         if (!existing.isEmpty()) {
@@ -42,7 +35,6 @@ public class AwardsAndAccoladesServiceImpl implements AwardsAndAccoladesService 
         }
 
         award.setUrl(url);
-        award.setWebSecurityUrl(webSecurityUrl);
 
 //        if (awardImage != null && !awardImage.isEmpty()) {
 //            try {
@@ -66,7 +58,7 @@ public class AwardsAndAccoladesServiceImpl implements AwardsAndAccoladesService 
 
     @Override
     public WebAwardsAndAccolades updateAward(Long id, WebAwardsAndAccolades award, MultipartFile awardImage, String url) {
-         WebAwardsAndAccolades existing = repository.findById(id)
+        WebAwardsAndAccolades existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Award not found"));
 
         existing.setAwardName(award.getAwardName() != null ? award.getAwardName() : existing.getAwardName());
@@ -105,7 +97,7 @@ public class AwardsAndAccoladesServiceImpl implements AwardsAndAccoladesService 
 
     @Override
     public void deleteAward(Long id, String url) {
-         WebAwardsAndAccolades award = repository.findById(id)
+        WebAwardsAndAccolades award = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Award not found"));
 
         if (award.getAwardImage() != null && award.getAwardImage().contains("amazonaws.com")) {
@@ -117,7 +109,7 @@ public class AwardsAndAccoladesServiceImpl implements AwardsAndAccoladesService 
 
     @Override
     public WebAwardsAndAccolades getAwardById(Long id, String url) {
-         return repository.findById(id)
+        return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Award not found"));
     }
 }

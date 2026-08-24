@@ -2,11 +2,10 @@ package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebManuBar;
 import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
-import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.ManuBarRepository;
-import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.service.ManuBarService;
 import com.sankalpapp.dynamicProfile.service.S3Service;
+import com.sankalpapp.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,33 +19,11 @@ public class ManuBarServiceImpl implements ManuBarService {
     private ManuBarRepository repository;
 
     @Autowired
-    private SecurityUrlrepository securityUrlRepository;
-
-    @Autowired
     private S3Service s3Service;
-
-    private void validateUrlExists(String url) {
-
-        String normalizedUrl = normalizeUrl(url);
-
-        securityUrlRepository.findByUrl(normalizedUrl)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed"
-                ));
-    }
-
-
-    private String normalizeUrl(String url) {
-        return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
-    }
 
     @Override
     public WebManuBar createManuBar(WebManuBar webManuBar, MultipartFile menubarImage, String url) {
-         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
-                .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
-
         webManuBar.setUrl(url);
-        webManuBar.setWebSecurityUrl(webSecurityUrl);
 
 //        if (menubarImage != null && !menubarImage.isEmpty()) {
 //            try {
@@ -61,21 +38,20 @@ public class ManuBarServiceImpl implements ManuBarService {
     }
 
 
-
     @Override
     public List<WebManuBar> getAllByBranchCode(String url) {
-         return repository.findAllOrderById();
+        return repository.findAllOrderById();
     }
 
 
     @Override
     public WebManuBar updateManuBar(Long id, WebManuBar webManuBar, MultipartFile menubarImage, String url) {
-         WebManuBar existing = repository.findById(id)
+        WebManuBar existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ManuBar not found"));
 
         existing.setManuBarColor(webManuBar.getManuBarColor() != null ? webManuBar.getManuBarColor() : existing.getManuBarColor());
         existing.setUrl(webManuBar.getUrl() != null ? webManuBar.getUrl() : existing.getUrl());
-        existing.setMenubarName(webManuBar.getMenubarName()!=null ? webManuBar.getMenubarName():existing.getMenubarName());
+        existing.setMenubarName(webManuBar.getMenubarName() != null ? webManuBar.getMenubarName() : existing.getMenubarName());
 
 //        if (menubarImage != null && !menubarImage.isEmpty()) {
 //            try {
@@ -96,7 +72,7 @@ public class ManuBarServiceImpl implements ManuBarService {
 
     @Override
     public void deleteManuBar(Long id, String url) {
-         WebManuBar webManuBar = repository.findById(id)
+        WebManuBar webManuBar = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ManuBar not found"));
 
         if (webManuBar.getMenubarImage() != null && webManuBar.getMenubarImage().contains("amazonaws.com")) {
@@ -108,7 +84,7 @@ public class ManuBarServiceImpl implements ManuBarService {
 
     @Override
     public WebManuBar getManuBarById(Long id, String url) {
-         return repository.findById(id)
+        return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ManuBar not found"));
     }
 }

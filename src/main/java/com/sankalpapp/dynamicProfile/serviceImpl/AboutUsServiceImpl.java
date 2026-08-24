@@ -1,12 +1,10 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebAboutUs;
-import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
-import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.AboutUsRepository;
-import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.service.AboutUsService;
 import com.sankalpapp.dynamicProfile.service.S3Service;
+import com.sankalpapp.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,21 +18,7 @@ public class AboutUsServiceImpl implements AboutUsService {
     private AboutUsRepository repository;
 
     @Autowired
-    private SecurityUrlrepository securityUrlRepository;
-
-    @Autowired
     private S3Service s3Service;
-
-    private void validateUrlExists(String url) {
-
-        String normalizedUrl = normalizeUrl(url);
-
-        securityUrlRepository.findByUrl(normalizedUrl)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed"
-                ));
-    }
-
 
     private String normalizeUrl(String url) {
         return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
@@ -42,11 +26,7 @@ public class AboutUsServiceImpl implements AboutUsService {
 
     @Override
     public WebAboutUs createAboutUs(WebAboutUs webAboutUs, MultipartFile aboutUsImage, String url) {
-         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
-                .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
-
         webAboutUs.setUrl(url);
-        webAboutUs.setWebSecurityUrl(webSecurityUrl);
 
 //        if (aboutUsImage != null && !aboutUsImage.isEmpty()) {
 //            try {
@@ -61,15 +41,14 @@ public class AboutUsServiceImpl implements AboutUsService {
     }
 
 
-
     @Override
     public List<WebAboutUs> getAllAboutUsByBranchCode(String url) {
-         return repository.findAllOrderById();
+        return repository.findAllOrderById();
     }
 
     @Override
     public WebAboutUs updateAboutUs(int id, WebAboutUs webAboutUs, MultipartFile aboutUsImage, String url) {
-         WebAboutUs existing = repository.findById(id)
+        WebAboutUs existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("AboutUs not found"));
 
         existing.setAboutUsTitle(webAboutUs.getAboutUsTitle() != null ? webAboutUs.getAboutUsTitle() : existing.getAboutUsTitle());
@@ -101,7 +80,7 @@ public class AboutUsServiceImpl implements AboutUsService {
 
     @Override
     public void deleteAboutUs(int id, String url) {
-         WebAboutUs webAboutUs = repository.findById(id)
+        WebAboutUs webAboutUs = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("AboutUs not found"));
 
         // Delete image from S3 if exists
@@ -114,7 +93,7 @@ public class AboutUsServiceImpl implements AboutUsService {
 
     @Override
     public WebAboutUs getAboutUsById(int id, String url) {
-         return repository.findById(id)
+        return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("AboutUs not found"));
     }
 }

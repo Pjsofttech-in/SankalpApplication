@@ -2,11 +2,10 @@ package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
 import com.sankalpapp.dynamicProfile.entity.WebTestimonials;
-import com.sankalpapp.exception.ResourceNotFoundException;
-import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.repository.TestimonialsRepository;
 import com.sankalpapp.dynamicProfile.service.S3Service;
 import com.sankalpapp.dynamicProfile.service.TestimonialsService;
+import com.sankalpapp.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,21 +19,7 @@ public class TestimonialsServiceImpl implements TestimonialsService {
     private TestimonialsRepository repository;
 
     @Autowired
-    private SecurityUrlrepository securityUrlRepository;
-
-    @Autowired
     private S3Service s3Service;
-
-    private void validateUrlExists(String url) {
-
-        String normalizedUrl = normalizeUrl(url);
-
-        securityUrlRepository.findByUrl(normalizedUrl)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed"
-                ));
-    }
-
 
     private String normalizeUrl(String url) {
         if (url == null) return "";
@@ -43,10 +28,6 @@ public class TestimonialsServiceImpl implements TestimonialsService {
 
     @Override
     public WebTestimonials create(WebTestimonials webTestimonials, MultipartFile testimonialImage, String url) {
-        //validateUrlExists;
-        WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
-                .orElseThrow(() -> new ResourceNotFoundException("URL not found in SecurityUrl table"));
-
         // Static color logic
         List<WebTestimonials> existingTestimonials = repository.findAll();
         if (!existingTestimonials.isEmpty()) {
@@ -54,7 +35,6 @@ public class TestimonialsServiceImpl implements TestimonialsService {
         }
 
         webTestimonials.setUrl(url);
-        webTestimonials.setWebSecurityUrl(webSecurityUrl);
 
 //        if (testimonialImage != null && !testimonialImage.isEmpty()) {
 //            try {
@@ -70,13 +50,13 @@ public class TestimonialsServiceImpl implements TestimonialsService {
 
     @Override
     public List<WebTestimonials> getAllByBranchCode(String url) {
-         return repository.findAllOrderById();
+        return repository.findAllOrderById();
     }
 
 
     @Override
     public WebTestimonials update(Long id, WebTestimonials webTestimonials, MultipartFile testimonialImage, String url) {
-         WebTestimonials existing = repository.findById(id)
+        WebTestimonials existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Testimonial not found"));
 
         if (webTestimonials.getTestimonialTitle() != null)
@@ -121,7 +101,7 @@ public class TestimonialsServiceImpl implements TestimonialsService {
 
     @Override
     public void delete(Long id, String url) {
-         WebTestimonials testimonial = repository.findById(id)
+        WebTestimonials testimonial = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Testimonial not found"));
 
         if (testimonial.getTestimonialImage() != null && testimonial.getTestimonialImage().contains("amazonaws.com")) {
@@ -133,7 +113,7 @@ public class TestimonialsServiceImpl implements TestimonialsService {
 
     @Override
     public WebTestimonials getById(Long id, String url) {
-         return repository.findById(id)
+        return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Testimonial not found"));
     }
 }
