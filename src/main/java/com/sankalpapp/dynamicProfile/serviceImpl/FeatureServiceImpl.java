@@ -3,20 +3,25 @@ package com.sankalpapp.dynamicProfile.serviceImpl;
 import com.sankalpapp.dynamicProfile.entity.Feature;
 import com.sankalpapp.dynamicProfile.repository.FeatureRepository;
 import com.sankalpapp.dynamicProfile.service.FeatureService;
+import com.sankalpapp.serviceimpl.S3Service;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
 public class FeatureServiceImpl implements FeatureService {
 
+    private final static String folder = "Feature";
     private final FeatureRepository featureRepository;
+    private final S3Service s3service;
 
     public FeatureServiceImpl(
-            FeatureRepository featureRepository) {
+            FeatureRepository featureRepository, S3Service s3service) {
 
         this.featureRepository = featureRepository;
+        this.s3service = s3service;
     }
 
     @Override
@@ -34,12 +39,20 @@ public class FeatureServiceImpl implements FeatureService {
          * feature.setImage(imageUrl);
          */
 
-        if (imageFile != null && !imageFile.isEmpty()) {
-
-            // TODO: Upload image to Cloudflare R2
-        }
+        uploadFile(imageFile, feature);
 
         return featureRepository.save(feature);
+    }
+
+    private void uploadFile(MultipartFile pdf, Feature feature) {
+        if (pdf != null) {
+            try {
+                String fileURL = s3service.uploadFile(pdf, folder);
+                feature.setLink(fileURL);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to upload File");
+            }
+        }
     }
 
     @Override
@@ -88,19 +101,7 @@ public class FeatureServiceImpl implements FeatureService {
                 feature.getLink()
         );
 
-        /*
-         * Only replace the image when a new image
-         * has been provided.
-         */
-        if (imageFile != null && !imageFile.isEmpty()) {
-
-            // TODO: Upload new image to Cloudflare R2
-
-            // String imageUrl =
-            //         r2StorageService.uploadFile(imageFile);
-
-            // existingFeature.setImage(imageUrl);
-        }
+        uploadFile(imageFile, feature);
 
         return featureRepository.save(existingFeature);
     }
@@ -118,10 +119,7 @@ public class FeatureServiceImpl implements FeatureService {
                                 )
                         );
 
-        /*
-         * Later, delete the image from R2 here
-         * before deleting the database record.
-         */
+        s3service.deleteFileByUrl(existingFeature.getLink());
 
         featureRepository.delete(existingFeature);
     }

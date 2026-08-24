@@ -1,15 +1,16 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
+import com.sankalpapp.dynamicProfile.entity.WebManuBar;
 import com.sankalpapp.dynamicProfile.entity.WebMapAndImages;
-import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
 import com.sankalpapp.dynamicProfile.repository.MapAndImagesRepository;
 import com.sankalpapp.dynamicProfile.service.MapAndImagesService;
-import com.sankalpapp.dynamicProfile.service.S3Service;
 import com.sankalpapp.exception.ResourceNotFoundException;
+import com.sankalpapp.serviceimpl.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -21,23 +22,14 @@ public class MapAndImagesServiceImpl implements MapAndImagesService {
     @Autowired
     private S3Service s3Service;
 
-    private String normalizeUrl(String url) {
-        return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
-    }
+    private static final String folder = "MapAndImage";
 
     @Override
     public WebMapAndImages create(WebMapAndImages entity, MultipartFile imageFile, String url) {
 
         entity.setUrl(url);
 
-//        if (imageFile != null && !imageFile.isEmpty()) {
-//            try {
-//                String imageUrl = s3Service.uploadImage(imageFile);
-//                entity.setContactImage(imageUrl);
-//            } catch (IOException e) {
-//                throw new RuntimeException("Failed to upload contact image", e);
-//            }
-//        }
+        uploadFile(imageFile, entity);
 
         return repository.save(entity);
     }
@@ -57,22 +49,20 @@ public class MapAndImagesServiceImpl implements MapAndImagesService {
         existing.setMaps(updated.getMaps() != null ? updated.getMaps() : existing.getMaps());
         existing.setUrl(updated.getUrl() != null ? updated.getUrl() : existing.getUrl());
 
-//        if (imageFile != null && !imageFile.isEmpty()) {
-//            try {
-//                String newImageUrl = s3Service.uploadImage(imageFile);
-//
-//                // Optional: delete old image if stored in S3
-//                if (existing.getContactImage() != null && existing.getContactImage().contains("amazonaws.com")) {
-//                    s3Service.deleteImage(existing.getContactImage());
-//                }
-//
-//                existing.setContactImage(newImageUrl);
-//            } catch (IOException e) {
-//                throw new RuntimeException("Failed to upload contact image", e);
-//            }
-//        }
+        uploadFile(imageFile, existing);
 
         return repository.save(existing);
+    }
+
+    private void uploadFile(MultipartFile pdf, WebMapAndImages obj) {
+        if (pdf != null) {
+            try {
+                String fileURL = s3Service.uploadFile(pdf, folder);
+                obj.setContactImage(fileURL);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to upload File");
+            }
+        }
     }
 
     @Override
@@ -80,9 +70,7 @@ public class MapAndImagesServiceImpl implements MapAndImagesService {
         WebMapAndImages entity = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("MapAndImages not found"));
 
-        if (entity.getContactImage() != null && entity.getContactImage().contains("amazonaws.com")) {
-            s3Service.deleteImage(entity.getContactImage());
-        }
+        s3Service.deleteFileByUrl(entity.getContactImage());
 
         repository.deleteById(id);
     }

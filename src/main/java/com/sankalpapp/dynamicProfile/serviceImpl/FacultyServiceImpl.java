@@ -1,15 +1,16 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
+import com.sankalpapp.dynamicProfile.entity.WebAwardsAndAccolades;
 import com.sankalpapp.dynamicProfile.entity.WebFaculty;
-import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
 import com.sankalpapp.dynamicProfile.repository.FacultyRepository;
 import com.sankalpapp.dynamicProfile.service.FacultyService;
-import com.sankalpapp.dynamicProfile.service.S3Service;
 import com.sankalpapp.exception.ResourceNotFoundException;
+import com.sankalpapp.serviceimpl.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -21,9 +22,7 @@ public class FacultyServiceImpl implements FacultyService {
     @Autowired
     private S3Service s3Service;
 
-    private String normalizeUrl(String url) {
-        return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
-    }
+    private static final String folder = "Faculty";
 
     @Override
     public WebFaculty createFacility(WebFaculty webFaculty, MultipartFile image, String url) {
@@ -35,16 +34,20 @@ public class FacultyServiceImpl implements FacultyService {
 
         webFaculty.setUrl(url);
 
-//        if (image != null && !image.isEmpty()) {
-//            try {
-//                String imageUrl = s3Service.uploadImage(image);
-//                webFaculty.setFacilityImage(imageUrl);
-//            } catch (IOException e) {
-//                throw new RuntimeException("Failed to upload facility image", e);
-//            }
-//        }
+        uploadFile(image, webFaculty);
 
         return repository.save(webFaculty);
+    }
+
+    private void uploadFile(MultipartFile pdf, WebFaculty obj) {
+        if (pdf != null) {
+            try {
+                String fileURL = s3Service.uploadFile(pdf, folder);
+                obj.setFacilityImage(fileURL);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to upload File");
+            }
+        }
     }
 
 
@@ -75,17 +78,7 @@ public class FacultyServiceImpl implements FacultyService {
             repository.saveAll(allFacilities);
         }
 
-//        if (image != null && !image.isEmpty()) {
-//            try {
-//                String imageUrl = s3Service.uploadImage(image);
-//                if (existing.getFacilityImage() != null && existing.getFacilityImage().contains("amazonaws.com")) {
-//                    s3Service.deleteImage(existing.getFacilityImage());
-//                }
-//                existing.setFacilityImage(imageUrl);
-//            } catch (IOException e) {
-//                throw new RuntimeException("Failed to upload facility image", e);
-//            }
-//        }
+        uploadFile(image, webFaculty);
 
         return repository.save(existing);
     }
@@ -96,9 +89,7 @@ public class FacultyServiceImpl implements FacultyService {
         WebFaculty webFaculty = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Facility not found"));
 
-        if (webFaculty.getFacilityImage() != null && webFaculty.getFacilityImage().contains("amazonaws.com")) {
-            s3Service.deleteImage(webFaculty.getFacilityImage());
-        }
+        s3Service.deleteFileByUrl(webFaculty.getFacilityImage());
 
         repository.deleteById(id);
     }

@@ -1,14 +1,16 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
+import com.sankalpapp.dynamicProfile.entity.WebAboutUs;
 import com.sankalpapp.dynamicProfile.entity.WebAwardsAndAccolades;
 import com.sankalpapp.dynamicProfile.repository.AwardsAndAccoladesRepository;
 import com.sankalpapp.dynamicProfile.service.AwardsAndAccoladesService;
-import com.sankalpapp.dynamicProfile.service.S3Service;
 import com.sankalpapp.exception.ResourceNotFoundException;
+import com.sankalpapp.serviceimpl.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -20,11 +22,7 @@ public class AwardsAndAccoladesServiceImpl implements AwardsAndAccoladesService 
     @Autowired
     private S3Service s3Service;
 
-
-    private String normalizeUrl(String url) {
-
-        return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
-    }
+    private static final String folder = "Awards";
 
     @Override
     public WebAwardsAndAccolades createAward(WebAwardsAndAccolades award, MultipartFile awardImage, String url) {
@@ -33,19 +31,21 @@ public class AwardsAndAccoladesServiceImpl implements AwardsAndAccoladesService 
         if (!existing.isEmpty()) {
             award.setAwardColour(existing.get(0).getAwardColour());
         }
-
         award.setUrl(url);
-
-//        if (awardImage != null && !awardImage.isEmpty()) {
-//            try {
-//                String imageUrl = s3Service.uploadImage(awardImage);
-//                award.setAwardImage(imageUrl);
-//            } catch (IOException e) {
-//                throw new RuntimeException("Failed to upload Award image", e);
-//            }
-//        }
+        uploadFile(awardImage, award);
 
         return repository.save(award);
+    }
+
+    private void uploadFile(MultipartFile pdf, WebAwardsAndAccolades obj) {
+        if (pdf != null) {
+            try {
+                String fileURL = s3Service.uploadFile(pdf, folder);
+                obj.setAwardImage(fileURL);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to upload File");
+            }
+        }
     }
 
 
@@ -77,20 +77,7 @@ public class AwardsAndAccoladesServiceImpl implements AwardsAndAccoladesService 
             repository.saveAll(allAwards);
         }
 
-//        if (awardImage != null && !awardImage.isEmpty()) {
-//            try {
-//                String imageUrl = s3Service.uploadImage(awardImage);
-//
-//                if (existing.getAwardImage() != null && existing.getAwardImage().contains("amazonaws.com")) {
-//                    s3Service.deleteImage(existing.getAwardImage());
-//                }
-//
-//                existing.setAwardImage(imageUrl);
-//            } catch (IOException e) {
-//                throw new RuntimeException("Failed to upload Award image", e);
-//            }
-//        }
-
+        uploadFile(awardImage, existing);
         return repository.save(existing);
     }
 
@@ -100,9 +87,7 @@ public class AwardsAndAccoladesServiceImpl implements AwardsAndAccoladesService 
         WebAwardsAndAccolades award = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Award not found"));
 
-        if (award.getAwardImage() != null && award.getAwardImage().contains("amazonaws.com")) {
-            s3Service.deleteImage(award.getAwardImage());
-        }
+        s3Service.deleteFileByUrl(award.getAwardImage());
 
         repository.deleteById(id);
     }

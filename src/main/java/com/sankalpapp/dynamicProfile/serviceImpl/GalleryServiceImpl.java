@@ -1,15 +1,16 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebGallery;
-import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
 import com.sankalpapp.dynamicProfile.repository.GalleryRepository;
 import com.sankalpapp.dynamicProfile.service.GalleryService;
-import com.sankalpapp.dynamicProfile.service.S3Service;
 import com.sankalpapp.exception.ResourceNotFoundException;
+import com.sankalpapp.serviceimpl.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,15 +18,11 @@ import java.util.Optional;
 @Service
 public class GalleryServiceImpl implements GalleryService {
 
+    private static final String folder = "Gallery";
     @Autowired
     private GalleryRepository repository;
-
     @Autowired
     private S3Service s3Service;
-
-    private String normalizeUrl(String url) {
-        return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
-    }
 
     @Override
     public WebGallery createGallery(WebGallery webGallery, List<MultipartFile> images, String url) {
@@ -36,28 +33,28 @@ public class GalleryServiceImpl implements GalleryService {
         if (!existing.isEmpty()) {
             webGallery.setGalleryColor(existing.get(0).getGalleryColor());
         }
-
-        // Upload images to S3
-//        List<String> uploaded = new ArrayList<>();
-//        if (images != null) {
-//            for (MultipartFile image : images) {
-//                try {
-//                    String imageUrl = s3Service.uploadImage(image);
-//                    uploaded.add(imageUrl);
-//                } catch (IOException e) {
-//                    throw new RuntimeException("Image upload failed", e);
-//                }
-//            }
-//        }
-//        webGallery.setGalleryImages(uploaded);
-
+        uploadFile(images, webGallery);
         return repository.save(webGallery);
+    }
+
+    private void uploadFile(List<MultipartFile> images, WebGallery obj) {
+        if (!CollectionUtils.isEmpty(images)) {
+            List<String> urls = new ArrayList<>();
+            for (MultipartFile image : images) {
+                try {
+                    String fileURL = s3Service.uploadFile(image, folder);
+                    urls.add(fileURL);
+                } catch (IOException e) {
+                    throw new RuntimeException("Unable to upload File");
+                }
+            }
+            obj.setGalleryImages(urls);
+        }
     }
 
 
     @Override
     public List<WebGallery> getAllGalleriesByBranchCode(String url) {
-        //validateUrlExists;
         return repository.findAllOrderById();
     }
 
@@ -87,35 +84,12 @@ public class GalleryServiceImpl implements GalleryService {
         List<String> currentImages = new ArrayList<>(Optional.ofNullable(existing.getGalleryImages()).orElse(new ArrayList<>()));
 
         if (deleteImages != null) {
-            currentImages.removeIf(imageUrl -> {
-                String fileName = extractFileName(imageUrl);
-                if (deleteImages.contains(fileName)) {
-                    s3Service.deleteImage(imageUrl);
-                    return true;
-                }
-                return false;
+            currentImages.forEach(imageUrl -> {
+                s3Service.deleteFileByUrl(imageUrl);
             });
         }
-
-//        if (newImages != null) {
-//            String branchCode = permissionService.fetchBranchCode(role, email);
-//            for (MultipartFile image : newImages) {
-//                try {
-//                    String imageUrl = s3Service.uploadImage(image);
-//                    currentImages.add(imageUrl);
-//                } catch (IOException e) {
-//                    throw new RuntimeException("Image upload failed", e);
-//                }
-//            }
-//        }
-
-        existing.setGalleryImages(currentImages);
+        uploadFile(newImages, existing);
         return repository.save(existing);
-    }
-
-
-    private String extractFileName(String imageUrl) {
-        return imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
     }
 
     @Override
@@ -125,7 +99,7 @@ public class GalleryServiceImpl implements GalleryService {
 
         if (webGallery.getGalleryImages() != null) {
             for (String image : webGallery.getGalleryImages()) {
-                s3Service.deleteImage(image);
+                s3Service.deleteFileByUrl(image);
             }
         }
 
@@ -137,5 +111,4 @@ public class GalleryServiceImpl implements GalleryService {
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found"));
     }
-
 }

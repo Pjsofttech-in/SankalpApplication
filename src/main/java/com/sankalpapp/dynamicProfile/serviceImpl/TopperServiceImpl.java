@@ -1,15 +1,16 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
-import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
+import com.sankalpapp.dynamicProfile.entity.WebManuBar;
 import com.sankalpapp.dynamicProfile.entity.WebTopper;
 import com.sankalpapp.dynamicProfile.repository.TopperRepository;
-import com.sankalpapp.dynamicProfile.service.S3Service;
 import com.sankalpapp.dynamicProfile.service.TopperService;
 import com.sankalpapp.exception.ResourceNotFoundException;
+import com.sankalpapp.serviceimpl.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -21,30 +22,32 @@ public class TopperServiceImpl implements TopperService {
     @Autowired
     private S3Service s3Service;
 
-    private String normalizeUrl(String url) {
-        return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
-    }
+    private static final String folder = "Topper";
 
     @Override
     public WebTopper createTopper(WebTopper webTopper, MultipartFile topperImage, String url) {
         // Apply static color from first record if exists
         List<WebTopper> existingWebToppers = repository.findAll();
         if (!existingWebToppers.isEmpty()) {
-            webTopper.setTopperColor(existingWebToppers.get(0).getTopperColor());
+            webTopper.setTopperColor(existingWebToppers.getFirst().getTopperColor());
         }
 
         webTopper.setUrl(url);
 
-//        if (topperImage != null && !topperImage.isEmpty()) {
-//            try {
-//                String imageUrl = s3Service.uploadImage(topperImage);
-//                webTopper.setTopperImage(imageUrl);
-//            } catch (IOException e) {
-//                throw new RuntimeException("Failed to upload Topper image", e);
-//            }
-//        }
+        uploadFile(topperImage, webTopper);
 
         return repository.save(webTopper);
+    }
+
+    private void uploadFile(MultipartFile pdf, WebTopper obj) {
+        if (pdf != null) {
+            try {
+                String fileURL = s3Service.uploadFile(pdf, folder);
+                obj.setTopperImage(fileURL);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to upload File");
+            }
+        }
     }
 
 
@@ -78,19 +81,7 @@ public class TopperServiceImpl implements TopperService {
             repository.saveAll(allWebToppers); // Save all updated
         }
 
-        if (topperImage != null && !topperImage.isEmpty()) {
-//            try {
-//                String imageUrl = s3Service.uploadImage(topperImage);
-//
-//                if (existing.getTopperImage() != null && existing.getTopperImage().contains("amazonaws.com")) {
-//                    s3Service.deleteImage(existing.getTopperImage());
-//                }
-//
-//                existing.setTopperImage(imageUrl);
-//            } catch (IOException e) {
-//                throw new RuntimeException("Failed to upload Topper image", e);
-//            }
-        }
+        uploadFile(topperImage, existing);
 
         return repository.save(existing);
     }
@@ -100,9 +91,7 @@ public class TopperServiceImpl implements TopperService {
         WebTopper webTopper = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Topper not found"));
 
-        if (webTopper.getTopperImage() != null && webTopper.getTopperImage().contains("amazonaws.com")) {
-            s3Service.deleteImage(webTopper.getTopperImage());
-        }
+        s3Service.deleteFileByUrl(webTopper.getTopperImage());
 
         repository.deleteById(id);
     }

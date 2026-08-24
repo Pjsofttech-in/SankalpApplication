@@ -1,22 +1,28 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.HeroSection;
+import com.sankalpapp.dynamicProfile.entity.WebFaculty;
 import com.sankalpapp.dynamicProfile.repository.HeroSectionRepository;
 import com.sankalpapp.dynamicProfile.service.HeroSectionService;
+import com.sankalpapp.serviceimpl.S3Service;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
 public class HeroSectionServiceImpl implements HeroSectionService {
 
     private final HeroSectionRepository heroSectionRepository;
+    private final S3Service s3Service;
+    private static final String folder = "HeroSection";
 
     public HeroSectionServiceImpl(
-            HeroSectionRepository heroSectionRepository) {
+            HeroSectionRepository heroSectionRepository, S3Service s3Service) {
 
         this.heroSectionRepository = heroSectionRepository;
+        this.s3Service = s3Service;
     }
 
     @Override
@@ -25,23 +31,20 @@ public class HeroSectionServiceImpl implements HeroSectionService {
             MultipartFile imageFile,
             String url) {
 
-        /*
-         * Image upload logic will go here.
-         *
-         * For example, when R2 is implemented:
-         *
-         * String imageUrl = r2StorageService.uploadFile(imageFile);
-         * heroSection.setImage(imageUrl);
-         */
-
-        if (imageFile != null && !imageFile.isEmpty()) {
-
-            // TODO: Replace this with your R2 upload service
-            // String imageUrl = r2StorageService.uploadFile(imageFile);
-            // heroSection.setImage(imageUrl);
-        }
+        uploadFile(imageFile, heroSection);
 
         return heroSectionRepository.save(heroSection);
+    }
+
+    private void uploadFile(MultipartFile pdf, HeroSection obj) {
+        if (pdf != null) {
+            try {
+                String fileURL = s3Service.uploadFile(pdf, folder);
+                obj.setImage(fileURL);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to upload File");
+            }
+        }
     }
 
     @Override
@@ -94,16 +97,7 @@ public class HeroSectionServiceImpl implements HeroSectionService {
                 heroSection.getPriority()
         );
 
-        /*
-         * Only replace the existing image if a new image
-         * was actually provided.
-         */
-        if (imageFile != null && !imageFile.isEmpty()) {
-
-            // TODO: Replace this with your R2 upload service
-            // String imageUrl = r2StorageService.uploadFile(imageFile);
-            // existingHeroSection.setImage(imageUrl);
-        }
+        uploadFile(imageFile, existingHeroSection);
 
         return heroSectionRepository.save(
                 existingHeroSection
@@ -122,17 +116,7 @@ public class HeroSectionServiceImpl implements HeroSectionService {
                                         "Hero Section not found with id: " + id
                                 )
                         );
-
-        /*
-         * When R2 is implemented, you can also delete
-         * the image from R2 here.
-         *
-         * if (existingHeroSection.getImage() != null) {
-         *     r2StorageService.deleteFile(
-         *         existingHeroSection.getImage()
-         *     );
-         * }
-         */
+        s3Service.deleteFileByUrl(existingHeroSection.getImage());
 
         heroSectionRepository.delete(existingHeroSection);
     }

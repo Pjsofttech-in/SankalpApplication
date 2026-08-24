@@ -19,7 +19,8 @@ import java.util.stream.Collectors;
 public class AnswerKeyServiceImpl implements AnswerKeyService {
 
     private final AnswerKeyRepository answerKeyRepository;
-    private final ExamRepository examRepository;
+    private final S3Service s3service;
+    private final static String folder = "AnswerKey";
 
     @Override
     public AnswerKeyResponse saveAnswerKey(String title,
@@ -28,23 +29,26 @@ public class AnswerKeyServiceImpl implements AnswerKeyService {
                                            Boolean active,
                                            MultipartFile pdf) {
 
-        Exam exam = examRepository.findById(examId)
-                .orElseThrow(() -> new RuntimeException("Exam not found"));
-
         AnswerKey answerKey = AnswerKey.builder()
                 .title(title)
                 .link(link)
                 .active(active)
-                .exam(exam)
                 .build();
 
-        try {
-            answerKey.setPdfBlob(pdf.getBytes());
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to upload PDF");
-        }
+        uploadFile(pdf, answerKey);
 
         return mapToResponse(answerKeyRepository.save(answerKey));
+    }
+
+    private void uploadFile(MultipartFile pdf, AnswerKey answerKey) {
+        if(pdf != null) {
+            try {
+                String fileURL = s3service.uploadFile(pdf, folder);
+                answerKey.setLink(fileURL);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to upload File");
+            }
+        }
     }
 
     @Override
@@ -58,21 +62,11 @@ public class AnswerKeyServiceImpl implements AnswerKeyService {
         AnswerKey answerKey = answerKeyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Answer Key not found"));
 
-        Exam exam = examRepository.findById(examId)
-                .orElseThrow(() -> new RuntimeException("Exam not found"));
-
         answerKey.setTitle(title);
         answerKey.setLink(link);
         answerKey.setActive(active);
-        answerKey.setExam(exam);
 
-        if (pdf != null && !pdf.isEmpty()) {
-            try {
-                answerKey.setPdfBlob(pdf.getBytes());
-            } catch (IOException e) {
-                throw new RuntimeException("Unable to upload PDF");
-            }
-        }
+        uploadFile(pdf, answerKey);
 
         return mapToResponse(answerKeyRepository.save(answerKey));
     }
@@ -82,6 +76,8 @@ public class AnswerKeyServiceImpl implements AnswerKeyService {
 
         AnswerKey answerKey = answerKeyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Answer Key not found"));
+
+        s3service.deleteFileByUrl(answerKey.getLink());
 
         answerKeyRepository.delete(answerKey);
     }
@@ -104,14 +100,14 @@ public class AnswerKeyServiceImpl implements AnswerKeyService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public byte[] downloadPdf(Long id) {
-
-        AnswerKey answerKey = answerKeyRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Answer Key not found"));
-
-        return answerKey.getPdfBlob();
-    }
+//    @Override
+//    public byte[] downloadPdf(Long id) {
+//
+//        AnswerKey answerKey = answerKeyRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("Answer Key not found"));
+//
+//        return answerKey.getPdfBlob();
+//    }
 
     private AnswerKeyResponse mapToResponse(AnswerKey answerKey) {
 
@@ -120,8 +116,8 @@ public class AnswerKeyServiceImpl implements AnswerKeyService {
                 .title(answerKey.getTitle())
                 .link(answerKey.getLink())
                 .active(answerKey.getActive())
-                .examId(answerKey.getExam().getId())
-                .examName(answerKey.getExam().getExamName())
+//                .examId(answerKey.getExam().getId())
+//                .examName(answerKey.getExam().getExamName())
                 .build();
     }
 }

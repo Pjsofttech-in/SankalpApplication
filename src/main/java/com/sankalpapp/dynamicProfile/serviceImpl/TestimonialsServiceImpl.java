@@ -1,15 +1,16 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
-import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
 import com.sankalpapp.dynamicProfile.entity.WebTestimonials;
+import com.sankalpapp.dynamicProfile.entity.WebVisionMission;
 import com.sankalpapp.dynamicProfile.repository.TestimonialsRepository;
-import com.sankalpapp.dynamicProfile.service.S3Service;
 import com.sankalpapp.dynamicProfile.service.TestimonialsService;
 import com.sankalpapp.exception.ResourceNotFoundException;
+import com.sankalpapp.serviceimpl.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -21,10 +22,7 @@ public class TestimonialsServiceImpl implements TestimonialsService {
     @Autowired
     private S3Service s3Service;
 
-    private String normalizeUrl(String url) {
-        if (url == null) return "";
-        return url.split(",")[0].trim().toLowerCase();
-    }
+    private static final String folder = "Testimonials";
 
     @Override
     public WebTestimonials create(WebTestimonials webTestimonials, MultipartFile testimonialImage, String url) {
@@ -36,16 +34,20 @@ public class TestimonialsServiceImpl implements TestimonialsService {
 
         webTestimonials.setUrl(url);
 
-//        if (testimonialImage != null && !testimonialImage.isEmpty()) {
-//            try {
-//                String imageUrl = s3Service.uploadImage(testimonialImage);
-//                webTestimonials.setTestimonialImage(imageUrl);
-//            } catch (IOException e) {
-//                throw new RuntimeException("Failed to upload testimonial image", e);
-//            }
-//        }
+        uploadFile(testimonialImage, webTestimonials);
 
         return repository.save(webTestimonials);
+    }
+
+    private void uploadFile(MultipartFile pdf, WebTestimonials obj) {
+        if (pdf != null) {
+            try {
+                String fileURL = s3Service.uploadFile(pdf, folder);
+                obj.setTestimonialImage(fileURL);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to upload File");
+            }
+        }
     }
 
     @Override
@@ -83,17 +85,7 @@ public class TestimonialsServiceImpl implements TestimonialsService {
             existing.setTestimonialColor(webTestimonials.getTestimonialColor());
         }
 
-//        if (testimonialImage != null && !testimonialImage.isEmpty()) {
-//            try {
-//                String imageUrl = s3Service.uploadImage(testimonialImage);
-//                if (existing.getTestimonialImage() != null && existing.getTestimonialImage().contains("amazonaws.com")) {
-//                    s3Service.deleteImage(existing.getTestimonialImage());
-//                }
-//                existing.setTestimonialImage(imageUrl);
-//            } catch (IOException e) {
-//                throw new RuntimeException("Failed to upload testimonial image", e);
-//            }
-//        }
+        uploadFile(testimonialImage, existing);
 
         return repository.save(existing);
     }
@@ -104,9 +96,7 @@ public class TestimonialsServiceImpl implements TestimonialsService {
         WebTestimonials testimonial = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Testimonial not found"));
 
-        if (testimonial.getTestimonialImage() != null && testimonial.getTestimonialImage().contains("amazonaws.com")) {
-            s3Service.deleteImage(testimonial.getTestimonialImage());
-        }
+        s3Service.deleteFileByUrl(testimonial.getTestimonialImage());
 
         repository.deleteById(id);
     }

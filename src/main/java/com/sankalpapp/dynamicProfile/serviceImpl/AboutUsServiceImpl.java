@@ -3,12 +3,13 @@ package com.sankalpapp.dynamicProfile.serviceImpl;
 import com.sankalpapp.dynamicProfile.entity.WebAboutUs;
 import com.sankalpapp.dynamicProfile.repository.AboutUsRepository;
 import com.sankalpapp.dynamicProfile.service.AboutUsService;
-import com.sankalpapp.dynamicProfile.service.S3Service;
 import com.sankalpapp.exception.ResourceNotFoundException;
+import com.sankalpapp.serviceimpl.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -18,26 +19,26 @@ public class AboutUsServiceImpl implements AboutUsService {
     private AboutUsRepository repository;
 
     @Autowired
-    private S3Service s3Service;
+    private S3Service s3service;
 
-    private String normalizeUrl(String url) {
-        return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
-    }
+    private static final String folder = "AboutUs";
 
     @Override
     public WebAboutUs createAboutUs(WebAboutUs webAboutUs, MultipartFile aboutUsImage, String url) {
         webAboutUs.setUrl(url);
-
-//        if (aboutUsImage != null && !aboutUsImage.isEmpty()) {
-//            try {
-//                String imageUrl = s3Service.uploadImage(aboutUsImage);
-//                webAboutUs.setAboutUsImage(imageUrl);
-//            } catch (IOException e) {
-//                throw new RuntimeException("Failed to upload AboutUs image", e);
-//            }
-//        }
-
+        uploadFile(aboutUsImage, webAboutUs);
         return repository.save(webAboutUs);
+    }
+
+    private void uploadFile(MultipartFile pdf, WebAboutUs webAboutUs) {
+        if (pdf != null) {
+            try {
+                String fileURL = s3service.uploadFile(pdf, folder);
+                webAboutUs.setAboutUsImage(fileURL);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to upload File");
+            }
+        }
     }
 
 
@@ -59,21 +60,7 @@ public class AboutUsServiceImpl implements AboutUsService {
         existing.setTotalStudents(webAboutUs.getTotalStudents());
         existing.setTotalYearsOfExcellence(webAboutUs.getTotalYearsOfExcellence());
 
-//        if (aboutUsImage != null && !aboutUsImage.isEmpty()) {
-//            try {
-//                // Upload new image
-//                String imageUrl = s3Service.uploadImage(aboutUsImage);
-//
-//                // Optional: delete old image if exists
-//                if (existing.getAboutUsImage() != null && existing.getAboutUsImage().contains("amazonaws.com")) {
-//                    s3Service.deleteImage(existing.getAboutUsImage());
-//                }
-//
-//                existing.setAboutUsImage(imageUrl);
-//            } catch (IOException e) {
-//                throw new RuntimeException("Failed to upload AboutUs image", e);
-//            }
-//        }
+        uploadFile(aboutUsImage, existing);
 
         return repository.save(existing);
     }
@@ -83,10 +70,7 @@ public class AboutUsServiceImpl implements AboutUsService {
         WebAboutUs webAboutUs = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("AboutUs not found"));
 
-        // Delete image from S3 if exists
-        if (webAboutUs.getAboutUsImage() != null && webAboutUs.getAboutUsImage().contains("amazonaws.com")) {
-            s3Service.deleteImage(webAboutUs.getAboutUsImage());
-        }
+        s3service.deleteFile(webAboutUs.getUrl());
 
         repository.deleteById(id);
     }
