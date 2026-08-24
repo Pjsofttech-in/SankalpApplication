@@ -26,5 +26,5 @@ public interface AnswerKeyService {
 
     List<AnswerKeyResponse> getAllAnswerKeys();
 
-    byte[] downloadPdf(Long id);
+//    byte[] downloadPdf(Long id);
 }

@@ -26,16 +26,6 @@ public class AnswerKey {
     @Column(columnDefinition = "TEXT")
     private String link;
 
-    // PDF File Stored in Database
-    @Lob
-    @Column(name = "pdf_blob")
-    private byte[] pdfBlob;
-
-    // Related Exam
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "exam_id")
-    private Exam exam;
-
     @Builder.Default
     @Column(nullable = false)
     private Boolean active = true;

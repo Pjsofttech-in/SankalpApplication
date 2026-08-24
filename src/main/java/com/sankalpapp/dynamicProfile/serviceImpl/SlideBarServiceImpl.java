@@ -1,17 +1,15 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
-import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
 import com.sankalpapp.dynamicProfile.entity.WebSlideBar;
 import com.sankalpapp.dynamicProfile.repository.SlideBarRepository;
-import com.sankalpapp.dynamicProfile.service.S3Service;
 import com.sankalpapp.dynamicProfile.service.SlideBarService;
 import com.sankalpapp.exception.ResourceNotFoundException;
+import com.sankalpapp.serviceimpl.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -22,10 +20,6 @@ public class SlideBarServiceImpl implements SlideBarService {
 
     @Autowired
     private S3Service s3Service;
-
-    private String normalizeUrl(String url) {
-        return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
-    }
 
     @Override
     public WebSlideBar createSlideBar(WebSlideBar webSlideBar, List<MultipartFile> slideBarImages, String url) {
@@ -81,20 +75,20 @@ public class SlideBarServiceImpl implements SlideBarService {
                 : new ArrayList<>();
 
         // Delete matching images by filename
-        if (!currentImages.isEmpty() && deleteImages != null && !deleteImages.isEmpty()) {
-            Iterator<String> iterator = currentImages.iterator();
-            while (iterator.hasNext()) {
-                String existingImageUrl = iterator.next();
-                String existingImageName = extractFileName(existingImageUrl);
-                if (deleteImages.contains(existingImageName)) {
-                    if (existingImageUrl.contains("amazonaws.com")) {
-                        s3Service.deleteImage(existingImageUrl);
-                    }
-                    iterator.remove();
-                }
-            }
-            existing.setSlideImages(currentImages);
-        }
+//        if (!currentImages.isEmpty() && deleteImages != null && !deleteImages.isEmpty()) {
+//            Iterator<String> iterator = currentImages.iterator();
+//            while (iterator.hasNext()) {
+//                String existingImageUrl = iterator.next();
+//                String existingImageName = extractFileName(existingImageUrl);
+//                if (deleteImages.contains(existingImageName)) {
+//                    if (existingImageUrl.contains("amazonaws.com")) {
+//                        s3Service.deleteImage(existingImageUrl);
+//                    }
+//                    iterator.remove();
+//                }
+//            }
+//            existing.setSlideImages(currentImages);
+//        }
 
         // Upload and add new images
 //        if (newImages != null && !newImages.isEmpty()) {
@@ -125,14 +119,14 @@ public class SlideBarServiceImpl implements SlideBarService {
         WebSlideBar webSlideBar = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("SlideBar not found"));
 
-        // ✅ Delete all images
-        if (webSlideBar.getSlideImages() != null) {
-            for (String image : webSlideBar.getSlideImages()) {
-                if (image != null && image.contains("amazonaws.com")) {
-                    s3Service.deleteImage(image);
-                }
-            }
-        }
+//        // ✅ Delete all images
+//        if (webSlideBar.getSlideImages() != null) {
+//            for (String image : webSlideBar.getSlideImages()) {
+//                if (image != null && image.contains("amazonaws.com")) {
+//                    s3Service.deleteImage(image);
+//                }
+//            }
+//        }
 
         repository.deleteById(id);
     }

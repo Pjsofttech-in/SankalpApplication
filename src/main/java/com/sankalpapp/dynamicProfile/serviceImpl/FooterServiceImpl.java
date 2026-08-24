@@ -16,11 +16,6 @@ public class FooterServiceImpl implements FooterService {
     @Autowired
     private FooterRepository repository;
 
-    private String normalizeUrl(String url) {
-        if (url == null) return "";
-        return url.split(",")[0].trim().toLowerCase();
-    }
-
     @Override
     public WebFooter createFooter(WebFooter webFooter, String url) {
         webFooter.setUrl(url);

@@ -1,15 +1,16 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
-import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
+import com.sankalpapp.dynamicProfile.entity.WebTopper;
 import com.sankalpapp.dynamicProfile.entity.WebVisionMission;
 import com.sankalpapp.dynamicProfile.repository.VisionMissionRepository;
-import com.sankalpapp.dynamicProfile.service.S3Service;
 import com.sankalpapp.dynamicProfile.service.VisionMissionService;
 import com.sankalpapp.exception.ResourceNotFoundException;
+import com.sankalpapp.serviceimpl.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -21,24 +22,13 @@ public class VisionMissionServiceImpl implements VisionMissionService {
     @Autowired
     private S3Service s3Service;
 
-    private String normalizeUrl(String url) {
-        return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
-    }
+    private static final String folder = "Vision";
 
     @Override
     public WebVisionMission create(WebVisionMission vm, MultipartFile directorImage, String url) {
-        //validateUrlExists;
-        // ❗ Prevent duplicate creation per branch
 
         vm.setUrl(url);
-        if (directorImage != null && !directorImage.isEmpty()) {
-//            try {
-//                String imageUrl = s3Service.uploadImage(directorImage);
-//                vm.setDirectorImage(imageUrl);
-//            } catch (IOException e) {
-//                throw new RuntimeException("Failed to upload director image", e);
-//            }
-        }
+        uploadFile(directorImage, vm);
 
         return repository.save(vm);
     }
@@ -52,7 +42,6 @@ public class VisionMissionServiceImpl implements VisionMissionService {
 
     @Override
     public WebVisionMission update(Long id, WebVisionMission vm, MultipartFile directorImage, String url) {
-        //validateUrlExists;
         WebVisionMission existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("VisionMission not found"));
 
@@ -64,23 +53,20 @@ public class VisionMissionServiceImpl implements VisionMissionService {
         existing.setVisionmissionColor(vm.getVisionmissionColor() != null ? vm.getVisionmissionColor() : existing.getVisionmissionColor());
         existing.setUrl(vm.getUrl() != null ? vm.getUrl() : existing.getUrl());
 
-        if (directorImage != null && !directorImage.isEmpty()) {
-//            try {
-//                // Upload new image
-//                String imageUrl = s3Service.uploadImage(directorImage);
-//
-//                // Delete old image if exists and was uploaded to S3
-//                if (existing.getDirectorImage() != null && existing.getDirectorImage().contains("amazonaws.com")) {
-//                    s3Service.deleteImage(existing.getDirectorImage());
-//                }
-//
-//                existing.setDirectorImage(imageUrl);
-//            } catch (IOException e) {
-//                throw new RuntimeException("Failed to upload director image", e);
-//            }
-        }
+        uploadFile(directorImage, existing);
 
         return repository.save(existing);
+    }
+
+    private void uploadFile(MultipartFile pdf, WebVisionMission obj) {
+        if (pdf != null) {
+            try {
+                String fileURL = s3Service.uploadFile(pdf, folder);
+                obj.setDirectorImage(fileURL);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to upload File");
+            }
+        }
     }
 
     @Override
@@ -88,10 +74,7 @@ public class VisionMissionServiceImpl implements VisionMissionService {
         WebVisionMission vm = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("VisionMission not found"));
 
-        // Delete image from S3 if exists
-        if (vm.getDirectorImage() != null && vm.getDirectorImage().contains("amazonaws.com")) {
-            s3Service.deleteImage(vm.getDirectorImage());
-        }
+        s3Service.deleteFileByUrl(vm.getDirectorImage());
 
         repository.deleteById(id);
     }

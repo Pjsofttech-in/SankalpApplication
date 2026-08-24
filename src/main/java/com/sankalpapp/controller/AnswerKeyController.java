@@ -79,15 +79,15 @@ public class AnswerKeyController {
     }
 
 
-    // Download PDF
-    @GetMapping("/{id}/download")
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
-    public ResponseEntity<byte[]> downloadPdf(@PathVariable Long id) {
-
-        byte[] pdf = answerKeyService.downloadPdf(id);
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(pdf);
-    }
+//    // Download PDF
+//    @GetMapping("/{id}/download")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
+//    public ResponseEntity<byte[]> downloadPdf(@PathVariable Long id) {
+//
+//        byte[] pdf = answerKeyService.downloadPdf(id);
+//
+//        return ResponseEntity.ok()
+//                .contentType(MediaType.APPLICATION_PDF)
+//                .body(pdf);
+//    }
 }

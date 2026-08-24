@@ -1,15 +1,16 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebCourse;
-import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
+import com.sankalpapp.dynamicProfile.entity.WebTestimonials;
 import com.sankalpapp.dynamicProfile.repository.CourseRepository;
 import com.sankalpapp.dynamicProfile.service.CourseService;
-import com.sankalpapp.dynamicProfile.service.S3Service;
 import com.sankalpapp.exception.ResourceNotFoundException;
+import com.sankalpapp.serviceimpl.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -21,9 +22,7 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     private S3Service s3Service;
 
-    private String normalizeUrl(String url) {
-        return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
-    }
+    private static final String folder = "Course";
 
     @Override
     public WebCourse createCourse(WebCourse webCourse, MultipartFile courseImage, String url) {
@@ -37,18 +36,21 @@ public class CourseServiceImpl implements CourseService {
 
         webCourse.setUrl(url);
 
-//        if (courseImage != null && !courseImage.isEmpty()) {
-//            try {
-//                String imageUrl = s3Service.uploadImage(courseImage);
-//                webCourse.setCourseImage(imageUrl);
-//            } catch (IOException e) {
-//                throw new RuntimeException("Failed to upload course image", e);
-//            }
-//        }
+        uploadFile(courseImage, webCourse);
 
         return repository.save(webCourse);
     }
 
+    private void uploadFile(MultipartFile pdf, WebCourse obj) {
+        if (pdf != null) {
+            try {
+                String fileURL = s3Service.uploadFile(pdf, folder);
+                obj.setCourseImage(fileURL);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to upload File");
+            }
+        }
+    }
 
     @Override
     public List<WebCourse> getAllCoursesByBranchCode(String url) {
@@ -77,19 +79,7 @@ public class CourseServiceImpl implements CourseService {
             repository.saveAll(allCours);
         }
 
-//        if (courseImage != null && !courseImage.isEmpty()) {
-//            try {
-//                String newImageUrl = s3Service.uploadImage(courseImage);
-//
-//                if (existing.getCourseImage() != null && existing.getCourseImage().contains("amazonaws.com")) {
-//                    s3Service.deleteImage(existing.getCourseImage());
-//                }
-//
-//                existing.setCourseImage(newImageUrl);
-//            } catch (IOException e) {
-//                throw new RuntimeException("Failed to upload course image", e);
-//            }
-//        }
+        uploadFile(courseImage, existing);
 
         return repository.save(existing);
     }
@@ -100,9 +90,7 @@ public class CourseServiceImpl implements CourseService {
         WebCourse webCourse = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
-        if (webCourse.getCourseImage() != null && webCourse.getCourseImage().contains("amazonaws.com")) {
-            s3Service.deleteImage(webCourse.getCourseImage());
-        }
+        s3Service.deleteFileByUrl(webCourse.getCourseImage());
 
         repository.deleteById(id);
     }

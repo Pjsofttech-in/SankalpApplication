@@ -1,14 +1,14 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.dto.WebJobCareerOptionDTO;
+import com.sankalpapp.dynamicProfile.entity.HeroSection;
 import com.sankalpapp.dynamicProfile.entity.WebHRDetails;
 import com.sankalpapp.dynamicProfile.entity.WebJobCareerOption;
-import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
 import com.sankalpapp.dynamicProfile.repository.JobCareerOptionRepository;
 import com.sankalpapp.dynamicProfile.repository.WebHRDetailsRepository;
 import com.sankalpapp.dynamicProfile.service.JobCareerOptionService;
-import com.sankalpapp.dynamicProfile.service.S3Service;
 import com.sankalpapp.exception.ResourceNotFoundException;
+import com.sankalpapp.serviceimpl.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,9 +29,7 @@ public class JobCareerOptionServiceImpl implements JobCareerOptionService {
     @Autowired
     private S3Service s3Service;
 
-    private String normalizeUrl(String url) {
-        return url == null ? "" : url.split(",")[0].trim().toLowerCase();
-    }
+    private static final String folder = "JobCareerOption";
 
     @Override
     public WebJobCareerOptionDTO create(WebJobCareerOption option, MultipartFile resumeFile, String url, Long webHRDetailsId) {
@@ -47,16 +45,20 @@ public class JobCareerOptionServiceImpl implements JobCareerOptionService {
         option.setPostDate(LocalDate.now());
         option.setWebHRDetails(webHRDetails);
 
-//        if (resumeFile != null && !resumeFile.isEmpty()) {
-//            try {
-//                String uploadedUrl = s3Service.uploadImage(resumeFile);
-//                option.setResumeUrl(uploadedUrl);
-//            } catch (IOException e) {
-//                throw new RuntimeException("Failed to upload resume PDF to S3", e);
-//            }
-//        }
+        uploadFile(resumeFile, option);
 
         return mapToDTO(repository.save(option));
+    }
+
+    private void uploadFile(MultipartFile pdf, WebJobCareerOption obj) {
+        if (pdf != null) {
+            try {
+                String fileURL = s3Service.uploadFile(pdf, folder);
+                obj.setResumeUrl(fileURL);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to upload File");
+            }
+        }
     }
 
     @Override
@@ -74,14 +76,7 @@ public class JobCareerOptionServiceImpl implements JobCareerOptionService {
         existing.setUrl(option.getUrl() != null ? option.getUrl() : existing.getUrl());
         existing.setJobVacancy(option.getJobVacancy() != null ? option.getJobVacancy() : existing.getJobVacancy());
 
-        if (resumeFile != null && !resumeFile.isEmpty()) {
-            try {
-                String uploadedUrl = s3Service.uploadImage(resumeFile);
-                existing.setResumeUrl(uploadedUrl);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to upload resume to S3", e);
-            }
-        }
+        uploadFile(resumeFile, existing);
 
 
         if (webHRDetailsId != null) {
@@ -146,6 +141,7 @@ public class JobCareerOptionServiceImpl implements JobCareerOptionService {
         WebJobCareerOption job = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Job post not found with ID: " + id));
 
+        s3Service.deleteFileByUrl(job.getResumeUrl());
         repository.delete(job);
     }
 
