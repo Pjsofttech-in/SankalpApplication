@@ -2,10 +2,9 @@ package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebFooter;
 import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
-import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.FooterRepository;
-import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.service.FooterService;
+import com.sankalpapp.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,39 +16,21 @@ public class FooterServiceImpl implements FooterService {
     @Autowired
     private FooterRepository repository;
 
-    @Autowired
-    private SecurityUrlrepository securityUrlRepository;
-
-    private void validateUrlExists(String url) {
-
-        String normalizedUrl = normalizeUrl(url);
-
-        securityUrlRepository.findByUrl(normalizedUrl)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed for branchCode"
-                ));
-    }
-
     private String normalizeUrl(String url) {
         if (url == null) return "";
         return url.split(",")[0].trim().toLowerCase();
     }
+
     @Override
     public WebFooter createFooter(WebFooter webFooter, String url) {
-         String normalizedUrl = normalizeUrl(url);
-        WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizedUrl)
-                .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
-
         webFooter.setUrl(url);
-        webFooter.setWebSecurityUrl(webSecurityUrl);
-
         return repository.save(webFooter);
     }
 
 
     @Override
     public List<WebFooter> getAllFootersByBranchCode(String url) {
-         return repository.findAllOrderById();
+        return repository.findAllOrderById();
     }
 
 
@@ -76,7 +57,7 @@ public class FooterServiceImpl implements FooterService {
 
     @Override
     public void deleteFooter(Long id, String url) {
-         repository.findById(id)
+        repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Footer not found"));
 
         repository.deleteById(id);
@@ -84,7 +65,7 @@ public class FooterServiceImpl implements FooterService {
 
     @Override
     public WebFooter getFooterById(Long id, String url) {
-         return repository.findById(id)
+        return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Footer not found"));
     }
 }

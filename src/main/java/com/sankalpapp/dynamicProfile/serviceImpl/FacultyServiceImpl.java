@@ -2,11 +2,10 @@ package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebFaculty;
 import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
-import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.FacultyRepository;
-import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.service.FacultyService;
 import com.sankalpapp.dynamicProfile.service.S3Service;
+import com.sankalpapp.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,20 +19,7 @@ public class FacultyServiceImpl implements FacultyService {
     private FacultyRepository repository;
 
     @Autowired
-    private SecurityUrlrepository securityUrlRepository;
-
-    @Autowired
     private S3Service s3Service;
-
-    private void validateUrlExists(String url) {
-
-        String normalizedUrl = normalizeUrl(url);
-        securityUrlRepository.findByUrl(normalizedUrl)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed"
-                ));
-    }
-
 
     private String normalizeUrl(String url) {
         return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
@@ -41,9 +27,6 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public WebFaculty createFacility(WebFaculty webFaculty, MultipartFile image, String url) {
-         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
-                .orElseThrow(() -> new ResourceNotFoundException("Provided URL does not exist in security URL table"));
-
         // Apply static color logic
         List<WebFaculty> existing = repository.findAll();
         if (!existing.isEmpty()) {
@@ -51,7 +34,6 @@ public class FacultyServiceImpl implements FacultyService {
         }
 
         webFaculty.setUrl(url);
-        webFaculty.setWebSecurityUrl(webSecurityUrl);
 
 //        if (image != null && !image.isEmpty()) {
 //            try {
@@ -75,7 +57,7 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public WebFaculty updateFacility(Long id, WebFaculty webFaculty, MultipartFile image, String url) {
-         WebFaculty existing = repository.findById(id)
+        WebFaculty existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Facility not found"));
 
         existing.setFacilityName(webFaculty.getFacilityName() != null ? webFaculty.getFacilityName() : existing.getFacilityName());
@@ -111,7 +93,7 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public void deleteFacility(Long id, String url) {
-         WebFaculty webFaculty = repository.findById(id)
+        WebFaculty webFaculty = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Facility not found"));
 
         if (webFaculty.getFacilityImage() != null && webFaculty.getFacilityImage().contains("amazonaws.com")) {
@@ -123,7 +105,7 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public WebFaculty getFacilityById(Long id, String url) {
-         return repository.findById(id)
+        return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Facility not found"));
     }
 }

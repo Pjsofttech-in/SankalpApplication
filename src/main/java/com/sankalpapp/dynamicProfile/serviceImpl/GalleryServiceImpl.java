@@ -2,11 +2,10 @@ package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebGallery;
 import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
-import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.GalleryRepository;
-import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.service.GalleryService;
 import com.sankalpapp.dynamicProfile.service.S3Service;
+import com.sankalpapp.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,20 +21,7 @@ public class GalleryServiceImpl implements GalleryService {
     private GalleryRepository repository;
 
     @Autowired
-    private SecurityUrlrepository securityUrlRepository;
-
-    @Autowired
     private S3Service s3Service;
-
-    private void validateUrlExists(String url) {
-
-        String normalizedUrl = normalizeUrl(url);
-        securityUrlRepository.findByUrl(normalizedUrl)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed for branchCode "
-                ));
-    }
-
 
     private String normalizeUrl(String url) {
         return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
@@ -43,11 +29,7 @@ public class GalleryServiceImpl implements GalleryService {
 
     @Override
     public WebGallery createGallery(WebGallery webGallery, List<MultipartFile> images, String url) {
-         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
-                .orElseThrow(() -> new ResourceNotFoundException("Security URL not found"));
-
         webGallery.setUrl(url);
-        webGallery.setWebSecurityUrl(webSecurityUrl);
 
         // Static color logic
         List<WebGallery> existing = repository.findAll();
@@ -138,7 +120,7 @@ public class GalleryServiceImpl implements GalleryService {
 
     @Override
     public void deleteGallery(Long id, String url) {
-         WebGallery webGallery = repository.findById(id)
+        WebGallery webGallery = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found"));
 
         if (webGallery.getGalleryImages() != null) {
@@ -152,7 +134,7 @@ public class GalleryServiceImpl implements GalleryService {
 
     @Override
     public WebGallery getGalleryById(Long id, String url) {
-         return repository.findById(id)
+        return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Gallery not found"));
     }
 

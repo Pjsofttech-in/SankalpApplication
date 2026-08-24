@@ -2,10 +2,9 @@ package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebCounter;
 import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
-import com.sankalpapp.exception.ResourceNotFoundException;
 import com.sankalpapp.dynamicProfile.repository.CounterRepository;
-import com.sankalpapp.dynamicProfile.repository.SecurityUrlrepository;
 import com.sankalpapp.dynamicProfile.service.CounterService;
+import com.sankalpapp.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,18 +16,6 @@ public class CounterServiceImpl implements CounterService {
     @Autowired
     private CounterRepository repository;
 
-    @Autowired
-    private SecurityUrlrepository securityUrlRepository;
-
-    private void validateUrlExists(String url) {
-
-        String normalizedUrl = normalizeUrl(url);
-        securityUrlRepository.findByUrl(normalizedUrl)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "URL [" + url + "] is not allowed"
-                ));
-    }
-
 
     private String normalizeUrl(String url) {
         return (url == null) ? "" : url.split(",")[0].trim().toLowerCase();
@@ -36,10 +23,6 @@ public class CounterServiceImpl implements CounterService {
 
     @Override
     public WebCounter createCounter(WebCounter webCounter, String url) {
-         WebSecurityUrl webSecurityUrl = securityUrlRepository.findByUrl(normalizeUrl(url))
-                .orElseThrow(() -> new ResourceNotFoundException("URL not found"));
-
-        webCounter.setWebSecurityUrl(webSecurityUrl);
         webCounter.setUrl(url);
 
         return repository.save(webCounter);
@@ -47,13 +30,13 @@ public class CounterServiceImpl implements CounterService {
 
     @Override
     public List<WebCounter> getAllByBranchCode(String url) {
-         return repository.findAllOrderById();
+        return repository.findAllOrderById();
     }
 
 
     @Override
     public WebCounter updateCounter(Long id, WebCounter webCounter, String url) {
-         WebCounter existing = repository.findById(id)
+        WebCounter existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Counter not found"));
 
         // Update values
@@ -76,7 +59,7 @@ public class CounterServiceImpl implements CounterService {
 
     @Override
     public void deleteCounter(Long id, String url) {
-         WebCounter webCounter = repository.findById(id)
+        WebCounter webCounter = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Counter not found"));
 
         repository.delete(webCounter);
@@ -84,7 +67,7 @@ public class CounterServiceImpl implements CounterService {
 
     @Override
     public WebCounter getCounterById(Long id, String url) {
-         return repository.findById(id)
+        return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Counter not found"));
     }
 }
