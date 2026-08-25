@@ -91,6 +91,16 @@ public class ExamQuestionServiceImpl implements ExamQuestionService {
             );
         }
 
+        long currentMarks =
+                examQuestionRepository
+                        .sumMarksByExamId(exam.getId());
+
+        if (currentMarks + marks > exam.getTotalMarks()) {
+            throw new RuntimeException(
+                    "Total question marks cannot exceed exam total marks"
+            );
+        }
+
         ExamQuestion examQuestion = ExamQuestion.builder()
                 .exam(exam)
                 .question(question)
