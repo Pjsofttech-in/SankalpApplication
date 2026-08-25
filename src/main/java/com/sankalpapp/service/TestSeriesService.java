@@ -1,18 +1,40 @@
 package com.sankalpapp.service;
 
+import com.sankalpapp.dto.Request.AddExamToTestSeriesRequest;
+import com.sankalpapp.dto.Request.CreateTestSeriesRequest;
+import com.sankalpapp.dto.Request.ReorderExamRequest;
 import com.sankalpapp.entity.TestSeries;
 
 import java.util.List;
 
 public interface TestSeriesService {
 
-    TestSeries createTestSeries(TestSeries testSeries);
+    TestSeries create(CreateTestSeriesRequest request);
 
-    TestSeries updateTestSeries(Long id, TestSeries testSeries);
+    TestSeries getById(Long id);
 
-    List<TestSeries> getAllTestSeries();
+    List<TestSeries> getAll();
 
-    TestSeries getTestSeriesById(Long id);
+    TestSeries update(
+            Long id,
+            CreateTestSeriesRequest request
+    );
 
-    void deleteTestSeries(Long id);
+    void delete(Long id);
+
+    void addExam(
+            Long testSeriesId,
+            AddExamToTestSeriesRequest request
+    );
+
+    void removeExam(
+            Long testSeriesId,
+            Long examId
+    );
+
+    void reorderExam(
+            Long testSeriesId,
+            Long examId,
+            ReorderExamRequest request
+    );
 }

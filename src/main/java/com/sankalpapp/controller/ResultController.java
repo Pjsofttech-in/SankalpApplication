@@ -1,58 +1,44 @@
 package com.sankalpapp.controller;
 
-import com.sankalpapp.dto.Request.ResultRequest;
-import com.sankalpapp.dto.Response.ResultResponse;
-import com.sankalpapp.service.ResultService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
+import com.sankalpapp.dto.Response.ExamResultResponse;
+import com.sankalpapp.service.ExamAttemptService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/results")
-@RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class ResultController {
 
-    private final ResultService resultService;
+    private final ExamAttemptService examAttemptService;
 
-    // Save Result
-    @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
-    public ResultResponse saveResult(@RequestBody ResultRequest request) {
-        return resultService.saveResult(request);
+    public ResultController(
+            ExamAttemptService examAttemptService
+    ) {
+        this.examAttemptService =
+                examAttemptService;
     }
 
-    // Get All Results
-    @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
-    public List<ResultResponse> getAllResults() {
-        return resultService.getAllResults();
+    @PutMapping("/{resultId}/publish")
+    public ResponseEntity<ExamResultResponse>
+    publishResult(
+            @PathVariable Long resultId
+    ) {
+
+        return ResponseEntity.ok(
+                examAttemptService.publishResult(
+                        resultId
+                )
+        );
     }
 
-    // Get Result By Id
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
-    public ResultResponse getResultById(@PathVariable Long id) {
-        return resultService.getResultById(id);
-    }
+    // Get result
+    @GetMapping("/{resultId}")
+    public ResponseEntity<ExamResultResponse> getResult(
+            @PathVariable Long resultId
+    ) {
 
-    // Update Result
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
-    public ResultResponse updateResult(@PathVariable Long id,
-                                       @RequestBody ResultRequest request) {
-        return resultService.updateResult(id, request);
-    }
-
-    // Delete Result
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public String deleteResult(@PathVariable Long id) {
-
-        resultService.deleteResult(id);
-
-        return "Result deleted successfully.";
+        return ResponseEntity.ok(
+                examAttemptService.getResult(resultId)
+        );
     }
 }

@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -35,12 +36,22 @@ public class Exam {
     @Column(nullable = false)
     private Integer duration;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer maxAttempts = 1;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @OneToMany(mappedBy = "exam", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Question> questions;
+    @OneToMany(
+            mappedBy = "exam",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @OrderBy("sequence ASC")
+    @Builder.Default
+    private List<ExamQuestion> questions = new ArrayList<>();
 
     @Builder.Default
     @Column(nullable = false)
@@ -53,6 +64,7 @@ public class Exam {
 
     @PrePersist
     public void onCreate() {
+
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
 
@@ -63,6 +75,7 @@ public class Exam {
 
     @PreUpdate
     public void onUpdate() {
+
         updatedAt = LocalDateTime.now();
     }
 }

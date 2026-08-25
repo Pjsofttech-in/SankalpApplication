@@ -1,19 +1,19 @@
 package com.sankalpapp.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "test_series")
-@Data
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class TestSeries {
 
     @Id
@@ -21,31 +21,51 @@ public class TestSeries {
     private Long id;
 
     @Column(nullable = false)
-    private String name; // SSC CGL, SSC
+    private String title;
 
-    private String examType; // T1, T2
-
-
-    private Integer durationMinutes;
-
-    private boolean active = true;
-
-    private Long mrp;
-
-    private Integer price;
-
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    private  String features;
+    private String image;
 
-    private String testseriesImageUrl;
+    private Double price;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean active = true;
 
-    @OneToMany(mappedBy = "testSeries", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private List<Subject> subjects;
+    private LocalDateTime startDate;
+
+    private LocalDateTime endDate;
+
+    @OneToMany(
+            mappedBy = "testSeries",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @OrderBy("sequence ASC")
+    @Builder.Default
+    private List<TestSeriesExam> exams = new ArrayList<>();
+
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void onCreate() {
+
+        if (active == null) {
+            active = true;
+        }
+
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+
+        updatedAt = LocalDateTime.now();
+    }
 }

@@ -26,7 +26,7 @@ public class StudentAnswerServiceImpl implements StudentAnswerService {
 
         existing.setSelectedAnswer(answer.getSelectedAnswer());
         existing.setCorrect(answer.getCorrect());
-        existing.setStudent(answer.getStudent());
+        existing.setAttempt(answer.getAttempt());
         existing.setQuestion(answer.getQuestion());
 
         return repository.save(existing);

@@ -1,16 +1,23 @@
 package com.sankalpapp.serviceimpl;
 
 import com.sankalpapp.dto.Request.ExamRequest;
+import com.sankalpapp.dto.Request.StudentAnswerRequest;
+import com.sankalpapp.dto.Request.SubmitExamRequest;
 import com.sankalpapp.dto.Response.ExamResponse;
-import com.sankalpapp.entity.Category;
-import com.sankalpapp.entity.Exam;
-import com.sankalpapp.repository.CategoryRepository;
-import com.sankalpapp.repository.ExamRepository;
+import com.sankalpapp.dto.Response.QuestionResponse;
+import com.sankalpapp.dto.Response.StartExamResponse;
+import com.sankalpapp.entity.*;
+import com.sankalpapp.entity.ExamAttempt.AttemptStatus;
+import com.sankalpapp.repository.*;
 import com.sankalpapp.service.ExamService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,7 +25,14 @@ import java.util.stream.Collectors;
 public class ExamServiceImpl implements ExamService {
 
     private final ExamRepository examRepository;
+    private final ExamQuestionRepository examQuestionRepository;
     private final CategoryRepository categoryRepository;
+    private final QuestionRepository questionRepository;
+    private final StudentRepository studentRepository;
+    private final ExamAttemptRepository examAttemptRepository;
+    private final StudentAnswerRepository studentAnswerRepository;
+    private final ResultRepository resultRepository;
+
 
     @Override
     public ExamResponse saveExam(ExamRequest request) {
@@ -99,4 +113,5 @@ public class ExamServiceImpl implements ExamService {
 
                 .build();
     }
+
 }

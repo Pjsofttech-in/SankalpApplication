@@ -1,57 +1,128 @@
 package com.sankalpapp.controller;
 
+import com.sankalpapp.dto.Request.AddExamToTestSeriesRequest;
+import com.sankalpapp.dto.Request.CreateTestSeriesRequest;
+import com.sankalpapp.dto.Request.ReorderExamRequest;
 import com.sankalpapp.entity.TestSeries;
 import com.sankalpapp.service.TestSeriesService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-    @RestController
-//    @CrossOrigin("https://mahastudy.in")
-    @CrossOrigin(origins = {
-            "http://localhost:5173",
-            "http://localhost:5174",
-            "https://mahastudy.in"
-    })
-    @RequiredArgsConstructor
-    public class TestSeriesController {
+@RestController
+@RequestMapping("/api/test-series")
+public class TestSeriesController {
 
-        private final TestSeriesService testSeriesService;
+    private final TestSeriesService testSeriesService;
 
-        // Create
-        @PostMapping("/createTestSeries")
-        public ResponseEntity<TestSeries> create(@RequestBody TestSeries testSeries) {
-            return ResponseEntity.ok(testSeriesService.createTestSeries(testSeries));
-        }
-
-        //  Update
-        @PutMapping("/UpdateTestSeriesById/{id}")
-        public ResponseEntity<TestSeries> update(
-                @PathVariable Long id,
-                @RequestBody TestSeries testSeries) {
-            return ResponseEntity.ok(testSeriesService.updateTestSeries(id, testSeries));
-        }
-
-        //  Get All
-        @GetMapping("/getAllTestSeries")
-        public ResponseEntity<List<TestSeries>> getAll() {
-            return ResponseEntity.ok(testSeriesService.getAllTestSeries());
-        }
-
-        //  Get By Id
-        @GetMapping("/GetById/{id}")
-        public ResponseEntity<TestSeries> getById(@PathVariable Long id) {
-            return ResponseEntity.ok(testSeriesService.getTestSeriesById(id));
-        }
-
-        //  Delete
-        @DeleteMapping("/deleteTestSeries/{id}")
-        public ResponseEntity<String> delete(@PathVariable Long id) {
-            testSeriesService.deleteTestSeries(id);
-            return ResponseEntity.ok("TestSeries deleted successfully");
-        }
+    public TestSeriesController(
+            TestSeriesService testSeriesService
+    ) {
+        this.testSeriesService = testSeriesService;
     }
 
+    @PostMapping
+    public ResponseEntity<TestSeries> create(
+            @RequestBody CreateTestSeriesRequest request
+    ) {
 
+        return ResponseEntity.ok(
+                testSeriesService.create(request)
+        );
+    }
+
+    @GetMapping
+    public ResponseEntity<List<TestSeries>> getAll() {
+
+        return ResponseEntity.ok(
+                testSeriesService.getAll()
+        );
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TestSeries> getById(
+            @PathVariable Long id
+    ) {
+
+        return ResponseEntity.ok(
+                testSeriesService.getById(id)
+        );
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TestSeries> update(
+            @PathVariable Long id,
+            @RequestBody CreateTestSeriesRequest request
+    ) {
+
+        return ResponseEntity.ok(
+                testSeriesService.update(
+                        id,
+                        request
+                )
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> delete(
+            @PathVariable Long id
+    ) {
+
+        testSeriesService.delete(id);
+
+        return ResponseEntity.ok(
+                "Test series deleted successfully"
+        );
+    }
+
+    @PostMapping("/{testSeriesId}/exams")
+    public ResponseEntity<String> addExam(
+            @PathVariable Long testSeriesId,
+            @RequestBody AddExamToTestSeriesRequest request
+    ) {
+
+        testSeriesService.addExam(
+                testSeriesId,
+                request
+        );
+
+        return ResponseEntity.ok(
+                "Exam added to test series successfully"
+        );
+    }
+
+    @DeleteMapping("/{testSeriesId}/exams/{examId}")
+    public ResponseEntity<String> removeExam(
+            @PathVariable Long testSeriesId,
+            @PathVariable Long examId
+    ) {
+
+        testSeriesService.removeExam(
+                testSeriesId,
+                examId
+        );
+
+        return ResponseEntity.ok(
+                "Exam removed from test series successfully"
+        );
+    }
+
+    @PutMapping("/{testSeriesId}/exams/{examId}/sequence")
+    public ResponseEntity<String> reorderExam(
+            @PathVariable Long testSeriesId,
+            @PathVariable Long examId,
+            @RequestBody ReorderExamRequest request
+    ) {
+
+        testSeriesService.reorderExam(
+                testSeriesId,
+                examId,
+                request
+        );
+
+        return ResponseEntity.ok(
+                "Exam sequence updated successfully"
+        );
+    }
+}

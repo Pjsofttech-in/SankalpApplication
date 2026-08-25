@@ -6,12 +6,23 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "student_answers")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(
+        name = "student_answers",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_attempt_question",
+                        columnNames = {
+                                "attempt_id",
+                                "question_id"
+                        }
+                )
+        }
+)
 public class StudentAnswer {
 
     @Id
@@ -25,12 +36,14 @@ public class StudentAnswer {
     @Column(nullable = false)
     private Boolean correct = false;
 
-    // Student who answered
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "student_id", nullable = false)
-    private Student student;
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer marksObtained = 0;
 
-    // Question answered
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "attempt_id", nullable = false)
+    private ExamAttempt attempt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id", nullable = false)
     private Question question;
@@ -43,6 +56,10 @@ public class StudentAnswer {
 
         if (correct == null) {
             correct = false;
+        }
+
+        if (marksObtained == null) {
+            marksObtained = 0;
         }
 
         createdAt = LocalDateTime.now();

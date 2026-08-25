@@ -1,7 +1,9 @@
 package com.sankalpapp.service;
 
 import com.sankalpapp.dto.Request.ExamRequest;
+import com.sankalpapp.dto.Request.SubmitExamRequest;
 import com.sankalpapp.dto.Response.ExamResponse;
+import com.sankalpapp.dto.Response.StartExamResponse;
 
 import java.util.List;
 
@@ -16,4 +18,5 @@ public interface ExamService {
     ExamResponse getExamById(Long id);
 
     List<ExamResponse> getAllExams();
+
 }

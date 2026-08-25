@@ -34,19 +34,13 @@ public class Question {
     @Column(nullable = false)
     private String correctAnswer;
 
-    @Column(nullable = false)
-    private Integer marks;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "exam_id", nullable = false)
-    private Exam exam;
-
     @Builder.Default
     @Column(nullable = false)
     private Boolean active = true;
 
     @PrePersist
     public void onCreate() {
+
         if (active == null) {
             active = true;
         }
