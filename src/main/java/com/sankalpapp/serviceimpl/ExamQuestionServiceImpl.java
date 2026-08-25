@@ -35,10 +35,17 @@ public class ExamQuestionServiceImpl implements ExamQuestionService {
 
         Exam exam = examRepository.findById(examId)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Exam not found with id: " + examId
-                        )
-                );
+                        new RuntimeException("Exam not found"));
+
+        long questionCount =
+                examQuestionRepository.countByExamIdAndActiveTrue(exam.getId());
+
+        if (questionCount >= exam.getTotalQuestions()) {
+            throw new RuntimeException(
+                    "Exam already contains maximum allowed questions: "
+                            + exam.getTotalQuestions()
+            );
+        }
 
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() ->
@@ -68,6 +75,29 @@ public class ExamQuestionServiceImpl implements ExamQuestionService {
         if (marks == null || marks <= 0) {
             throw new RuntimeException(
                     "Marks must be greater than zero"
+            );
+        }
+
+        if (sequence > exam.getTotalQuestions()) {
+            throw new RuntimeException(
+                    "Sequence cannot be greater than total questions: "
+                            + exam.getTotalQuestions()
+            );
+        }
+
+        if (sequence < 1) {
+            throw new RuntimeException(
+                    "Sequence must be greater than 0"
+            );
+        }
+
+        long currentMarks =
+                examQuestionRepository
+                        .sumMarksByExamId(exam.getId());
+
+        if (currentMarks + marks > exam.getTotalMarks()) {
+            throw new RuntimeException(
+                    "Total question marks cannot exceed exam total marks"
             );
         }
 
