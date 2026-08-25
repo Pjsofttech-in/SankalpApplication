@@ -1,58 +1,72 @@
 package com.sankalpapp.controller;
 
-import com.sankalpapp.dto.Request.QuestionRequest;
-import com.sankalpapp.dto.Response.QuestionResponse;
+import com.sankalpapp.entity.Question;
 import com.sankalpapp.service.QuestionService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/questions")
-@RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class QuestionController {
 
     private final QuestionService questionService;
 
-    // Save Question
+    public QuestionController(
+            QuestionService questionService
+    ) {
+        this.questionService = questionService;
+    }
+
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
-    public QuestionResponse saveQuestion(@RequestBody QuestionRequest request) {
-        return questionService.saveQuestion(request);
+    public ResponseEntity<Question> create(
+            @RequestBody Question question
+    ) {
+
+        return ResponseEntity.ok(
+                questionService.create(question)
+        );
     }
 
-    // Get All Questions
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
-    public List<QuestionResponse> getAllQuestions() {
-        return questionService.getAllQuestions();
+    public ResponseEntity<List<Question>> getAll() {
+
+        return ResponseEntity.ok(
+                questionService.getAll()
+        );
     }
 
-    // Get Question By Id
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
-    public QuestionResponse getQuestionById(@PathVariable Long id) {
-        return questionService.getQuestionById(id);
+    public ResponseEntity<Question> getById(
+            @PathVariable Long id
+    ) {
+
+        return ResponseEntity.ok(
+                questionService.getById(id)
+        );
     }
 
-    // Update Question
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
-    public QuestionResponse updateQuestion(@PathVariable Long id,
-                                           @RequestBody QuestionRequest request) {
-        return questionService.updateQuestion(id, request);
+    public ResponseEntity<Question> update(
+            @PathVariable Long id,
+            @RequestBody Question question
+    ) {
+
+        return ResponseEntity.ok(
+                questionService.update(id, question)
+        );
     }
 
-    // Delete Question
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public String deleteQuestion(@PathVariable Long id) {
+    public ResponseEntity<String> delete(
+            @PathVariable Long id
+    ) {
 
-        questionService.deleteQuestion(id);
+        questionService.delete(id);
 
-        return "Question deleted successfully.";
+        return ResponseEntity.ok(
+                "Question deleted successfully"
+        );
     }
 }

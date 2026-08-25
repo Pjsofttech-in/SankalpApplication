@@ -25,6 +25,8 @@ public class QuestionResponse {
 
     private Integer marks;
 
+    private Integer sequence;
+
     private Long examId;
 
     private String examName;

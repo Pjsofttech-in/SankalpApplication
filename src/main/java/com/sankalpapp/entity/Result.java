@@ -6,7 +6,6 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "results")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -33,13 +32,21 @@ public class Result {
     @Column(nullable = false)
     private String resultStatus;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exam_id", nullable = false)
     private Exam exam;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "attempt_id", nullable = false, unique = true)
+    private ExamAttempt attempt;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean published = false;
 
     @Builder.Default
     @Column(nullable = false)
@@ -57,12 +64,17 @@ public class Result {
             active = true;
         }
 
+        if (published == null) {
+            published = false;
+        }
+
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     public void onUpdate() {
+
         updatedAt = LocalDateTime.now();
     }
 }

@@ -1,6 +1,7 @@
 package com.sankalpapp.repository;
 
 import com.sankalpapp.entity.Student;
+import com.sankalpapp.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -33,5 +34,9 @@ public interface StudentRepository extends JpaRepository<Student, Long>,
     List<String> findUniqueSchoolsByCenterTaluka(
             @Param("centerId") Long centerId
     );
+
+    Optional<Student> findByUser(User user);
+
+    Optional<Student> findByUserId(Long userId);
 
 }
