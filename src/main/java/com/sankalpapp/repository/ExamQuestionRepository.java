@@ -26,4 +26,13 @@ public interface ExamQuestionRepository
     List<ExamQuestion> findByExamIdOrderBySequenceAsc(
             Long examId
     );
+
+    boolean existsByExamIdAndQuestionId(
+            Long examId,
+            Long questionId
+    );
+
+    long countByExamIdAndActiveTrue(
+            Long examId
+    );
 }
