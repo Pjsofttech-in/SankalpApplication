@@ -548,7 +548,7 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
         attempt.setObtainedMarks(obtainedMarks);
 
         attempt.setStatus(
-                ExamAttempt.AttemptStatus.EVALUATED
+                ExamAttempt.AttemptStatus.SUBMITTED
         );
 
         examAttemptRepository.save(attempt);
