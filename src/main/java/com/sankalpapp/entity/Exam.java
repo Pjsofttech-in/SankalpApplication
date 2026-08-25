@@ -53,6 +53,13 @@ public class Exam {
     @Builder.Default
     private List<ExamQuestion> questions = new ArrayList<>();
 
+    @OneToMany(
+            mappedBy = "exam",
+            cascade = CascadeType.ALL
+    )
+    @Builder.Default
+    private List<TestSeriesExam> testSeriesExams = new ArrayList<>();
+
     @Builder.Default
     @Column(nullable = false)
     private Boolean active = true;

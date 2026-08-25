@@ -16,4 +16,10 @@ public interface ResultRepository
     List<Result> findByStudent(Student student);
 
     List<Result> findByExam(Exam exam);
+
+
+    Optional<Result> findByStudentIdAndExamId(
+            Long studentId,
+            Long examId
+    );
 }

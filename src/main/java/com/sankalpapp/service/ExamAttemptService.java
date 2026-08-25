@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ExamAttemptService {
 
-    ExamStartResponse startExam(Long examId);
+    ExamStartResponse startExam(Long examId, Long testSeriesId);
 
     List<StudentQuestionResponse> getExamQuestions(
             Long attemptId

@@ -1,10 +1,11 @@
 package com.sankalpapp.controller;
 
-import com.sankalpapp.dto.Request.AddExamToTestSeriesRequest;
-import com.sankalpapp.dto.Request.CreateTestSeriesRequest;
-import com.sankalpapp.dto.Request.ReorderExamRequest;
-import com.sankalpapp.entity.TestSeries;
+import com.sankalpapp.dto.Request.TestSeriesExamRequest;
+import com.sankalpapp.dto.Request.TestSeriesRequest;
+import com.sankalpapp.dto.Response.TestSeriesProgressResponse;
+import com.sankalpapp.dto.Response.TestSeriesResponse;
 import com.sankalpapp.service.TestSeriesService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,19 +13,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/test-series")
+@RequiredArgsConstructor
 public class TestSeriesController {
 
     private final TestSeriesService testSeriesService;
 
-    public TestSeriesController(
-            TestSeriesService testSeriesService
-    ) {
-        this.testSeriesService = testSeriesService;
-    }
-
     @PostMapping
-    public ResponseEntity<TestSeries> create(
-            @RequestBody CreateTestSeriesRequest request
+    public ResponseEntity<TestSeriesResponse> create(
+            @RequestBody TestSeriesRequest request
     ) {
 
         return ResponseEntity.ok(
@@ -32,16 +28,19 @@ public class TestSeriesController {
         );
     }
 
-    @GetMapping
-    public ResponseEntity<List<TestSeries>> getAll() {
+    @PutMapping("/{id}")
+    public ResponseEntity<TestSeriesResponse> update(
+            @PathVariable Long id,
+            @RequestBody TestSeriesRequest request
+    ) {
 
         return ResponseEntity.ok(
-                testSeriesService.getAll()
+                testSeriesService.update(id, request)
         );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TestSeries> getById(
+    public ResponseEntity<TestSeriesResponse> getById(
             @PathVariable Long id
     ) {
 
@@ -50,17 +49,11 @@ public class TestSeriesController {
         );
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<TestSeries> update(
-            @PathVariable Long id,
-            @RequestBody CreateTestSeriesRequest request
-    ) {
+    @GetMapping
+    public ResponseEntity<List<TestSeriesResponse>> getAll() {
 
         return ResponseEntity.ok(
-                testSeriesService.update(
-                        id,
-                        request
-                )
+                testSeriesService.getAll()
         );
     }
 
@@ -72,57 +65,49 @@ public class TestSeriesController {
         testSeriesService.delete(id);
 
         return ResponseEntity.ok(
-                "Test series deleted successfully"
+                "Test Series deleted successfully"
         );
     }
 
     @PostMapping("/{testSeriesId}/exams")
-    public ResponseEntity<String> addExam(
+    public ResponseEntity<TestSeriesResponse> addExam(
             @PathVariable Long testSeriesId,
-            @RequestBody AddExamToTestSeriesRequest request
+            @RequestBody TestSeriesExamRequest request
     ) {
 
-        testSeriesService.addExam(
-                testSeriesId,
-                request
-        );
-
         return ResponseEntity.ok(
-                "Exam added to test series successfully"
+                testSeriesService.addExam(
+                        testSeriesId,
+                        request
+                )
         );
     }
 
     @DeleteMapping("/{testSeriesId}/exams/{examId}")
-    public ResponseEntity<String> removeExam(
+    public ResponseEntity<TestSeriesResponse> removeExam(
             @PathVariable Long testSeriesId,
             @PathVariable Long examId
     ) {
 
-        testSeriesService.removeExam(
-                testSeriesId,
-                examId
-        );
-
         return ResponseEntity.ok(
-                "Exam removed from test series successfully"
+                testSeriesService.removeExam(
+                        testSeriesId,
+                        examId
+                )
         );
     }
 
-    @PutMapping("/{testSeriesId}/exams/{examId}/sequence")
-    public ResponseEntity<String> reorderExam(
+    @GetMapping("/{testSeriesId}/progress/{studentId}")
+    public ResponseEntity<TestSeriesProgressResponse> getStudentProgress(
             @PathVariable Long testSeriesId,
-            @PathVariable Long examId,
-            @RequestBody ReorderExamRequest request
+            @PathVariable Long studentId
     ) {
 
-        testSeriesService.reorderExam(
-                testSeriesId,
-                examId,
-                request
-        );
-
         return ResponseEntity.ok(
-                "Exam sequence updated successfully"
+                testSeriesService.getStudentProgress(
+                        testSeriesId,
+                        studentId
+                )
         );
     }
 }

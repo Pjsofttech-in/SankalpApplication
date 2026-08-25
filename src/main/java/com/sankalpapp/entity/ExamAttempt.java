@@ -26,6 +26,11 @@ public class ExamAttempt {
     @JoinColumn(name = "exam_id", nullable = false)
     private Exam exam;
 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "test_series_id", nullable = true)
+    private TestSeries testSeries;
+
     @Column(nullable = false)
     private LocalDateTime startedAt;
 
@@ -45,6 +50,10 @@ public class ExamAttempt {
             orphanRemoval = true
     )
     private List<StudentAnswer> answers;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer attemptNumber = 1;
 
     private Integer totalMarks;
 

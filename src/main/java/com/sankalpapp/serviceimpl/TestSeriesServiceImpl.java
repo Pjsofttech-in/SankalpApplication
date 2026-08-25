@@ -1,50 +1,41 @@
 package com.sankalpapp.serviceimpl;
 
-import com.sankalpapp.dto.Request.AddExamToTestSeriesRequest;
-import com.sankalpapp.dto.Request.CreateTestSeriesRequest;
-import com.sankalpapp.dto.Request.ReorderExamRequest;
-import com.sankalpapp.entity.Exam;
-import com.sankalpapp.entity.TestSeries;
-import com.sankalpapp.entity.TestSeriesExam;
-import com.sankalpapp.repository.ExamRepository;
-import com.sankalpapp.repository.TestSeriesExamRepository;
-import com.sankalpapp.repository.TestSeriesRepository;
+import com.sankalpapp.dto.Request.TestSeriesExamRequest;
+import com.sankalpapp.dto.Request.TestSeriesRequest;
+import com.sankalpapp.dto.Response.TestSeriesExamResponse;
+import com.sankalpapp.dto.Response.TestSeriesProgressExamResponse;
+import com.sankalpapp.dto.Response.TestSeriesProgressResponse;
+import com.sankalpapp.dto.Response.TestSeriesResponse;
+import com.sankalpapp.entity.*;
+import com.sankalpapp.repository.*;
 import com.sankalpapp.service.TestSeriesService;
-import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class TestSeriesServiceImpl implements TestSeriesService {
 
     private final TestSeriesRepository testSeriesRepository;
     private final TestSeriesExamRepository testSeriesExamRepository;
     private final ExamRepository examRepository;
 
-    public TestSeriesServiceImpl(
-            TestSeriesRepository testSeriesRepository,
-            TestSeriesExamRepository testSeriesExamRepository,
-            ExamRepository examRepository
-    ) {
-        this.testSeriesRepository = testSeriesRepository;
-        this.testSeriesExamRepository = testSeriesExamRepository;
-        this.examRepository = examRepository;
-    }
+    private final ExamAttemptRepository examAttemptRepository;
+    private final ResultRepository resultRepository;
 
     @Override
-    @Transactional
-    public TestSeries create(
-            CreateTestSeriesRequest request
+    public TestSeriesResponse create(
+            TestSeriesRequest request
     ) {
 
         TestSeries testSeries = TestSeries.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
-                .image(request.getImage())
-                .price(request.getPrice())
-                .startDate(request.getStartDate())
-                .endDate(request.getEndDate())
                 .active(
                         request.getActive() != null
                                 ? request.getActive()
@@ -52,181 +43,349 @@ public class TestSeriesServiceImpl implements TestSeriesService {
                 )
                 .build();
 
-        return testSeriesRepository.save(testSeries);
+        testSeries = testSeriesRepository.save(testSeries);
+
+        return mapToResponse(testSeries);
     }
 
     @Override
-    public TestSeries getById(Long id) {
-
-        return testSeriesRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Test series not found with id: " + id
-                        )
-                );
-    }
-
-    @Override
-    public List<TestSeries> getAll() {
-
-        return testSeriesRepository.findAll();
-    }
-
-    @Override
-    @Transactional
-    public TestSeries update(
+    public TestSeriesResponse update(
             Long id,
-            CreateTestSeriesRequest request
+            TestSeriesRequest request
     ) {
 
-        TestSeries testSeries = getById(id);
+        TestSeries testSeries =
+                testSeriesRepository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Test Series not found with id: " + id
+                                )
+                        );
 
-        testSeries.setTitle(request.getTitle());
-        testSeries.setDescription(request.getDescription());
-        testSeries.setImage(request.getImage());
-        testSeries.setPrice(request.getPrice());
-        testSeries.setStartDate(request.getStartDate());
-        testSeries.setEndDate(request.getEndDate());
-
-        if (request.getActive() != null) {
-            testSeries.setActive(request.getActive());
+        if (request.getTitle() != null) {
+            testSeries.setTitle(request.getTitle());
         }
 
-        return testSeriesRepository.save(testSeries);
+        if (request.getDescription() != null) {
+            testSeries.setDescription(
+                    request.getDescription()
+            );
+        }
+
+        if (request.getActive() != null) {
+            testSeries.setActive(
+                    request.getActive()
+            );
+        }
+
+        testSeriesRepository.save(testSeries);
+
+        return mapToResponse(testSeries);
     }
 
     @Override
-    @Transactional
-    public void delete(Long id) {
+    @Transactional(readOnly = true)
+    public TestSeriesResponse getById(
+            Long id
+    ) {
 
-        TestSeries testSeries = getById(id);
+        TestSeries testSeries =
+                testSeriesRepository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Test Series not found with id: " + id
+                                )
+                        );
+
+        return mapToResponse(testSeries);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TestSeriesResponse> getAll() {
+
+        return testSeriesRepository
+                .findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Override
+    public void delete(
+            Long id
+    ) {
+
+        TestSeries testSeries =
+                testSeriesRepository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Test Series not found with id: " + id
+                                )
+                        );
 
         testSeriesRepository.delete(testSeries);
     }
 
     @Override
-    @Transactional
-    public void addExam(
+    public TestSeriesResponse addExam(
             Long testSeriesId,
-            AddExamToTestSeriesRequest request
+            TestSeriesExamRequest request
     ) {
 
-        TestSeries testSeries = getById(testSeriesId);
+        TestSeries testSeries =
+                testSeriesRepository.findById(testSeriesId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Test Series not found with id: "
+                                                + testSeriesId
+                                )
+                        );
 
-        Exam exam = examRepository.findById(
-                        request.getExamId()
-                )
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Exam not found with id: "
-                                        + request.getExamId()
-                        )
-                );
+        Exam exam =
+                examRepository.findById(request.getExamId())
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Exam not found with id: "
+                                                + request.getExamId()
+                                )
+                        );
 
-        /*
-         * Prevent the same exam from being added twice.
-         */
         if (testSeriesExamRepository
-                .findByTestSeriesAndExam(testSeries, exam)
-                .isPresent()) {
+                .existsByTestSeriesIdAndExamId(
+                        testSeriesId,
+                        request.getExamId()
+                )) {
 
             throw new RuntimeException(
-                    "Exam is already part of this test series"
+                    "Exam is already present in this test series"
             );
-        }
-
-        /*
-         * If sequence is not provided,
-         * put the exam at the end.
-         */
-        Integer sequence = request.getSequence();
-
-        if (sequence == null) {
-
-            List<TestSeriesExam> existing =
-                    testSeriesExamRepository
-                            .findByTestSeriesOrderBySequenceAsc(
-                                    testSeries
-                            );
-
-            sequence = existing.size() + 1;
         }
 
         TestSeriesExam testSeriesExam =
                 TestSeriesExam.builder()
                         .testSeries(testSeries)
                         .exam(exam)
-                        .sequence(sequence)
+                        .sequence(request.getSequence())
                         .active(true)
                         .build();
 
         testSeriesExamRepository.save(testSeriesExam);
+
+        return mapToResponse(testSeries);
     }
 
     @Override
-    @Transactional
-    public void removeExam(
+    @Transactional(readOnly = true)
+    public TestSeriesProgressResponse getStudentProgress(
+            Long testSeriesId,
+            Long studentId
+    ) {
+
+        TestSeries testSeries =
+                testSeriesRepository.findById(testSeriesId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Test Series not found with id: "
+                                                + testSeriesId
+                                )
+                        );
+
+        List<TestSeriesExam> seriesExams =
+                testSeriesExamRepository
+                        .findByTestSeriesIdOrderBySequenceAsc(
+                                testSeriesId
+                        );
+
+        List<TestSeriesProgressExamResponse> progress =
+                seriesExams.stream()
+                        .map(seriesExam ->
+                                buildProgressForExam(
+                                        seriesExam,
+                                        studentId
+                                )
+                        )
+                        .toList();
+
+        int completedExams = (int) progress.stream()
+                .filter(p ->
+                        "PUBLISHED".equals(p.getStatus())
+                )
+                .count();
+
+        double overallPercentage =
+                progress.stream()
+                        .filter(p -> p.getPercentage() != null)
+                        .mapToDouble(
+                                TestSeriesProgressExamResponse::getPercentage
+                        )
+                        .average()
+                        .orElse(0.0);
+
+        return TestSeriesProgressResponse.builder()
+                .testSeriesId(testSeries.getId())
+                .title(testSeries.getTitle())
+                .description(testSeries.getDescription())
+                .totalExams(seriesExams.size())
+                .completedExams(completedExams)
+                .overallPercentage(
+                        Math.round(overallPercentage * 100.0) / 100.0
+                )
+                .exams(progress)
+                .build();
+    }
+
+    private TestSeriesProgressExamResponse buildProgressForExam(
+            TestSeriesExam seriesExam,
+            Long studentId
+    ) {
+
+        Exam exam = seriesExam.getExam();
+
+        TestSeriesProgressExamResponse.TestSeriesProgressExamResponseBuilder response =
+                TestSeriesProgressExamResponse.builder()
+                        .examId(exam.getId())
+                        .examName(exam.getExamName())
+                        .sequence(seriesExam.getSequence())
+                        .totalMarks(exam.getTotalMarks())
+                        .totalQuestions(exam.getTotalQuestions())
+                        .duration(exam.getDuration())
+                        .obtainedMarks(null)
+                        .percentage(null)
+                        .grade(null)
+                        .published(false);
+
+        Optional<ExamAttempt> attempt =
+                examAttemptRepository
+                        .findTopByStudentIdAndExamIdOrderByIdDesc(
+                                studentId,
+                                exam.getId()
+                        );
+
+        if (attempt.isEmpty()) {
+
+            return response
+                    .status("NOT_STARTED")
+                    .build();
+        }
+
+        ExamAttempt examAttempt = attempt.get();
+
+        if (examAttempt.getStatus()
+                == ExamAttempt.AttemptStatus.STARTED) {
+
+            return response
+                    .status("IN_PROGRESS")
+                    .build();
+        }
+
+        if (examAttempt.getStatus()
+                == ExamAttempt.AttemptStatus.SUBMITTED) {
+
+            return response
+                    .status("SUBMITTED")
+                    .build();
+        }
+
+        Optional<Result> result =
+                resultRepository.findByAttemptId(
+                        examAttempt.getId()
+                );
+
+        if (result.isEmpty()) {
+
+            return response
+                    .status("EVALUATED")
+                    .build();
+        }
+
+        Result r = result.get();
+
+        String status =
+                Boolean.TRUE.equals(r.getPublished())
+                        ? "PUBLISHED"
+                        : "EVALUATED";
+
+        return response
+                .status(status)
+                .obtainedMarks(r.getObtainedMarks())
+                .percentage(r.getPercentage())
+                .grade(r.getGrade())
+                .published(r.getPublished())
+                .build();
+    }
+
+    @Override
+    public TestSeriesResponse removeExam(
             Long testSeriesId,
             Long examId
     ) {
 
-        TestSeries testSeries = getById(testSeriesId);
-
-        Exam exam = examRepository.findById(examId)
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Exam not found with id: " + examId
-                        )
-                );
+        if (!testSeriesRepository.existsById(testSeriesId)) {
+            throw new RuntimeException(
+                    "Test Series not found with id: "
+                            + testSeriesId
+            );
+        }
 
         TestSeriesExam testSeriesExam =
                 testSeriesExamRepository
-                        .findByTestSeriesAndExam(
-                                testSeries,
-                                exam
+                        .findByTestSeriesIdAndExamId(
+                                testSeriesId,
+                                examId
                         )
                         .orElseThrow(() ->
                                 new RuntimeException(
-                                        "Exam is not part of this test series"
+                                        "Exam is not present in this test series"
                                 )
                         );
 
         testSeriesExamRepository.delete(testSeriesExam);
+
+        return getById(testSeriesId);
     }
 
-    @Override
-    @Transactional
-    public void reorderExam(
-            Long testSeriesId,
-            Long examId,
-            ReorderExamRequest request
+    private TestSeriesResponse mapToResponse(
+            TestSeries testSeries
     ) {
 
-        TestSeries testSeries = getById(testSeriesId);
-
-        Exam exam = examRepository.findById(examId)
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Exam not found with id: " + examId
-                        )
-                );
-
-        TestSeriesExam testSeriesExam =
+        List<TestSeriesExam> seriesExams =
                 testSeriesExamRepository
-                        .findByTestSeriesAndExam(
-                                testSeries,
-                                exam
-                        )
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Exam is not part of this test series"
-                                )
+                        .findByTestSeriesIdOrderBySequenceAsc(
+                                testSeries.getId()
                         );
 
-        testSeriesExam.setSequence(
-                request.getSequence()
-        );
+        List<TestSeriesExamResponse> examResponses =
+                seriesExams.stream()
+                        .map(this::mapExam)
+                        .toList();
 
-        testSeriesExamRepository.save(testSeriesExam);
+        return TestSeriesResponse.builder()
+                .id(testSeries.getId())
+                .title(testSeries.getTitle())
+                .description(testSeries.getDescription())
+                .active(testSeries.getActive())
+                .exams(examResponses)
+                .createdAt(testSeries.getCreatedAt())
+                .updatedAt(testSeries.getUpdatedAt())
+                .build();
+    }
+
+    private TestSeriesExamResponse mapExam(
+            TestSeriesExam testSeriesExam
+    ) {
+
+        Exam exam = testSeriesExam.getExam();
+
+        return TestSeriesExamResponse.builder()
+                .id(testSeriesExam.getId())
+                .examId(exam.getId())
+                .examName(exam.getExamName())
+                .sequence(testSeriesExam.getSequence())
+                .totalQuestions(exam.getTotalQuestions())
+                .totalMarks(exam.getTotalMarks())
+                .duration(exam.getDuration())
+                .active(testSeriesExam.getActive())
+                .build();
     }
 }

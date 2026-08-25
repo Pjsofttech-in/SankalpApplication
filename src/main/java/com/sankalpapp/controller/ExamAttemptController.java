@@ -26,12 +26,13 @@ public class ExamAttemptController {
 
     @PostMapping("/start")
     public ResponseEntity<ExamStartResponse> startExam(
-            @RequestParam Long examId
+            @RequestParam Long examId,
+            @RequestParam(required = false) Long testSeriesId
     ) {
 
         return ResponseEntity.ok(
                 examAttemptService.startExam(
-                        examId
+                        examId, testSeriesId
                 )
         );
     }

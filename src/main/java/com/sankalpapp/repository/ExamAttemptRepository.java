@@ -11,7 +11,36 @@ import java.util.Optional;
 public interface ExamAttemptRepository
         extends JpaRepository<ExamAttempt, Long> {
 
-    Optional<ExamAttempt> findByStudentIdAndExamIdAndStatus(
+    long countByStudentIdAndExamIdAndTestSeriesId(
+            Long studentId,
+            Long examId,
+            Long testSeriesId
+    );
+
+    long countByStudentIdAndExamIdAndTestSeriesIsNull(
+            Long studentId,
+            Long examId
+    );
+
+    List<ExamAttempt> findByStudentIdAndExamIdAndTestSeriesIdOrderByAttemptNumberAsc(
+            Long studentId,
+            Long examId,
+            Long testSeriesId
+    );
+
+    Optional<ExamAttempt> findTopByStudentIdAndExamIdAndTestSeriesIdAndStatus(
+            Long studentId,
+            Long examId,
+            Long testSeriesId,
+            ExamAttempt.AttemptStatus status
+    );
+
+    Optional<ExamAttempt> findTopByStudentIdAndExamIdOrderByIdDesc(
+            Long studentId,
+            Long examId
+    );
+
+    Optional<ExamAttempt> findTopByStudentIdAndExamIdAndTestSeriesIsNullAndStatus(
             Long studentId,
             Long examId,
             ExamAttempt.AttemptStatus status

@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 public class ExamAttemptServiceImpl implements ExamAttemptService {
 
     private final ExamAttemptRepository examAttemptRepository;
+    private final TestSeriesRepository testSeriesRepository;
+    private final TestSeriesExamRepository testSeriesExamRepository;
     private final StudentAnswerRepository studentAnswerRepository;
     private final ResultRepository resultRepository;
     private final StudentRepository studentRepository;
@@ -37,17 +39,27 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
 
     @Override
     @Transactional
-    public ExamStartResponse startExam(Long examId) {
+    public ExamStartResponse startExam(Long examId, Long testSeriesId) {
 
         Student student = getAuthenticatedStudent();
 
-        Optional<ExamAttempt> activeAttempt =
-                examAttemptRepository
-                        .findByStudentIdAndExamIdAndStatus(
-                                student.getId(),
-                                examId,
-                                ExamAttempt.AttemptStatus.STARTED
-                        );
+        Optional<ExamAttempt> activeAttempt;
+        if(testSeriesId == null) {
+            activeAttempt = examAttemptRepository
+                    .findTopByStudentIdAndExamIdAndTestSeriesIsNullAndStatus(
+                            student.getId(),
+                            examId,
+                            ExamAttempt.AttemptStatus.STARTED
+                    );
+        } else {
+            activeAttempt = examAttemptRepository
+                    .findTopByStudentIdAndExamIdAndTestSeriesIdAndStatus(
+                            student.getId(),
+                            examId,
+                            testSeriesId,
+                            ExamAttempt.AttemptStatus.STARTED
+                    );
+        }
 
         if (activeAttempt.isPresent()) {
 
@@ -66,10 +78,47 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
 
         Exam exam = examRepository.findById(examId)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Exam not found with id: " + examId
-                        )
+                        new RuntimeException("Exam not found"));
+
+        long attemptCount;
+        TestSeries testSeries = null;
+
+        if (testSeriesId != null) {
+
+            testSeries = testSeriesRepository
+                    .findById(testSeriesId)
+                    .orElseThrow(() ->
+                            new RuntimeException("Test Series not found"));
+
+            boolean exists =
+                    testSeriesExamRepository
+                            .existsByTestSeriesIdAndExamId(
+                                    testSeries.getId(),
+                                    exam.getId()
+                            );
+
+            if (!exists) {
+                throw new RuntimeException(
+                        "Exam does not belong to this Test Series"
                 );
+            }
+
+            attemptCount =
+                    examAttemptRepository
+                            .countByStudentIdAndExamIdAndTestSeriesId(
+                                    student.getId(),
+                                    exam.getId(),
+                                    testSeries.getId()
+                            );
+        } else {
+            attemptCount =
+                    examAttemptRepository
+                            .countByStudentIdAndExamIdAndTestSeriesIsNull(
+                                    student.getId(),
+                                    exam.getId()
+                            );
+
+        }
 
         if (!Boolean.TRUE.equals(student.getActive())) {
             throw new RuntimeException(
@@ -83,26 +132,14 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
             );
         }
 
-        List<ExamAttempt> previousAttempts =
-                examAttemptRepository.findByStudent(student)
-                        .stream()
-                        .filter(attempt ->
-                                attempt.getExam()
-                                        .getId()
-                                        .equals(examId)
-                        )
-                        .toList();
+        if (attemptCount >= exam.getMaxAttempts()) {
 
-        int maxAttempts =
-                exam.getMaxAttempts() != null
-                        ? exam.getMaxAttempts()
-                        : 1;
-
-        if (previousAttempts.size() >= maxAttempts) {
             throw new RuntimeException(
                     "Maximum attempts reached for this exam"
             );
         }
+
+        int attemptNumber = (int) attemptCount + 1;
 
         LocalDateTime startedAt =
                 LocalDateTime.now();
@@ -116,6 +153,8 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
                 ExamAttempt.builder()
                         .student(student)
                         .exam(exam)
+                        .testSeries(testSeries)
+                        .attemptNumber(attemptNumber)
                         .startedAt(startedAt)
                         .expiresAt(expiresAt)
                         .status(
