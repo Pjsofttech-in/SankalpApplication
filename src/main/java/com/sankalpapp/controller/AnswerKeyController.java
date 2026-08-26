@@ -36,7 +36,7 @@ public class AnswerKeyController {
 
     // Get All Answer Keys
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
     public List<AnswerKeyResponse> getAllAnswerKeys() {
 
         return answerKeyService.getAllAnswerKeys();
@@ -45,7 +45,7 @@ public class AnswerKeyController {
 
     // Get Answer Key By Id
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
     public AnswerKeyResponse getAnswerKeyById(@PathVariable Long id) {
 
         return answerKeyService.getAnswerKeyById(id);

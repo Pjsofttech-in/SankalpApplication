@@ -53,7 +53,7 @@ public class SecurityConfig {
                         // Coordinator GET APIs - public
                         .requestMatchers(HttpMethod.GET, "/api/coordinators/**", "/api/districts/**",
                                 "/api/talukas/**", "/api/centers/**", "/api/payments/create-order", "/api/payments/verify",
-                                "/api/downloads/**", "/api/answerkeys/**")
+                                "/api/downloads/**", "/api/answerkeys/**", "/api/getAllSyllabus", "/api/getSyllabusById/**")
                         .permitAll()
 
                         // Exam attempt APIs
@@ -76,16 +76,16 @@ public class SecurityConfig {
                         .hasAnyAuthority("ADMIN", "STUDENT")
 
                         // Coordinator GET APIs - public
-                        .requestMatchers("/api/payments/create-order","/api/payments/verify")
+                        .requestMatchers("/api/payments/create-order", "/api/payments/verify")
                         .permitAll()
 
-                        .requestMatchers(HttpMethod.POST,"/api/students")
+                        .requestMatchers(HttpMethod.POST, "/api/students")
                         .permitAll()
 
-                        .requestMatchers(HttpMethod.POST,"/api2/**")
+                        .requestMatchers(HttpMethod.POST, "/api2/**")
                         .hasAuthority("ADMIN")
 
-                        .requestMatchers(HttpMethod.GET,"/api2/**")
+                        .requestMatchers(HttpMethod.GET, "/api2/**")
                         .permitAll()
 
                         // Admin APIs
@@ -94,11 +94,11 @@ public class SecurityConfig {
 
                         // Coordinator APIs
                         .requestMatchers("/api/coordinators/**")
-                        .hasAnyAuthority("ADMIN","COORDINATOR")
+                        .hasAnyAuthority("ADMIN", "COORDINATOR")
 
                         // Student APIs
                         .requestMatchers("/api/students/**")
-                        .hasAnyAuthority("ADMIN","COORDINATOR","STUDENT")
+                        .hasAnyAuthority("ADMIN", "COORDINATOR", "STUDENT")
 
                         // All other APIs require authentication
                         .anyRequest()
