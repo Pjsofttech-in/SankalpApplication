@@ -1,27 +1,32 @@
 package com.sankalpapp.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sankalpapp.entity.Syllabus;
 import com.sankalpapp.service.SyllabusService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class SyllabusController {
 
     private final SyllabusService syllabusService;
+    private final ObjectMapper objectMapper;
 
-    public SyllabusController(SyllabusService syllabusService) {
-        this.syllabusService = syllabusService;
-    }
-
-    @PostMapping("/createSyllabus")
+    @PostMapping(value = "/createSyllabus", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Syllabus> createSyllabus(
-            @RequestBody Syllabus syllabus) {
+            @RequestParam("syllabus") String syllabusJson,
+            @RequestParam("syllabusFile") MultipartFile syllabusFile) throws JsonProcessingException {
 
+        Syllabus syllabus = objectMapper.readValue(syllabusJson, Syllabus.class);
         return ResponseEntity.ok(
-                syllabusService.createSyllabus(syllabus)
+                syllabusService.createSyllabus(syllabus, syllabusFile)
         );
     }
 
@@ -42,13 +47,14 @@ public class SyllabusController {
         );
     }
 
-    @PutMapping("/updateSyllabus/{id}")
+    @PutMapping(value = "/updateSyllabus/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Syllabus> updateSyllabus(
             @PathVariable Long id,
-            @RequestBody Syllabus syllabus) {
-
+            @RequestParam("syllabus") String syllabusJson,
+            @RequestParam("syllabusFile") MultipartFile syllabusFile) throws JsonProcessingException {
+        Syllabus syllabus = objectMapper.readValue(syllabusJson, Syllabus.class);
         return ResponseEntity.ok(
-                syllabusService.updateSyllabus(id, syllabus)
+                syllabusService.updateSyllabus(id, syllabus, syllabusFile)
         );
     }
 
