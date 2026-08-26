@@ -119,7 +119,7 @@ public class FeatureServiceImpl implements FeatureService {
                                 )
                         );
 
-        s3service.deleteFileByUrl(existingFeature.getLink());
+        s3service.deleteFileByUrl(existingFeature.getImage());
 
         featureRepository.delete(existingFeature);
     }
