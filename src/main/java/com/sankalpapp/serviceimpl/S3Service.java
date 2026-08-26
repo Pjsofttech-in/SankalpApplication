@@ -28,57 +28,39 @@ public class S3Service {
         this.s3Client = s3Client;
     }
 
-    public String uploadFile(
-            MultipartFile file,
-            String folder) throws IOException {
+    public String uploadFile(MultipartFile file, String folder) throws IOException {
 
         String originalFileName = file.getOriginalFilename();
 
-        String fileName = UUID.randomUUID()
-                + "-"
-                + originalFileName;
+        String fileName = UUID.randomUUID() + "-" + originalFileName;
 
         String key = folder + "/" + fileName;
 
-        PutObjectRequest putObjectRequest =
-                PutObjectRequest.builder()
-                        .bucket(bucketName)
-                        .key(key)
-                        .contentType(file.getContentType())
-                        .build();
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder().bucket(bucketName).key(key).contentType(file.getContentType()).build();
 
-        s3Client.putObject(
-                putObjectRequest,
-                RequestBody.fromBytes(file.getBytes())
-        );
+        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
 
         return "https://" + cloudFrontDomain + "/" + key;
     }
 
     public void deleteFile(String key) {
         if (StringUtils.isNotBlank(key)) {
-            DeleteObjectRequest deleteObjectRequest =
-                    DeleteObjectRequest.builder()
-                            .bucket(bucketName)
-                            .key(key)
-                            .build();
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder().bucket(bucketName).key(key).build();
 
             s3Client.deleteObject(deleteObjectRequest);
         }
     }
 
     public void deleteFileByUrl(String fileUrl) {
-
+        if (StringUtils.isBlank(fileUrl)) {
+            return;
+        }
         String key = getKeyFromCloudFrontURL(fileUrl);
         deleteFile(key);
     }
 
     private @NonNull String getKeyFromCloudFrontURL(String fileUrl) {
         String prefix = "https://" + cloudFrontDomain + "/";
-
-        if (StringUtils.isBlank(fileUrl)) {
-            return "";
-        }
 
         if (!fileUrl.startsWith(prefix)) {
             throw new IllegalArgumentException("Invalid CloudFront URL");
