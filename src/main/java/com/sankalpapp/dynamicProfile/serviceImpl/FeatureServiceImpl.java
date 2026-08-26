@@ -48,7 +48,7 @@ public class FeatureServiceImpl implements FeatureService {
         if (pdf != null) {
             try {
                 String fileURL = s3service.uploadFile(pdf, folder);
-                feature.setLink(fileURL);
+                feature.setImage(fileURL);
             } catch (IOException e) {
                 throw new RuntimeException("Unable to upload File");
             }
