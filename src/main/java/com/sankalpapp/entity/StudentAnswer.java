@@ -48,6 +48,9 @@ public class StudentAnswer {
     @JoinColumn(name = "question_id", nullable = false)
     private Question question;
 
+    @Column(columnDefinition = "TEXT")  // ✅ Store long text explanation
+    private String answerExplanation;
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
 

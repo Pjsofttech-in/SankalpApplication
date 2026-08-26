@@ -1,6 +1,7 @@
 package com.sankalpapp.controller;
 
-import com.sankalpapp.entity.Question;
+import com.sankalpapp.dto.Request.QuestionRequest;
+import com.sankalpapp.dto.Response.QuestionResponse;
 import com.sankalpapp.service.QuestionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,17 +21,17 @@ public class QuestionController {
     }
 
     @PostMapping
-    public ResponseEntity<Question> create(
-            @RequestBody Question question
+    public ResponseEntity<QuestionResponse> create(
+            @RequestBody QuestionRequest questionRequest
     ) {
 
         return ResponseEntity.ok(
-                questionService.create(question)
+                questionService.create(questionRequest)
         );
     }
 
     @GetMapping
-    public ResponseEntity<List<Question>> getAll() {
+    public ResponseEntity<List<QuestionResponse>> getAll() {
 
         return ResponseEntity.ok(
                 questionService.getAll()
@@ -38,7 +39,7 @@ public class QuestionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Question> getById(
+    public ResponseEntity<QuestionResponse> getById(
             @PathVariable Long id
     ) {
 
@@ -48,9 +49,9 @@ public class QuestionController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Question> update(
+    public ResponseEntity<QuestionResponse> update(
             @PathVariable Long id,
-            @RequestBody Question question
+            @RequestBody QuestionRequest question
     ) {
 
         return ResponseEntity.ok(

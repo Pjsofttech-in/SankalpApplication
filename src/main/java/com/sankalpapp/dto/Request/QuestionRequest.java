@@ -1,21 +1,23 @@
 package com.sankalpapp.dto.Request;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class QuestionRequest {
 
     private String question;
+    private String questionType;
     private String optionA;
     private String optionB;
     private String optionC;
     private String optionD;
     private String correctAnswer;
-    private Integer marks;
-
-    private Long examId;
+    private String answerExplanation;
+    private Boolean active;
 }

@@ -1,18 +1,19 @@
 package com.sankalpapp.service;
 
-import com.sankalpapp.entity.Question;
+import com.sankalpapp.dto.Request.QuestionRequest;
+import com.sankalpapp.dto.Response.QuestionResponse;
 
 import java.util.List;
 
 public interface QuestionService {
 
-    Question create(Question question);
+    QuestionResponse create(QuestionRequest questionRequest);
 
-    Question getById(Long id);
+    QuestionResponse getById(Long id);
 
-    List<Question> getAll();
+    List<QuestionResponse> getAll();
 
-    Question update(Long id, Question question);
+    QuestionResponse update(Long id, QuestionRequest questionRequest);
 
     void delete(Long id);
 }

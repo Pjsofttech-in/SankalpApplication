@@ -20,6 +20,9 @@ public class Question {
     private String question;
 
     @Column(nullable = false)
+    private String questionType;
+
+    @Column(nullable = false)
     private String optionA;
 
     @Column(nullable = false)
@@ -34,6 +37,9 @@ public class Question {
     @Column(nullable = false)
     private String correctAnswer;
 
+    @Column(columnDefinition = "TEXT")  // ✅ Store long text explanation
+    private String answerExplanation;
+
     @Builder.Default
     @Column(nullable = false)
     private Boolean active = true;
@@ -44,5 +50,10 @@ public class Question {
         if (active == null) {
             active = true;
         }
+    }
+
+    public enum QuestionType {
+        MCQ,
+        DESCRIPTIVE
     }
 }
