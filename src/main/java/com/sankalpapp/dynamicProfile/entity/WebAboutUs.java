@@ -20,6 +20,7 @@ public class WebAboutUs {
     private int id;
 
     private String aboutUsTitle;
+    @Column(columnDefinition = "TEXT")
     private String aboutUsDescription;
     private String aboutUsImage;
     private String url;

@@ -25,6 +25,7 @@ public class WebTestimonials {
     @Column(name = "`rank`")
     private String rank;
     private String testimonialImage;
+    @Column(columnDefinition = "TEXT")
     private String description;
     private String testimonialColor;
     private String url;

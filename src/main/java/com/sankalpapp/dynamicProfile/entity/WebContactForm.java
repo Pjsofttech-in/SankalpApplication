@@ -26,6 +26,7 @@ public class WebContactForm {
     private String mobileNo;
     private String course;
     private String subject;
+    @Column(columnDefinition = "TEXT")
     private String description;
     @Email
     private String email;

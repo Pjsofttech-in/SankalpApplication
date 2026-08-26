@@ -35,7 +35,7 @@ public class WebVisionMission {
     @Column(name = "directorImage")
     private String directorImage;
 
-    @Column(name = "description", length = 3000)
+    @Column(columnDefinition = "TEXT")
     private String description;
     private String url;
 

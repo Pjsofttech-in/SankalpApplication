@@ -20,6 +20,7 @@ public class WebAwardsAndAccolades {
     private Long id;
 
     private String awardName;
+    @Column(columnDefinition = "TEXT")
     private String description;
     private String awardedBy;
     private int year;

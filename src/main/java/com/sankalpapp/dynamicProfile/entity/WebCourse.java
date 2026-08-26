@@ -20,6 +20,7 @@ public class WebCourse {
     private int id;
 
     private String courseName;
+    @Column(columnDefinition = "TEXT")
     private String courseDescription;
     private String courseImage;
     private String courseColor;
