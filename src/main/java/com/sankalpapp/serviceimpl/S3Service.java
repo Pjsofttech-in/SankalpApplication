@@ -56,7 +56,7 @@ public class S3Service {
     }
 
     public void deleteFile(String key) {
-        if(StringUtils.isNotBlank(key)) {
+        if (StringUtils.isNotBlank(key)) {
             DeleteObjectRequest deleteObjectRequest =
                     DeleteObjectRequest.builder()
                             .bucket(bucketName)
@@ -75,6 +75,10 @@ public class S3Service {
 
     private @NonNull String getKeyFromCloudFrontURL(String fileUrl) {
         String prefix = "https://" + cloudFrontDomain + "/";
+
+        if (StringUtils.isBlank(fileUrl)) {
+            return "";
+        }
 
         if (!fileUrl.startsWith(prefix)) {
             throw new IllegalArgumentException("Invalid CloudFront URL");

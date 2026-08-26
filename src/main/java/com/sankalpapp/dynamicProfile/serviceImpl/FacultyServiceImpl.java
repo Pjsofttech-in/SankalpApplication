@@ -29,7 +29,7 @@ public class FacultyServiceImpl implements FacultyService {
         // Apply static color logic
         List<WebFaculty> existing = repository.findAll();
         if (!existing.isEmpty()) {
-            webFaculty.setFacilityColor(existing.get(0).getFacilityColor());
+            webFaculty.setFacilityColor(existing.getFirst().getFacilityColor());
         }
 
         webFaculty.setUrl(url);
