@@ -1,5 +1,7 @@
 package com.sankalpapp.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sankalpapp.dto.Request.TestSeriesExamRequest;
 import com.sankalpapp.dto.Request.TestSeriesRequest;
 import com.sankalpapp.dto.Response.TestSeriesProgressResponse;
@@ -8,6 +10,7 @@ import com.sankalpapp.service.TestSeriesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,25 +20,30 @@ import java.util.List;
 public class TestSeriesController {
 
     private final TestSeriesService testSeriesService;
+    private final ObjectMapper objectMapper;
 
     @PostMapping
     public ResponseEntity<TestSeriesResponse> create(
-            @RequestBody TestSeriesRequest request
-    ) {
+            @RequestPart("testSeries") String testSeriesJson,
+            @RequestParam("testSeriesImage") MultipartFile image
+    ) throws JsonProcessingException {
+
+        TestSeriesRequest request = objectMapper.readValue(testSeriesJson, TestSeriesRequest.class);
 
         return ResponseEntity.ok(
-                testSeriesService.create(request)
+                testSeriesService.create(request, image)
         );
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<TestSeriesResponse> update(
             @PathVariable Long id,
-            @RequestBody TestSeriesRequest request
-    ) {
-
+            @RequestPart("testSeries") String testSeriesJson,
+            @RequestParam("testSeriesImage") MultipartFile image
+    ) throws JsonProcessingException {
+        TestSeriesRequest request = objectMapper.readValue(testSeriesJson, TestSeriesRequest.class);
         return ResponseEntity.ok(
-                testSeriesService.update(id, request)
+                testSeriesService.update(id, request, image)
         );
     }
 

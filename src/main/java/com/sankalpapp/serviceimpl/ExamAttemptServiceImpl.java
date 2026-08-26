@@ -1,7 +1,6 @@
 package com.sankalpapp.serviceimpl;
 
 import com.sankalpapp.dto.Request.StudentAnswerRequest;
-import com.sankalpapp.dto.Request.SubmitExamRequest;
 import com.sankalpapp.dto.Response.ExamResultResponse;
 import com.sankalpapp.dto.Response.ExamStartResponse;
 import com.sankalpapp.dto.Response.StudentQuestionResponse;
@@ -16,10 +15,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +42,7 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
         Student student = getAuthenticatedStudent();
 
         Optional<ExamAttempt> activeAttempt;
-        if(testSeriesId == null) {
+        if (testSeriesId == null) {
             activeAttempt = examAttemptRepository
                     .findTopByStudentIdAndExamIdAndTestSeriesIsNullAndStatus(
                             student.getId(),
@@ -164,6 +162,8 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
                         .obtainedMarks(0)
                         .build();
 
+        validateExamStartTime(attempt);
+
         ExamAttempt savedAttempt =
                 examAttemptRepository.save(attempt);
 
@@ -250,6 +250,7 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
         ExamAttempt attempt =
                 getStudentAttempt(attemptId);
 
+        validateExamStartTime(attempt);
         validateExamTime(attempt);
 
         if (attempt.getStatus()
@@ -326,7 +327,6 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
     public ExamResultResponse submitExam(
             Long attemptId
     ) {
-
         ExamAttempt attempt =
                 getStudentAttempt(attemptId);
 
@@ -337,31 +337,15 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
                     "Exam has already been submitted"
             );
         }
+        validateExamStartTime(attempt);
+        validateExamTime(attempt);
+        attempt.setStatus(
+                ExamAttempt.AttemptStatus.SUBMITTED
+        );
 
-        /*
-         * If time expired, auto-submit.
-         */
-        if (LocalDateTime.now()
-                .isAfter(attempt.getExpiresAt())) {
-
-            attempt.setStatus(
-                    ExamAttempt.AttemptStatus.SUBMITTED
-            );
-
-            attempt.setSubmittedAt(
-                    attempt.getExpiresAt()
-            );
-
-        } else {
-
-            attempt.setStatus(
-                    ExamAttempt.AttemptStatus.SUBMITTED
-            );
-
-            attempt.setSubmittedAt(
-                    LocalDateTime.now()
-            );
-        }
+        attempt.setSubmittedAt(
+                LocalDateTime.now()
+        );
 
         examAttemptRepository.save(attempt);
 
@@ -494,7 +478,9 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
     private void validateExamTime(
             ExamAttempt attempt
     ) {
-
+        LocalDateTime now = LocalDateTime.now();
+        boolean examEndTimeCheck = false;
+        boolean testSeriesEndTimeCheck = false;
         if (attempt.getStatus()
                 != ExamAttempt.AttemptStatus.STARTED) {
 
@@ -503,13 +489,57 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
             );
         }
 
-        if (LocalDateTime.now()
-                .isAfter(attempt.getExpiresAt())) {
+        if (attempt.getExam() != null && attempt.getExam().getTestEndDate() != null
+                && attempt.getExam().getEndTime() != null) {
+            examEndTimeCheck = now.isAfter(LocalDateTime.of(attempt.getExam().getTestEndDate(),
+                    attempt.getExam().getEndTime()));
+        }
+
+        if (attempt.getTestSeries() != null && attempt.getTestSeries().getEndDate() != null) {
+            testSeriesEndTimeCheck = now.isAfter(LocalDateTime.of(attempt.getTestSeries().getEndDate(),
+                    LocalTime.MAX));
+        }
+
+        if (now.isAfter(attempt.getExpiresAt())
+                || examEndTimeCheck || testSeriesEndTimeCheck) {
 
             autoSubmitExpiredAttempt(attempt);
 
             throw new RuntimeException(
                     "Exam time has expired"
+            );
+        }
+    }
+
+    private void validateExamStartTime(
+            ExamAttempt attempt
+    ) {
+        LocalDateTime now = LocalDateTime.now();
+        boolean examStartTimeCheck = false;
+        boolean testSeriesStartTimeCheck = false;
+        if (attempt.getStatus()
+                != ExamAttempt.AttemptStatus.STARTED) {
+
+            throw new RuntimeException(
+                    "Exam attempt is no longer active"
+            );
+        }
+
+        if (attempt.getExam() != null && attempt.getExam().getTestStartDate() != null
+                && attempt.getExam().getStartTime() != null) {
+            examStartTimeCheck = now.isBefore(LocalDateTime.of(attempt.getExam().getTestStartDate(),
+                    attempt.getExam().getStartTime()));
+        }
+
+        if (attempt.getTestSeries() != null && attempt.getTestSeries().getStartDate() != null) {
+            testSeriesStartTimeCheck = now.isBefore(LocalDateTime.of(attempt.getTestSeries().getStartDate(),
+                    LocalTime.MIDNIGHT));
+        }
+
+        if (examStartTimeCheck || testSeriesStartTimeCheck) {
+
+            throw new RuntimeException(
+                    "Exam/TestSeries time has not started yet"
             );
         }
     }

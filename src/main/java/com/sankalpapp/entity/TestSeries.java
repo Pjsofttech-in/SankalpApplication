@@ -3,6 +3,7 @@ package com.sankalpapp.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,13 +31,26 @@ public class TestSeries {
 
     private Double price;
 
+    private Double sellingPrice;
+    private Double mrp;
+    private String testFeatureOne;
+    private String testFeatureTwo;
+    private String testFeatureThree;
+    private String subject;
+    @Column(length = 1000)
+    private String seo;
+
     @Builder.Default
     @Column(nullable = false)
     private Boolean active = true;
 
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
-    private LocalDateTime endDate;
+    private LocalDate endDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     @OneToMany(
             mappedBy = "testSeries",

@@ -2,6 +2,7 @@ package com.sankalpapp.dto.Response;
 
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,6 +20,20 @@ public class TestSeriesResponse {
     private String description;
 
     private Boolean active;
+
+    private Double price;
+
+    private Double sellingPrice;
+    private Double mrp;
+    private String testFeatureOne;
+    private String testFeatureTwo;
+    private String testFeatureThree;
+    private String subject;
+    private String seo;
+
+    private Long categoryId;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     private List<TestSeriesExamResponse> exams;
 

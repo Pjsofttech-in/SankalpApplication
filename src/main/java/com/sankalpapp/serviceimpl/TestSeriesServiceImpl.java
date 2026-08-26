@@ -12,7 +12,10 @@ import com.sankalpapp.service.TestSeriesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,37 +24,62 @@ import java.util.Optional;
 @Transactional
 public class TestSeriesServiceImpl implements TestSeriesService {
 
+    private static final String folder = "TestSeries";
     private final TestSeriesRepository testSeriesRepository;
+    private final CategoryRepository categoryRepository;
     private final TestSeriesExamRepository testSeriesExamRepository;
     private final ExamRepository examRepository;
-
     private final ExamAttemptRepository examAttemptRepository;
     private final ResultRepository resultRepository;
+    private final S3Service s3service;
 
     @Override
     public TestSeriesResponse create(
-            TestSeriesRequest request
+            TestSeriesRequest request, MultipartFile image
     ) {
+
+        Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow();
 
         TestSeries testSeries = TestSeries.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .active(
-                        request.getActive() != null
-                                ? request.getActive()
-                                : true
+                        request.getActive() == null || request.getActive()
                 )
+                .category(category)
+                .mrp(request.getMrp())
+                .sellingPrice(request.getSellingPrice())
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
+                .price(request.getPrice())
+                .testFeatureOne(request.getTestFeatureOne())
+                .testFeatureTwo(request.getTestFeatureTwo())
+                .testFeatureThree(request.getTestFeatureThree())
+                .subject(request.getSubject())
                 .build();
+
+        uploadFile(image, testSeries);
 
         testSeries = testSeriesRepository.save(testSeries);
 
         return mapToResponse(testSeries);
     }
 
+    private void uploadFile(MultipartFile pdf, TestSeries testSeries) {
+        if (pdf != null) {
+            try {
+                String fileURL = s3service.uploadFile(pdf, folder);
+                testSeries.setImage(fileURL);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to upload File");
+            }
+        }
+    }
+
     @Override
     public TestSeriesResponse update(
             Long id,
-            TestSeriesRequest request
+            TestSeriesRequest request, MultipartFile image
     ) {
 
         TestSeries testSeries =
@@ -62,21 +90,63 @@ public class TestSeriesServiceImpl implements TestSeriesService {
                                 )
                         );
 
-        if (request.getTitle() != null) {
+        Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow();
+
+        // String fields (Checks for null, empty, and whitespace-only)
+        if (StringUtils.hasText(request.getTitle())) {
             testSeries.setTitle(request.getTitle());
         }
 
-        if (request.getDescription() != null) {
-            testSeries.setDescription(
-                    request.getDescription()
-            );
+        if (StringUtils.hasText(request.getDescription())) {
+            testSeries.setDescription(request.getDescription());
         }
 
-        if (request.getActive() != null) {
-            testSeries.setActive(
-                    request.getActive()
-            );
+        if (StringUtils.hasText(request.getTestFeatureOne())) {
+            testSeries.setTestFeatureOne(request.getTestFeatureOne());
         }
+
+        if (StringUtils.hasText(request.getTestFeatureTwo())) {
+            testSeries.setTestFeatureTwo(request.getTestFeatureTwo());
+        }
+
+        if (StringUtils.hasText(request.getTestFeatureThree())) {
+            testSeries.setTestFeatureThree(request.getTestFeatureThree());
+        }
+
+        // Assuming subject is a String. (If it's an object/entity, use != null instead)
+        if (StringUtils.hasText(request.getSubject())) {
+            testSeries.setSubject(request.getSubject());
+        }
+
+        // Non-String fields (Standard null checks)
+        if (request.getActive() != null) {
+            testSeries.setActive(request.getActive());
+        }
+
+        // Assuming 'category' was fetched from the DB based on request.getCategoryId()
+        testSeries.setCategory(category);
+
+        if (request.getMrp() != null) {
+            testSeries.setMrp(request.getMrp());
+        }
+
+        if (request.getSellingPrice() != null) {
+            testSeries.setSellingPrice(request.getSellingPrice());
+        }
+
+        if (request.getPrice() != null) {
+            testSeries.setPrice(request.getPrice());
+        }
+
+        if (request.getStartDate() != null) {
+            testSeries.setStartDate(request.getStartDate());
+        }
+
+        if (request.getEndDate() != null) {
+            testSeries.setEndDate(request.getEndDate());
+        }
+
+        uploadFile(image, testSeries);
 
         testSeriesRepository.save(testSeries);
 
@@ -365,6 +435,25 @@ public class TestSeriesServiceImpl implements TestSeriesService {
                 .title(testSeries.getTitle())
                 .description(testSeries.getDescription())
                 .active(testSeries.getActive())
+
+                // --- New fields incorporated ---
+                .mrp(testSeries.getMrp())
+                .sellingPrice(testSeries.getSellingPrice())
+                .price(testSeries.getPrice())
+                .startDate(testSeries.getStartDate())
+                .endDate(testSeries.getEndDate())
+                .testFeatureOne(testSeries.getTestFeatureOne())
+                .testFeatureTwo(testSeries.getTestFeatureTwo())
+                .testFeatureThree(testSeries.getTestFeatureThree())
+                .subject(testSeries.getSubject())
+
+                // Category mapping (adjust based on your DTO structure)
+                // If your DTO expects the ID:
+                .categoryId(testSeries.getCategory() != null ? testSeries.getCategory().getId() : null)
+                // OR If your DTO expects the full Category object/DTO:
+                // .category(testSeries.getCategory())
+                // -------------------------------
+
                 .exams(examResponses)
                 .createdAt(testSeries.getCreatedAt())
                 .updatedAt(testSeries.getUpdatedAt())

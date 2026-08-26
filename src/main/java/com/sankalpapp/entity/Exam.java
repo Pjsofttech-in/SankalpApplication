@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +40,21 @@ public class Exam {
     @Column(nullable = false)
     @Builder.Default
     private Integer maxAttempts = 1;
+
+    private LocalDate testStartDate;
+    private LocalDate testEndDate;
+    @Column(length = 5000)
+    private String terms;
+    private String image;
+
+    private Boolean downloadTestPaper;
+    private Boolean showTestResult;
+    private Boolean showAllResult;
+    @Column(length = 1000)
+    private String allResultPdf;
+
+    private LocalTime startTime;  // 🕒 Stores when the test starts
+    private LocalTime endTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)

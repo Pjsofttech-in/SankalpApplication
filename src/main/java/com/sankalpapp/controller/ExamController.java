@@ -1,14 +1,15 @@
 package com.sankalpapp.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sankalpapp.dto.Request.ExamRequest;
-import com.sankalpapp.dto.Request.SubmitExamRequest;
+import com.sankalpapp.dto.Request.TestSeriesRequest;
 import com.sankalpapp.dto.Response.ExamResponse;
-import com.sankalpapp.dto.Response.StartExamResponse;
 import com.sankalpapp.service.ExamService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -19,12 +20,15 @@ import java.util.List;
 public class ExamController {
 
     private final ExamService examService;
+    private final ObjectMapper objectMapper;
 
     // Save Exam
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
-    public ExamResponse saveExam(@RequestBody ExamRequest request) {
-        return examService.saveExam(request);
+    public ExamResponse saveExam(@RequestPart("exam") String examJson,
+                                 @RequestParam("examImage") MultipartFile image) throws JsonProcessingException {
+        ExamRequest request = objectMapper.readValue(examJson, ExamRequest.class);
+        return examService.saveExam(request, image);
     }
 
     // Get All Exams
@@ -45,8 +49,10 @@ public class ExamController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR')")
     public ExamResponse updateExam(@PathVariable Long id,
-                                   @RequestBody ExamRequest request) {
-        return examService.updateExam(id, request);
+                                   @RequestPart("exam") String examJson,
+                                   @RequestParam("examImage") MultipartFile image) throws JsonProcessingException {
+        ExamRequest request = objectMapper.readValue(examJson, ExamRequest.class);
+        return examService.updateExam(id, request, image);
     }
 
     // Delete Exam
