@@ -30,6 +30,7 @@ public class QuestionResponse {
     private Long examId;
 
     private Long sectionId;
+    private Long sectionName;
 
     private String examName;
     private String questionType;
