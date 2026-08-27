@@ -29,6 +29,8 @@ public class QuestionResponse {
 
     private Long examId;
 
+    private Long sectionId;
+
     private String examName;
     private String questionType;
     private String answerExplanation;

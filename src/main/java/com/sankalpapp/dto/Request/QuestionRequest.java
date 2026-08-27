@@ -20,4 +20,6 @@ public class QuestionRequest {
     private String correctAnswer;
     private String answerExplanation;
     private Boolean active;
+
+    private Long sectionId;
 }
