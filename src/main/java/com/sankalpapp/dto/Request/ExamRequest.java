@@ -1,6 +1,5 @@
 package com.sankalpapp.dto.Request;
 
-import jakarta.persistence.Column;
 import lombok.*;
 
 import java.time.LocalDate;

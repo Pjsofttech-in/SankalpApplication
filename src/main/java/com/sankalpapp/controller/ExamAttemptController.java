@@ -1,7 +1,6 @@
 package com.sankalpapp.controller;
 
 import com.sankalpapp.dto.Request.StudentAnswerRequest;
-import com.sankalpapp.dto.Request.SubmitExamRequest;
 import com.sankalpapp.dto.Response.ExamResultResponse;
 import com.sankalpapp.dto.Response.ExamStartResponse;
 import com.sankalpapp.dto.Response.StudentQuestionResponse;

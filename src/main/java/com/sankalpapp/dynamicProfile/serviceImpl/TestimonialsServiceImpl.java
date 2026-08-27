@@ -1,7 +1,6 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebTestimonials;
-import com.sankalpapp.dynamicProfile.entity.WebVisionMission;
 import com.sankalpapp.dynamicProfile.repository.TestimonialsRepository;
 import com.sankalpapp.dynamicProfile.service.TestimonialsService;
 import com.sankalpapp.exception.ResourceNotFoundException;

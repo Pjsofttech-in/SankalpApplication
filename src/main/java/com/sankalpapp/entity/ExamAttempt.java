@@ -55,15 +55,6 @@ public class ExamAttempt {
     @Builder.Default
     private Integer attemptNumber = 1;
 
-    private Integer totalMarks;
-
-    private Integer obtainedMarks;
-
-    private Integer correctQuestions;
-    private Integer incorrectQuestions;
-    private Integer solvedQuestions;
-    private Integer unsolvedQuestions;
-
     @PrePersist
     public void onCreate() {
 

@@ -1,7 +1,8 @@
 package com.sankalpapp.serviceimpl;
 
 import com.sankalpapp.dto.Request.ResultRequest;
-import com.sankalpapp.dto.Response.ResultResponse;
+import com.sankalpapp.dto.Response.ExamResultResponse;
+import com.sankalpapp.dto.mapper.ResultMapper;
 import com.sankalpapp.entity.Exam;
 import com.sankalpapp.entity.Result;
 import com.sankalpapp.entity.Student;
@@ -22,9 +23,10 @@ public class ResultServiceImpl implements ResultService {
     private final ResultRepository resultRepository;
     private final StudentRepository studentRepository;
     private final ExamRepository examRepository;
+    private final ResultMapper resultMapper;
 
     @Override
-    public ResultResponse saveResult(ResultRequest request) {
+    public ExamResultResponse saveResult(ResultRequest request) {
 
         Student student = studentRepository.findById(request.getStudentId())
                 .orElseThrow(() -> new RuntimeException("Student not found"));
@@ -42,11 +44,11 @@ public class ResultServiceImpl implements ResultService {
                 .exam(exam)
                 .build();
 
-        return mapToResponse(resultRepository.save(result));
+        return resultMapper.toResponse(resultRepository.save(result));
     }
 
     @Override
-    public ResultResponse updateResult(Long id, ResultRequest request) {
+    public ExamResultResponse updateResult(Long id, ResultRequest request) {
 
         Result result = resultRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Result not found"));
@@ -65,7 +67,7 @@ public class ResultServiceImpl implements ResultService {
         result.setStudent(student);
         result.setExam(exam);
 
-        return mapToResponse(resultRepository.save(result));
+        return resultMapper.toResponse(resultRepository.save(result));
     }
 
     @Override
@@ -78,34 +80,20 @@ public class ResultServiceImpl implements ResultService {
     }
 
     @Override
-    public ResultResponse getResultById(Long id) {
+    public ExamResultResponse getResultById(Long id) {
 
         Result result = resultRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Result not found"));
 
-        return mapToResponse(result);
+        return resultMapper.toResponse(result);
     }
 
     @Override
-    public List<ResultResponse> getAllResults() {
+    public List<ExamResultResponse> getAllResults() {
 
         return resultRepository.findAll()
                 .stream()
-                .map(this::mapToResponse)
+                .map(resultMapper::toResponse)
                 .collect(Collectors.toList());
-    }
-
-    private ResultResponse mapToResponse(Result result) {
-
-        return ResultResponse.builder()
-                .id(result.getId())
-                .studentName(result.getStudent().getStudentName())
-                .examName(result.getExam().getExamName())
-                .totalMarks(result.getTotalMarks())
-                .obtainedMarks(result.getObtainedMarks())
-                .percentage(result.getPercentage())
-                .grade(result.getGrade())
-                .resultStatus(result.getResultStatus())
-                .build();
     }
 }

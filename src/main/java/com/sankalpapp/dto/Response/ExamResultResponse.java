@@ -28,4 +28,12 @@ public class ExamResultResponse {
     private String resultStatus;
 
     private Boolean published;
+
+    private Integer correctQuestions;
+
+    private Integer incorrectQuestions;
+
+    private Integer solvedQuestions;
+
+    private Integer unsolvedQuestions;
 }

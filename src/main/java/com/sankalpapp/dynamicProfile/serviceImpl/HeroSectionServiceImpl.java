@@ -1,7 +1,6 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.HeroSection;
-import com.sankalpapp.dynamicProfile.entity.WebFaculty;
 import com.sankalpapp.dynamicProfile.repository.HeroSectionRepository;
 import com.sankalpapp.dynamicProfile.service.HeroSectionService;
 import com.sankalpapp.serviceimpl.S3Service;

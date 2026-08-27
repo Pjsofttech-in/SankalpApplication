@@ -61,6 +61,13 @@ public class TestSeries {
     @Builder.Default
     private List<TestSeriesExam> exams = new ArrayList<>();
 
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean resultFinalized = false;
+
+    @Column(length = 1000)
+    private String allResultPdf;
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
@@ -71,6 +78,10 @@ public class TestSeries {
 
         if (active == null) {
             active = true;
+        }
+
+        if (resultFinalized == null) {
+            resultFinalized = false;
         }
 
         createdAt = LocalDateTime.now();

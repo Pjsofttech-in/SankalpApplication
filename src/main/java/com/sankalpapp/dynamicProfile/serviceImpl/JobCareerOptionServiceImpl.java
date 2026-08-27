@@ -1,7 +1,6 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.dto.WebJobCareerOptionDTO;
-import com.sankalpapp.dynamicProfile.entity.HeroSection;
 import com.sankalpapp.dynamicProfile.entity.WebHRDetails;
 import com.sankalpapp.dynamicProfile.entity.WebJobCareerOption;
 import com.sankalpapp.dynamicProfile.repository.JobCareerOptionRepository;

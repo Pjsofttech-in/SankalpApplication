@@ -30,6 +30,18 @@ public class Result {
     private String grade;
 
     @Column(nullable = false)
+    private Integer correctQuestions;
+
+    @Column(nullable = false)
+    private Integer incorrectQuestions;
+
+    @Column(nullable = false)
+    private Integer solvedQuestions;
+
+    @Column(nullable = false)
+    private Integer unsolvedQuestions;
+
+    @Column(nullable = false)
     private String resultStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)

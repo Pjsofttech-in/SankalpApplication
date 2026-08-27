@@ -1,7 +1,6 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebCounter;
-import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
 import com.sankalpapp.dynamicProfile.repository.CounterRepository;
 import com.sankalpapp.dynamicProfile.service.CounterService;
 import com.sankalpapp.exception.ResourceNotFoundException;

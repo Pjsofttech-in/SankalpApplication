@@ -1,6 +1,5 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
-import com.sankalpapp.dynamicProfile.entity.WebTopper;
 import com.sankalpapp.dynamicProfile.entity.WebVisionMission;
 import com.sankalpapp.dynamicProfile.repository.VisionMissionRepository;
 import com.sankalpapp.dynamicProfile.service.VisionMissionService;

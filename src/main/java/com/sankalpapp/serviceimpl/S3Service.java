@@ -43,6 +43,31 @@ public class S3Service {
         return "https://" + cloudFrontDomain + "/" + key;
     }
 
+    public String uploadFile(
+            byte[] fileBytes,
+            String fileName,
+            String contentType,
+            String folder
+    ) throws IOException  {
+
+        String key =
+                folder + "/" + UUID.randomUUID() + "-" + fileName;
+
+        PutObjectRequest putObjectRequest =
+                PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(key)
+                        .contentType(contentType)
+                        .build();
+
+        s3Client.putObject(
+                putObjectRequest,
+                RequestBody.fromBytes(fileBytes)
+        );
+
+        return "https://" + cloudFrontDomain + "/" + key;
+    }
+
     public void deleteFile(String key) {
         if (StringUtils.isNotBlank(key)) {
             DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder().bucket(bucketName).key(key).build();

@@ -9,6 +9,10 @@ import java.util.Optional;
 public interface TestSeriesExamRepository
         extends JpaRepository<TestSeriesExam, Long> {
 
+    List<TestSeriesExam> findByTestSeriesIdAndActiveTrueOrderBySequenceAsc(
+            Long testSeriesId
+    );
+
     List<TestSeriesExam> findByTestSeriesIdOrderBySequenceAsc(
             Long testSeriesId
     );

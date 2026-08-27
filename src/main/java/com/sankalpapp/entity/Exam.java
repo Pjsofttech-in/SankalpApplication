@@ -47,6 +47,10 @@ public class Exam {
     private String terms;
     private String image;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean resultFinalized = false;
+
     private Boolean downloadTestPaper;
     private Boolean showTestResult;
     private Boolean showAllResult;
@@ -93,6 +97,10 @@ public class Exam {
 
         if (active == null) {
             active = true;
+        }
+
+        if (resultFinalized == null) {
+            resultFinalized = false;
         }
     }
 

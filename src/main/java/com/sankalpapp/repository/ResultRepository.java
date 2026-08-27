@@ -1,8 +1,8 @@
 package com.sankalpapp.repository;
 
+import com.sankalpapp.entity.Exam;
 import com.sankalpapp.entity.Result;
 import com.sankalpapp.entity.Student;
-import com.sankalpapp.entity.Exam;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -13,13 +13,9 @@ public interface ResultRepository
 
     Optional<Result> findByAttemptId(Long attemptId);
 
-    List<Result> findByStudent(Student student);
+    List<Result> findByExamIdAndActiveTrue(Long examId);
 
-    List<Result> findByExam(Exam exam);
-
-
-    Optional<Result> findByStudentIdAndExamId(
-            Long studentId,
+    List<Result> findByExamIdAndPublishedTrueAndActiveTrue(
             Long examId
     );
 }

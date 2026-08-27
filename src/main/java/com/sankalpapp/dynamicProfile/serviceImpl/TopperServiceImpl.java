@@ -1,6 +1,5 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
-import com.sankalpapp.dynamicProfile.entity.WebManuBar;
 import com.sankalpapp.dynamicProfile.entity.WebTopper;
 import com.sankalpapp.dynamicProfile.repository.TopperRepository;
 import com.sankalpapp.dynamicProfile.service.TopperService;

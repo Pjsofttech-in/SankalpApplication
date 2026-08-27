@@ -1,7 +1,6 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebCourse;
-import com.sankalpapp.dynamicProfile.entity.WebTestimonials;
 import com.sankalpapp.dynamicProfile.repository.CourseRepository;
 import com.sankalpapp.dynamicProfile.service.CourseService;
 import com.sankalpapp.exception.ResourceNotFoundException;

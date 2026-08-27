@@ -1,19 +1,19 @@
 package com.sankalpapp.service;
 
 import com.sankalpapp.dto.Request.ResultRequest;
-import com.sankalpapp.dto.Response.ResultResponse;
+import com.sankalpapp.dto.Response.ExamResultResponse;
 
 import java.util.List;
 
 public interface ResultService {
 
-    ResultResponse saveResult(ResultRequest request);
+    ExamResultResponse saveResult(ResultRequest request);
 
-    ResultResponse updateResult(Long id, ResultRequest request);
+    ExamResultResponse updateResult(Long id, ResultRequest request);
 
     void deleteResult(Long id);
 
-    ResultResponse getResultById(Long id);
+    ExamResultResponse getResultById(Long id);
 
-    List<ResultResponse> getAllResults();
+    List<ExamResultResponse> getAllResults();
 }

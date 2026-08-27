@@ -1,6 +1,5 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
-import com.sankalpapp.dynamicProfile.entity.WebManuBar;
 import com.sankalpapp.dynamicProfile.entity.WebMapAndImages;
 import com.sankalpapp.dynamicProfile.repository.MapAndImagesRepository;
 import com.sankalpapp.dynamicProfile.service.MapAndImagesService;

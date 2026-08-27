@@ -2,9 +2,7 @@ package com.sankalpapp.serviceimpl;
 
 import com.sankalpapp.dto.Response.AnswerKeyResponse;
 import com.sankalpapp.entity.AnswerKey;
-import com.sankalpapp.entity.Exam;
 import com.sankalpapp.repository.AnswerKeyRepository;
-import com.sankalpapp.repository.ExamRepository;
 import com.sankalpapp.service.AnswerKeyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

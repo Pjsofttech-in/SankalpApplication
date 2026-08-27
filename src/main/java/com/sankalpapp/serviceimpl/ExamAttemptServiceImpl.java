@@ -158,8 +158,6 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
                         .status(
                                 ExamAttempt.AttemptStatus.STARTED
                         )
-                        .totalMarks(exam.getTotalMarks())
-                        .obtainedMarks(0)
                         .build();
 
         validateExamStartTime(attempt);
@@ -571,13 +569,59 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
             ExamAttempt attempt
     ) {
 
+        Exam exam = attempt.getExam();
+
         List<StudentAnswer> answers =
                 studentAnswerRepository
                         .findByAttempt(attempt);
 
+        /*
+         * Question statistics
+         */
+        int correctQuestions = 0;
+        int incorrectQuestions = 0;
+        int solvedQuestions = 0;
+
+        /*
+         * Marks
+         */
+        int totalMarks = 0;
         int obtainedMarks = 0;
 
+        /*
+         * Get all questions assigned to this exam.
+         */
+        List<ExamQuestion> examQuestions =
+                examQuestionRepository
+                        .findByExamOrderBySequenceAsc(
+                                exam
+                        );
+
+        /*
+         * Calculate total marks from ExamQuestion.
+         */
+        totalMarks = examQuestions.stream().mapToInt(ExamQuestion::getMarks).sum();
+
+        /*
+         * Evaluate student's answers.
+         */
         for (StudentAnswer answer : answers) {
+
+            String selectedAnswer =
+                    answer.getSelectedAnswer();
+
+            /*
+             * Unanswered question
+             */
+            if (selectedAnswer == null ||
+                    selectedAnswer.trim().isEmpty()) {
+
+                answer.setCorrect(false);
+
+                continue;
+            }
+
+            solvedQuestions++;
 
             Question question =
                     answer.getQuestion();
@@ -585,56 +629,140 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
             boolean correct =
                     question.getCorrectAnswer()
                             .equalsIgnoreCase(
-                                    answer.getSelectedAnswer()
+                                    selectedAnswer.trim()
                             );
 
             answer.setCorrect(correct);
 
             if (correct) {
-                obtainedMarks++;
+
+                correctQuestions++;
+
+                /*
+                 * Find marks assigned to this question
+                 * in this particular exam.
+                 */
+                ExamQuestion examQuestion =
+                        examQuestions.stream()
+                                .filter(eq ->
+                                        eq.getQuestion()
+                                                .getId()
+                                                .equals(
+                                                        question.getId()
+                                                )
+                                )
+                                .findFirst()
+                                .orElseThrow(() ->
+                                        new RuntimeException(
+                                                "Question is not assigned to this exam"
+                                        )
+                                );
+
+                obtainedMarks +=
+                        examQuestion.getMarks();
+
+            } else {
+
+                incorrectQuestions++;
             }
         }
 
+        /*
+         * Calculate unsolved questions.
+         */
+        int unsolvedQuestions =
+                exam.getTotalQuestions()
+                        - solvedQuestions;
+
+        /*
+         * Prevent negative value if data is inconsistent.
+         */
+        if (unsolvedQuestions < 0) {
+            unsolvedQuestions = 0;
+        }
+
+        /*
+         * Save evaluated answers.
+         */
         studentAnswerRepository.saveAll(answers);
 
-        int totalMarks =
-                attempt.getExam().getTotalMarks();
-
+        /*
+         * Calculate percentage.
+         */
         double percentage =
                 totalMarks == 0
                         ? 0
                         : (obtainedMarks * 100.0)
                         / totalMarks;
 
+        /*
+         * Grade.
+         */
         String grade =
                 calculateGrade(percentage);
 
+        /*
+         * Result status.
+         */
         String resultStatus =
                 percentage >= 35
                         ? "PASS"
                         : "FAIL";
 
-        attempt.setObtainedMarks(obtainedMarks);
+        /*
+         * Create Result.
+         */
+        Result result =
+                Result.builder()
 
+                        .student(
+                                attempt.getStudent()
+                        )
+
+                        .exam(exam)
+
+                        .attempt(attempt)
+
+                        .totalMarks(totalMarks)
+
+                        .obtainedMarks(obtainedMarks)
+
+                        .percentage(percentage)
+
+                        .grade(grade)
+
+                        .resultStatus(resultStatus)
+
+                        .correctQuestions(
+                                correctQuestions
+                        )
+
+                        .incorrectQuestions(
+                                incorrectQuestions
+                        )
+
+                        .solvedQuestions(
+                                solvedQuestions
+                        )
+
+                        .unsolvedQuestions(
+                                unsolvedQuestions
+                        )
+
+                        .published(false)
+
+                        .active(true)
+
+                        .build();
+
+        /*
+         * Result is now evaluated.
+         */
         attempt.setStatus(
-                ExamAttempt.AttemptStatus.SUBMITTED
+                ExamAttempt.AttemptStatus.EVALUATED
         );
 
         examAttemptRepository.save(attempt);
-
-        Result result =
-                Result.builder()
-                        .student(attempt.getStudent())
-                        .exam(attempt.getExam())
-                        .attempt(attempt)
-                        .totalMarks(totalMarks)
-                        .obtainedMarks(obtainedMarks)
-                        .percentage(percentage)
-                        .grade(grade)
-                        .resultStatus(resultStatus)
-                        .published(false)
-                        .active(true)
-                        .build();
 
         return resultRepository.save(result);
     }

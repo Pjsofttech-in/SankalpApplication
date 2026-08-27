@@ -1,6 +1,5 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
-import com.sankalpapp.dynamicProfile.entity.WebAwardsAndAccolades;
 import com.sankalpapp.dynamicProfile.entity.WebFaculty;
 import com.sankalpapp.dynamicProfile.repository.FacultyRepository;
 import com.sankalpapp.dynamicProfile.service.FacultyService;

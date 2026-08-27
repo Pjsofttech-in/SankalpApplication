@@ -12,37 +12,66 @@ public class ResultMapper {
     ) {
 
         return ExamResultResponse.builder()
-                .resultId(result.getId())
+
+                .resultId(
+                        result.getId()
+                )
+
                 .attemptId(
                         result.getAttempt()
                                 .getId()
                 )
+
                 .examId(
                         result.getExam()
                                 .getId()
                 )
+
                 .examName(
                         result.getExam()
                                 .getExamName()
                 )
+
                 .totalMarks(
                         result.getTotalMarks()
                 )
+
                 .obtainedMarks(
                         result.getObtainedMarks()
                 )
+
+                .correctQuestions(
+                        result.getCorrectQuestions()
+                )
+
+                .incorrectQuestions(
+                        result.getIncorrectQuestions()
+                )
+
+                .solvedQuestions(
+                        result.getSolvedQuestions()
+                )
+
+                .unsolvedQuestions(
+                        result.getUnsolvedQuestions()
+                )
+
                 .percentage(
                         result.getPercentage()
                 )
+
                 .grade(
                         result.getGrade()
                 )
+
                 .resultStatus(
                         result.getResultStatus()
                 )
+
                 .published(
                         result.getPublished()
                 )
+
                 .build();
     }
 }

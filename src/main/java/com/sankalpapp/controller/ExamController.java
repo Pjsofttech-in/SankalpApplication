@@ -3,7 +3,6 @@ package com.sankalpapp.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sankalpapp.dto.Request.ExamRequest;
-import com.sankalpapp.dto.Request.TestSeriesRequest;
 import com.sankalpapp.dto.Response.ExamResponse;
 import com.sankalpapp.service.ExamService;
 import lombok.RequiredArgsConstructor;

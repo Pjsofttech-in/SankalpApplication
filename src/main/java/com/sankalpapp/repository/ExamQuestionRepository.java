@@ -25,15 +25,6 @@ public interface ExamQuestionRepository
             Long questionId
     );
 
-    List<ExamQuestion> findByExamIdOrderBySequenceAsc(
-            Long examId
-    );
-
-    boolean existsByExamIdAndQuestionId(
-            Long examId,
-            Long questionId
-    );
-
     @Query("""
                 SELECT COALESCE(SUM(eq.marks), 0)
                 FROM ExamQuestion eq

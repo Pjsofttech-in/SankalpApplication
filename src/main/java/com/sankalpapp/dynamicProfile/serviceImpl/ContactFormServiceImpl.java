@@ -1,7 +1,6 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebContactForm;
-import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
 import com.sankalpapp.dynamicProfile.repository.ContactFormRepository;
 import com.sankalpapp.dynamicProfile.service.ContactFormService;
 import com.sankalpapp.exception.ResourceNotFoundException;

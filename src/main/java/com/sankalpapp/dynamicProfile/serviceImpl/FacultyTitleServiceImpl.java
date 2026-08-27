@@ -1,7 +1,6 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
 import com.sankalpapp.dynamicProfile.entity.WebFacultyTitle;
-import com.sankalpapp.dynamicProfile.entity.WebSecurityUrl;
 import com.sankalpapp.dynamicProfile.repository.FacultyTitleRepository;
 import com.sankalpapp.dynamicProfile.service.FacultyTitleService;
 import com.sankalpapp.exception.ResourceNotFoundException;

@@ -1,6 +1,5 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
-import com.sankalpapp.dynamicProfile.entity.WebJobCareerOption;
 import com.sankalpapp.dynamicProfile.entity.WebManuBar;
 import com.sankalpapp.dynamicProfile.repository.ManuBarRepository;
 import com.sankalpapp.dynamicProfile.service.ManuBarService;
