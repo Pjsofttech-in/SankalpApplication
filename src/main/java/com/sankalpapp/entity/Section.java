@@ -28,9 +28,4 @@ public class Section {
    // @ManyToOne
     //@JoinColumn(name = "subject_id", nullable = false)
     //private Subject subject;
-
-    // one section many papers
-//    @ManyToMany(mappedBy = "sections")
-//    @JsonIgnore
-//    private List<Paper> papers;
 }

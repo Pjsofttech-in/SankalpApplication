@@ -44,6 +44,10 @@ public class Question {
     @Column(nullable = false)
     private Boolean active = true;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "section_id", nullable = false)
+    private Section section;
+
     @PrePersist
     public void onCreate() {
 
