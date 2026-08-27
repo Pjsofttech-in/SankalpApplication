@@ -10,4 +10,9 @@ public interface LeaderboardPdfService {
             Long examId,
             List<LeaderboardResponse> leaderboard
     );
+
+    byte[] generateTestSeriesLeaderboardPdf(
+            Long testSeriesId,
+            List<LeaderboardResponse> leaderboard
+    );
 }

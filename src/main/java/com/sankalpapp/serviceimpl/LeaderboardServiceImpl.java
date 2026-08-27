@@ -537,12 +537,12 @@ public class LeaderboardServiceImpl
          * the combined leaderboard.
          */
 
-        // byte[] pdf =
-        //        leaderboardPdfService
-        //                .generateTestSeriesLeaderboardPdf(
-        //                        testSeriesId,
-        //                        leaderboard
-        //                );
+         byte[] pdf =
+                leaderboardPdfService
+                        .generateTestSeriesLeaderboardPdf(
+                                testSeriesId,
+                                leaderboard
+                        );
 
         // S3 upload will go here.
 
