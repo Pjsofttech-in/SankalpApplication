@@ -53,7 +53,8 @@ public class SecurityConfig {
                         // Coordinator GET APIs - public
                         .requestMatchers(HttpMethod.GET, "/api/coordinators/**", "/api/districts/**",
                                 "/api/talukas/**", "/api/centers/**", "/api/payments/create-order", "/api/payments/verify",
-                                "/api/downloads/**", "/api/answerkeys/**", "/api/getAllSyllabus", "/api/getSyllabusById/**")
+                                "/api/downloads/**", "/api/answerkeys/**", "/api/getAllSyllabus",
+                                "/api/getSyllabusById/**","/api/test-series/**")
                         .permitAll()
 
                         // Exam attempt APIs
