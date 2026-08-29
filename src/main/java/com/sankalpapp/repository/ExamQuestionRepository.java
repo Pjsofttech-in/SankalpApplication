@@ -36,4 +36,8 @@ public interface ExamQuestionRepository
     long countByExamIdAndActiveTrue(
             Long examId
     );
+
+    boolean existsByExamIdAndSequenceAndActiveTrue(
+            Long examId, Integer sequence
+    );
 }

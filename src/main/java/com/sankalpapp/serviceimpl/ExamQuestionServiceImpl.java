@@ -85,6 +85,14 @@ public class ExamQuestionServiceImpl implements ExamQuestionService {
             );
         }
 
+        boolean existsSequence = examQuestionRepository.existsByExamIdAndSequenceAndActiveTrue(examId, sequence);
+
+        if (existsSequence) {
+            throw new RuntimeException(
+                    "Another question already exists for the same sequence"
+            );
+        }
+
         if (sequence < 1) {
             throw new RuntimeException(
                     "Sequence must be greater than 0"
