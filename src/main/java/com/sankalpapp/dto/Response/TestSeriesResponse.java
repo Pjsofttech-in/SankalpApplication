@@ -18,6 +18,7 @@ public class TestSeriesResponse {
     private String title;
 
     private String description;
+    private String image;
 
     private Boolean active;
 

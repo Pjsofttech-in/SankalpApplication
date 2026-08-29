@@ -437,6 +437,7 @@ public class TestSeriesServiceImpl implements TestSeriesService {
                 .active(testSeries.getActive())
 
                 // --- New fields incorporated ---
+                .image(testSeries.getImage())
                 .mrp(testSeries.getMrp())
                 .sellingPrice(testSeries.getSellingPrice())
                 .price(testSeries.getPrice())
