@@ -11,8 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-//@CrossOrigin(origins = "http://localhost:3000")
-@CrossOrigin(origins = "https://vartmannirnay.com")
+@RequestMapping("/api/vmMaterial")
 public class VMMaterialController {
 
     @Autowired

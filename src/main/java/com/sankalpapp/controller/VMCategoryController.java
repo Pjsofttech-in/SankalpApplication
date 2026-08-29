@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-//@CrossOrigin(origins = "http://localhost:3000")
-@CrossOrigin(origins = "https://vartmannirnay.com")
+@RequestMapping("/api/vmCategory")
 public class VMCategoryController {
 
     @Autowired

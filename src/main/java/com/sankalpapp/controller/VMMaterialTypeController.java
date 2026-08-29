@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @RestController
 //@CrossOrigin(origins = "http://localhost:3000")
-@CrossOrigin(origins = "https://vartmannirnay.com")
+@RequestMapping("/api/vmMaterialType")
 public class VMMaterialTypeController {
 
     @Autowired

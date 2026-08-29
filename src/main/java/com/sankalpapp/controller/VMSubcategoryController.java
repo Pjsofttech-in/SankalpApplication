@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-//@CrossOrigin(origins = "http://localhost:3000")
-@CrossOrigin(origins = "https://vartmannirnay.com")
+@RequestMapping("/api/vmSubCategory")
 public class VMSubcategoryController {
 
     @Autowired
