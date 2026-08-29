@@ -32,14 +32,14 @@ public class ExamController {
 
     // Get All Exams
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
     public List<ExamResponse> getAllExams() {
         return examService.getAllExams();
     }
 
     // Get Exam By Id
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
     public ExamResponse getExamById(@PathVariable Long id) {
         return examService.getExamById(id);
     }
