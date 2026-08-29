@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -413,6 +414,26 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
         return resultMapper.toResponse(
                 savedResult
         );
+    }
+
+    @Transactional
+    @Override
+    public List<ExamResultResponse> publishAllResults(List<Long> resultIds) {
+        if (!CollectionUtils.isEmpty(resultIds)) {
+            List<Result> allById = resultRepository.findAllById(resultIds);
+            allById = allById.stream().peek(result -> {
+                result.setPublished(true);
+                result.getAttempt()
+                        .setStatus(
+                                ExamAttempt.AttemptStatus.PUBLISHED
+                        );
+            }).toList();
+
+            allById = resultRepository.saveAllAndFlush(allById);
+
+            return allById.stream().map(resultMapper::toResponse).toList();
+        }
+        return List.of();
     }
 
     private ExamAttempt getAttempt(

@@ -4,6 +4,7 @@ import com.sankalpapp.dto.Request.StudentAnswerRequest;
 import com.sankalpapp.dto.Response.ExamResultResponse;
 import com.sankalpapp.dto.Response.ExamStartResponse;
 import com.sankalpapp.dto.Response.StudentQuestionResponse;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 
@@ -27,4 +28,7 @@ public interface ExamAttemptService {
     ExamResultResponse getResult(Long attemptId);
 
     ExamResultResponse publishResult(Long resultId);
+
+    @Transactional
+    List<ExamResultResponse> publishAllResults(List<Long> resultIds);
 }

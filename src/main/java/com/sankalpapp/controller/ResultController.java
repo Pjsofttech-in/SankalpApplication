@@ -2,21 +2,21 @@ package com.sankalpapp.controller;
 
 import com.sankalpapp.dto.Response.ExamResultResponse;
 import com.sankalpapp.service.ExamAttemptService;
+import com.sankalpapp.service.ResultService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/results")
+@RequiredArgsConstructor
 public class ResultController {
 
     private final ExamAttemptService examAttemptService;
-
-    public ResultController(
-            ExamAttemptService examAttemptService
-    ) {
-        this.examAttemptService =
-                examAttemptService;
-    }
+    private final ResultService resultService;
 
     @PutMapping("/{resultId}/publish")
     public ResponseEntity<ExamResultResponse>
@@ -31,6 +31,18 @@ public class ResultController {
         );
     }
 
+    @PutMapping("/publishAllResults")
+    public ResponseEntity<List<ExamResultResponse>> publishResultAll(
+            @RequestBody List<Long> resultIds
+    ) {
+
+        return ResponseEntity.ok(
+                examAttemptService.publishAllResults(
+                        resultIds
+                )
+        );
+    }
+
     // Get result
     @GetMapping("/{resultId}")
     public ResponseEntity<ExamResultResponse> getResult(
@@ -40,5 +52,12 @@ public class ResultController {
         return ResponseEntity.ok(
                 examAttemptService.getResult(resultId)
         );
+    }
+
+    // Get result
+    @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<List<ExamResultResponse>> getAllResults() {
+        return ResponseEntity.ok(resultService.getAllResults());
     }
 }
