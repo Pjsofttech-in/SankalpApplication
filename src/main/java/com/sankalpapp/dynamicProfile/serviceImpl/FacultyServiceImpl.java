@@ -15,13 +15,11 @@ import java.util.List;
 @Service
 public class FacultyServiceImpl implements FacultyService {
 
+    private static final String folder = "Faculty";
     @Autowired
     private FacultyRepository repository;
-
     @Autowired
     private S3Service s3Service;
-
-    private static final String folder = "Faculty";
 
     @Override
     public WebFaculty createFacility(WebFaculty webFaculty, MultipartFile image, String url) {

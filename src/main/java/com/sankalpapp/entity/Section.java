@@ -23,7 +23,7 @@ public class Section {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
-   // @ManyToOne
+    // @ManyToOne
     //@JoinColumn(name = "subject_id", nullable = false)
     //private Subject subject;
 }

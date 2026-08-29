@@ -23,14 +23,11 @@ public class WebAwardsAndAccolades {
     private String description;
     private String awardedBy;
     private int year;
-    private String  awardImage;
+    private String awardImage;
     private String awardTo;
     private String url;
     private String awardColour;
 
-    
-    
-    
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")

@@ -15,13 +15,11 @@ import java.util.List;
 @Service
 public class TopperServiceImpl implements TopperService {
 
+    private static final String folder = "Topper";
     @Autowired
     private TopperRepository repository;
-
     @Autowired
     private S3Service s3Service;
-
-    private static final String folder = "Topper";
 
     @Override
     public WebTopper createTopper(WebTopper webTopper, MultipartFile topperImage, String url) {

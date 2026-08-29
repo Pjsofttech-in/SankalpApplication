@@ -1,8 +1,8 @@
 package com.sankalpapp.serviceimpl;
 
-import com.sankalpapp.dto.Request.TalukaRequest;
-import com.sankalpapp.dto.Response.TalukaDTO;
 import com.sankalpapp.dto.mapper.TalukaMapper;
+import com.sankalpapp.dto.request.TalukaRequest;
+import com.sankalpapp.dto.response.TalukaDTO;
 import com.sankalpapp.entity.District;
 import com.sankalpapp.entity.Taluka;
 import com.sankalpapp.repository.DistrictRepository;

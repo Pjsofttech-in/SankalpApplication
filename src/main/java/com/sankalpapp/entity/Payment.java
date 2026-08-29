@@ -88,6 +88,6 @@ public class Payment {
     }
 
     public enum PaymentStatus {
-        SUCCESS, PENDING, FAILED;
+        SUCCESS, PENDING, FAILED
     }
 }

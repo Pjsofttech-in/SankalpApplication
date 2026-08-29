@@ -23,8 +23,7 @@ public class WebJobCareerOptionDTO {
     private String url;
     private String jobColour;
     private String createdByEmail;
-    
-    
+
 
     private Long webHRDetailsId;
 }

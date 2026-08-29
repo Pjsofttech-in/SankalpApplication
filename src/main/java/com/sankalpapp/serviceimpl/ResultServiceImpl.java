@@ -1,8 +1,8 @@
 package com.sankalpapp.serviceimpl;
 
-import com.sankalpapp.dto.Request.ResultRequest;
-import com.sankalpapp.dto.Response.ExamResultResponse;
 import com.sankalpapp.dto.mapper.ResultMapper;
+import com.sankalpapp.dto.request.ResultRequest;
+import com.sankalpapp.dto.response.ExamResultResponse;
 import com.sankalpapp.entity.Exam;
 import com.sankalpapp.entity.Result;
 import com.sankalpapp.entity.Student;

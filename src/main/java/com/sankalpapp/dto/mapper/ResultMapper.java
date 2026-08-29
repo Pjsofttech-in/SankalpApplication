@@ -1,6 +1,6 @@
 package com.sankalpapp.dto.mapper;
 
-import com.sankalpapp.dto.Response.ExamResultResponse;
+import com.sankalpapp.dto.response.ExamResultResponse;
 import com.sankalpapp.entity.Result;
 import org.springframework.stereotype.Component;
 

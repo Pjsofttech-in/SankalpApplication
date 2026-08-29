@@ -1,8 +1,8 @@
 package com.sankalpapp.service;
 
 import com.razorpay.RazorpayException;
-import com.sankalpapp.dto.Request.PaymentRequest;
-import com.sankalpapp.dto.Response.PaymentResponse;
+import com.sankalpapp.dto.request.PaymentRequest;
+import com.sankalpapp.dto.response.PaymentResponse;
 import org.json.JSONObject;
 
 import java.util.List;

@@ -15,13 +15,11 @@ import java.util.List;
 @Service
 public class CourseServiceImpl implements CourseService {
 
+    private static final String folder = "Course";
     @Autowired
     private CourseRepository repository;
-
     @Autowired
     private S3Service s3Service;
-
-    private static final String folder = "Course";
 
     @Override
     public WebCourse createCourse(WebCourse webCourse, MultipartFile courseImage, String url) {

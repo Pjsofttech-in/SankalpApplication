@@ -1,7 +1,7 @@
 package com.sankalpapp.dynamicProfile.controller;
 
-import com.sankalpapp.dto.Request.LoginRequest;
-import com.sankalpapp.dto.Response.LoginResponse;
+import com.sankalpapp.dto.request.LoginRequest;
+import com.sankalpapp.dto.response.LoginResponse;
 import com.sankalpapp.dynamicProfile.serviceImpl.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

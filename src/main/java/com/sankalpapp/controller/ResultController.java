@@ -1,6 +1,6 @@
 package com.sankalpapp.controller;
 
-import com.sankalpapp.dto.Response.ExamResultResponse;
+import com.sankalpapp.dto.response.ExamResultResponse;
 import com.sankalpapp.service.ExamAttemptService;
 import com.sankalpapp.service.ResultService;
 import lombok.RequiredArgsConstructor;

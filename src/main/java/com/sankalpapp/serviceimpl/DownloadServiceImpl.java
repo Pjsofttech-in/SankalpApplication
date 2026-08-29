@@ -1,7 +1,7 @@
 package com.sankalpapp.serviceimpl;
 
-import com.sankalpapp.dto.Request.DownloadRequest;
-import com.sankalpapp.dto.Response.DownloadResponse;
+import com.sankalpapp.dto.request.DownloadRequest;
+import com.sankalpapp.dto.response.DownloadResponse;
 import com.sankalpapp.entity.Download;
 import com.sankalpapp.repository.DownloadRepository;
 import com.sankalpapp.service.DownloadService;

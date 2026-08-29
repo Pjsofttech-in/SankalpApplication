@@ -15,13 +15,11 @@ import java.util.List;
 @Service
 public class ManuBarServiceImpl implements ManuBarService {
 
+    private static final String folder = "MenuBar";
     @Autowired
     private ManuBarRepository repository;
-
     @Autowired
     private S3Service s3Service;
-
-    private static final String folder = "MenuBar";
 
     @Override
     public WebManuBar createManuBar(WebManuBar webManuBar, MultipartFile menubarImage, String url) {

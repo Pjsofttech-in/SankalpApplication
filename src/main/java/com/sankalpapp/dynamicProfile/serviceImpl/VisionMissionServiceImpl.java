@@ -15,13 +15,11 @@ import java.util.List;
 @Service
 public class VisionMissionServiceImpl implements VisionMissionService {
 
+    private static final String folder = "Vision";
     @Autowired
     private VisionMissionRepository repository;
-
     @Autowired
     private S3Service s3Service;
-
-    private static final String folder = "Vision";
 
     @Override
     public WebVisionMission create(WebVisionMission vm, MultipartFile directorImage, String url) {

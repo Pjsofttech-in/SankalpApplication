@@ -20,9 +20,6 @@ public class WebFacultyTitle {
     private String facilityTitle;
     private String url;
 
-    
-    
-    
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")

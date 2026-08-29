@@ -38,9 +38,6 @@ public class WebVisionMission {
     private String description;
     private String url;
 
-    
-    
-    
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")

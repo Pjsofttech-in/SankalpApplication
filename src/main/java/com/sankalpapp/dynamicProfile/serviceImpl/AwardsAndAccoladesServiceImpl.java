@@ -15,13 +15,11 @@ import java.util.List;
 @Service
 public class AwardsAndAccoladesServiceImpl implements AwardsAndAccoladesService {
 
+    private static final String folder = "Awards";
     @Autowired
     private AwardsAndAccoladesRepository repository;
-
     @Autowired
     private S3Service s3Service;
-
-    private static final String folder = "Awards";
 
     @Override
     public WebAwardsAndAccolades createAward(WebAwardsAndAccolades award, MultipartFile awardImage, String url) {

@@ -48,7 +48,7 @@ public class S3Service {
             String fileName,
             String contentType,
             String folder
-    ) throws IOException  {
+    ) throws IOException {
 
         String key =
                 folder + "/" + UUID.randomUUID() + "-" + fileName;

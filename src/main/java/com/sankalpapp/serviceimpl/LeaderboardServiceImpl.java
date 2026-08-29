@@ -1,7 +1,6 @@
 package com.sankalpapp.serviceimpl;
 
-import com.sankalpapp.dto.Response.LeaderboardResponse;
-import com.sankalpapp.dynamicProfile.entity.HeroSection;
+import com.sankalpapp.dto.response.LeaderboardResponse;
 import com.sankalpapp.entity.*;
 import com.sankalpapp.repository.ExamRepository;
 import com.sankalpapp.repository.ResultRepository;
@@ -12,7 +11,6 @@ import com.sankalpapp.service.LeaderboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -23,13 +21,13 @@ import java.util.*;
 public class LeaderboardServiceImpl
         implements LeaderboardService {
 
+    private static final String folder = "Exams/Leaderboards";
     private final ResultRepository resultRepository;
     private final ExamRepository examRepository;
     private final TestSeriesRepository testSeriesRepository;
     private final TestSeriesExamRepository testSeriesExamRepository;
     private final LeaderboardPdfService leaderboardPdfService;
     private final S3Service s3Service;
-    private static final String folder = "Exams/Leaderboards";
 
     @Override
     @Transactional(readOnly = true)
@@ -537,7 +535,7 @@ public class LeaderboardServiceImpl
          * the combined leaderboard.
          */
 
-         byte[] pdf =
+        byte[] pdf =
                 leaderboardPdfService
                         .generateTestSeriesLeaderboardPdf(
                                 testSeriesId,

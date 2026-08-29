@@ -1,7 +1,7 @@
 package com.sankalpapp.service;
 
-import com.sankalpapp.dto.Request.QuestionRequest;
-import com.sankalpapp.dto.Response.QuestionResponse;
+import com.sankalpapp.dto.request.QuestionRequest;
+import com.sankalpapp.dto.response.QuestionResponse;
 
 import java.util.List;
 

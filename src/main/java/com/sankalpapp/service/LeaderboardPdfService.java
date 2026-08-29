@@ -1,6 +1,6 @@
 package com.sankalpapp.service;
 
-import com.sankalpapp.dto.Response.LeaderboardResponse;
+import com.sankalpapp.dto.response.LeaderboardResponse;
 
 import java.util.List;
 

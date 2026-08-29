@@ -1,9 +1,9 @@
 package com.sankalpapp.service;
 
-import com.sankalpapp.dto.Request.StudentAnswerRequest;
-import com.sankalpapp.dto.Response.ExamResultResponse;
-import com.sankalpapp.dto.Response.ExamStartResponse;
-import com.sankalpapp.dto.Response.StudentQuestionResponse;
+import com.sankalpapp.dto.request.StudentAnswerRequest;
+import com.sankalpapp.dto.response.ExamResultResponse;
+import com.sankalpapp.dto.response.ExamStartResponse;
+import com.sankalpapp.dto.response.StudentQuestionResponse;
 import jakarta.transaction.Transactional;
 
 import java.util.List;

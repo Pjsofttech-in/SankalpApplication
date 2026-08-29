@@ -2,10 +2,10 @@ package com.sankalpapp.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sankalpapp.dto.Request.TestSeriesExamRequest;
-import com.sankalpapp.dto.Request.TestSeriesRequest;
-import com.sankalpapp.dto.Response.TestSeriesProgressResponse;
-import com.sankalpapp.dto.Response.TestSeriesResponse;
+import com.sankalpapp.dto.request.TestSeriesExamRequest;
+import com.sankalpapp.dto.request.TestSeriesRequest;
+import com.sankalpapp.dto.response.TestSeriesProgressResponse;
+import com.sankalpapp.dto.response.TestSeriesResponse;
 import com.sankalpapp.service.TestSeriesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

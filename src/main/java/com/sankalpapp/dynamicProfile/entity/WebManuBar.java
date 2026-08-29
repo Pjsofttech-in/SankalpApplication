@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class  WebManuBar {
+public class WebManuBar {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,9 +22,6 @@ public class  WebManuBar {
     private String url;
     private String menubarName;
 
-    
-    
-    
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")

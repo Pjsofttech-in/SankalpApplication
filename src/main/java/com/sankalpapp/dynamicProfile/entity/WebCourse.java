@@ -27,9 +27,6 @@ public class WebCourse {
     private Double price;
     private String url;
 
-    
-    
-    
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")

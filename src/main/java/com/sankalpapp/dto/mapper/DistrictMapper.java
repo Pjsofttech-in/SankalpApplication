@@ -1,7 +1,7 @@
 package com.sankalpapp.dto.mapper;
 
-import com.sankalpapp.dto.Request.DistrictRequest;
-import com.sankalpapp.dto.Response.DistrictDTO;
+import com.sankalpapp.dto.request.DistrictRequest;
+import com.sankalpapp.dto.response.DistrictDTO;
 import com.sankalpapp.entity.District;
 
 import java.util.stream.Collectors;
@@ -26,9 +26,9 @@ public class DistrictMapper {
                         district.getTalukas() == null
                                 ? null
                                 : district.getTalukas()
-                                    .stream()
-                                    .map(TalukaMapper::toDTO)
-                                    .collect(Collectors.toList())
+                                .stream()
+                                .map(TalukaMapper::toDTO)
+                                .collect(Collectors.toList())
                 )
 
                 .createdAt(district.getCreatedAt())

@@ -1,7 +1,7 @@
 package com.sankalpapp.controller;
 
-import com.sankalpapp.dto.Request.LoginRequest;
-import com.sankalpapp.dto.Response.LoginResponse;
+import com.sankalpapp.dto.request.LoginRequest;
+import com.sankalpapp.dto.response.LoginResponse;
 import com.sankalpapp.entity.User;
 import com.sankalpapp.security.CustomUserDetailsService;
 import com.sankalpapp.security.JwtUtil;

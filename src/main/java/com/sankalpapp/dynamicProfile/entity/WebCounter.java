@@ -47,9 +47,6 @@ public class WebCounter {
     private String counterColor3;
     private String url;
 
-    
-    
-    
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")

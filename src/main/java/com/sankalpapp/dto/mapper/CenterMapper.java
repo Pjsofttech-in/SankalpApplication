@@ -1,7 +1,7 @@
 package com.sankalpapp.dto.mapper;
 
-import com.sankalpapp.dto.Request.CenterRequest;
-import com.sankalpapp.dto.Response.CenterDTO;
+import com.sankalpapp.dto.request.CenterRequest;
+import com.sankalpapp.dto.response.CenterDTO;
 import com.sankalpapp.entity.Center;
 import com.sankalpapp.entity.Coordinator;
 import com.sankalpapp.entity.District;

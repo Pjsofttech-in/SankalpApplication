@@ -45,9 +45,6 @@ public class WebTopper {
     @Column(name = "image_url_id")
     private List<Integer> imageUrlIds;
 
-    
-    
-    
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")

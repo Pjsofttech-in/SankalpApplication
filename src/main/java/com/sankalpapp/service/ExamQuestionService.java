@@ -1,6 +1,6 @@
 package com.sankalpapp.service;
 
-import com.sankalpapp.dto.Response.ExamQuestionDto;
+import com.sankalpapp.dto.response.ExamQuestionDto;
 
 import java.util.List;
 

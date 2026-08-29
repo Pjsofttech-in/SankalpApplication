@@ -1,7 +1,7 @@
 package com.sankalpapp.dto.mapper;
 
-import com.sankalpapp.dto.Request.CoordinatorRequest;
-import com.sankalpapp.dto.Response.CoordinatorDTO;
+import com.sankalpapp.dto.request.CoordinatorRequest;
+import com.sankalpapp.dto.response.CoordinatorDTO;
 import com.sankalpapp.entity.Center;
 import com.sankalpapp.entity.Coordinator;
 import com.sankalpapp.entity.User;

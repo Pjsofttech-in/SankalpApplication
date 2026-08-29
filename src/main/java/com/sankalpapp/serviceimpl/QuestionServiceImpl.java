@@ -1,8 +1,8 @@
 package com.sankalpapp.serviceimpl;
 
-import com.sankalpapp.dto.Request.QuestionRequest;
-import com.sankalpapp.dto.Response.QuestionResponse;
 import com.sankalpapp.dto.mapper.QuestionMapper;
+import com.sankalpapp.dto.request.QuestionRequest;
+import com.sankalpapp.dto.response.QuestionResponse;
 import com.sankalpapp.entity.Question;
 import com.sankalpapp.entity.Section;
 import com.sankalpapp.repository.QuestionRepository;
@@ -108,7 +108,7 @@ public class QuestionServiceImpl implements QuestionService {
         if (request.getActive() != null) {
             entity.setActive(request.getActive());
         }
-        if (request.getSectionId()!=null) {
+        if (request.getSectionId() != null) {
             Section section = sectionService.getSectionById(request.getSectionId());
             entity.setSection(section);
         }

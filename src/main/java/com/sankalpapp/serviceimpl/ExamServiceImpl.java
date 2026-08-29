@@ -1,7 +1,7 @@
 package com.sankalpapp.serviceimpl;
 
-import com.sankalpapp.dto.Request.ExamRequest;
-import com.sankalpapp.dto.Response.ExamResponse;
+import com.sankalpapp.dto.request.ExamRequest;
+import com.sankalpapp.dto.response.ExamResponse;
 import com.sankalpapp.entity.Category;
 import com.sankalpapp.entity.Exam;
 import com.sankalpapp.repository.CategoryRepository;

@@ -25,7 +25,7 @@ public class WebJobCareerOption {
     private String description;
     private String location;
     private String salaryRange;
-//    private String JobCareerOptionColor;
+    //    private String JobCareerOptionColor;
     @Column(length = 500)
     private String responsibilities;
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -36,9 +36,6 @@ public class WebJobCareerOption {
     private String jobColour;
     private String jobVacancy;
 
-    
-    
-    
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")
@@ -46,7 +43,7 @@ public class WebJobCareerOption {
     private WebSecurityUrl webSecurityUrl;
 
     @ManyToOne
-    @JoinColumn(name ="Web_Hr_Details_id")
+    @JoinColumn(name = "Web_Hr_Details_id")
 //    @JsonIgnore
     private WebHRDetails webHRDetails;
 }

@@ -1,7 +1,7 @@
 package com.sankalpapp.controller;
 
-import com.sankalpapp.dto.Request.TalukaRequest;
-import com.sankalpapp.dto.Response.TalukaDTO;
+import com.sankalpapp.dto.request.TalukaRequest;
+import com.sankalpapp.dto.response.TalukaDTO;
 import com.sankalpapp.service.TalukaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

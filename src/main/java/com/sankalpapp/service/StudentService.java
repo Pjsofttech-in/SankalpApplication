@@ -1,8 +1,8 @@
 package com.sankalpapp.service;
 
-import com.sankalpapp.dto.Request.StudentRequest;
-import com.sankalpapp.dto.Response.StudentDTO;
-import com.sankalpapp.dto.Response.StudentFilterDTO;
+import com.sankalpapp.dto.request.StudentRequest;
+import com.sankalpapp.dto.response.StudentDTO;
+import com.sankalpapp.dto.response.StudentFilterDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

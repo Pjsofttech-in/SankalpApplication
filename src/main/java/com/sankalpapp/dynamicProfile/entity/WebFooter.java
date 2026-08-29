@@ -28,9 +28,6 @@ public class WebFooter {
     private String address;
     private String url;
 
-    
-    
-    
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")

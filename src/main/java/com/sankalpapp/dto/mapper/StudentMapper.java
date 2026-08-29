@@ -1,6 +1,6 @@
 package com.sankalpapp.dto.mapper;
 
-import com.sankalpapp.dto.Response.StudentDTO;
+import com.sankalpapp.dto.response.StudentDTO;
 import com.sankalpapp.entity.Student;
 
 public final class StudentMapper {

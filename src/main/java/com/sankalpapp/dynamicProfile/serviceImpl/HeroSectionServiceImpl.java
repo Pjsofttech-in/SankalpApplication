@@ -13,9 +13,9 @@ import java.util.List;
 @Service
 public class HeroSectionServiceImpl implements HeroSectionService {
 
+    private static final String folder = "HeroSection";
     private final HeroSectionRepository heroSectionRepository;
     private final S3Service s3Service;
-    private static final String folder = "HeroSection";
 
     public HeroSectionServiceImpl(
             HeroSectionRepository heroSectionRepository, S3Service s3Service) {

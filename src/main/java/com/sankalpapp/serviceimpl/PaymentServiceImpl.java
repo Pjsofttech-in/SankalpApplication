@@ -3,8 +3,8 @@ package com.sankalpapp.serviceimpl;
 import com.razorpay.Order;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
-import com.sankalpapp.dto.Request.PaymentRequest;
-import com.sankalpapp.dto.Response.PaymentResponse;
+import com.sankalpapp.dto.request.PaymentRequest;
+import com.sankalpapp.dto.response.PaymentResponse;
 import com.sankalpapp.entity.Payment;
 import com.sankalpapp.entity.Student;
 import com.sankalpapp.exception.ResourceNotFoundException;
@@ -42,7 +42,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentResponse savePayment(PaymentRequest request) {
         Student student = null;
-        if(Objects.nonNull(request.getStudentId())) {
+        if (Objects.nonNull(request.getStudentId())) {
             student = studentRepository.findById(request.getStudentId()).orElse(null);
         }
 

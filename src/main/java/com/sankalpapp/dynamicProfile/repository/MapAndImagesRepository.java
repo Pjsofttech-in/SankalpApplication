@@ -13,5 +13,5 @@ public interface MapAndImagesRepository extends JpaRepository<WebMapAndImages, L
     @Query("SELECT m FROM WebMapAndImages m ORDER BY m.id DESC")
     List<WebMapAndImages> findAllOrderById();
 
-    
+
 }

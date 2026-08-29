@@ -29,9 +29,6 @@ public class WebFaculty {
     private String facilityColor;
     private String url;
 
-    
-    
-    
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")

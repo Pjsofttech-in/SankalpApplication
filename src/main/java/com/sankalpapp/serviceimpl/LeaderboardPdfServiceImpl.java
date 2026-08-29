@@ -4,7 +4,7 @@ import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
-import com.sankalpapp.dto.Response.LeaderboardResponse;
+import com.sankalpapp.dto.response.LeaderboardResponse;
 import com.sankalpapp.entity.TestSeries;
 import com.sankalpapp.repository.TestSeriesRepository;
 import com.sankalpapp.service.LeaderboardPdfService;

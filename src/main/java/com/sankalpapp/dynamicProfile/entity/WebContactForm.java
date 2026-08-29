@@ -30,12 +30,9 @@ public class WebContactForm {
     private String description;
     @Email
     private String email;
-    private  String academicYear;
+    private String academicYear;
     private String url;
 
-    
-    
-    
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")

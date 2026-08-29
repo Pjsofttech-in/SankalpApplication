@@ -54,7 +54,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/coordinators/**", "/api/districts/**",
                                 "/api/talukas/**", "/api/centers/**", "/api/payments/create-order", "/api/payments/verify",
                                 "/api/downloads/**", "/api/answerkeys/**", "/api/getAllSyllabus",
-                                "/api/getSyllabusById/**","/api/test-series/**", "/api/questions/**", "/api/exams/**")
+                                "/api/getSyllabusById/**", "/api/test-series/**", "/api/questions/**", "/api/exams/**")
                         .permitAll()
 
                         // Exam attempt APIs

@@ -1,7 +1,7 @@
 package com.sankalpapp.serviceimpl;
 
-import com.sankalpapp.dto.Response.ExamQuestionDto;
 import com.sankalpapp.dto.mapper.ExamQuestionMapper;
+import com.sankalpapp.dto.response.ExamQuestionDto;
 import com.sankalpapp.entity.Exam;
 import com.sankalpapp.entity.ExamQuestion;
 import com.sankalpapp.entity.Question;

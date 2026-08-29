@@ -1,10 +1,10 @@
 package com.sankalpapp.serviceimpl;
 
-import com.sankalpapp.dto.Request.StudentAnswerRequest;
-import com.sankalpapp.dto.Response.ExamResultResponse;
-import com.sankalpapp.dto.Response.ExamStartResponse;
-import com.sankalpapp.dto.Response.StudentQuestionResponse;
 import com.sankalpapp.dto.mapper.ResultMapper;
+import com.sankalpapp.dto.request.StudentAnswerRequest;
+import com.sankalpapp.dto.response.ExamResultResponse;
+import com.sankalpapp.dto.response.ExamStartResponse;
+import com.sankalpapp.dto.response.StudentQuestionResponse;
 import com.sankalpapp.entity.*;
 import com.sankalpapp.repository.*;
 import com.sankalpapp.service.ExamAttemptService;

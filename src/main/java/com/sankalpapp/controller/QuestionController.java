@@ -1,7 +1,7 @@
 package com.sankalpapp.controller;
 
-import com.sankalpapp.dto.Request.QuestionRequest;
-import com.sankalpapp.dto.Response.QuestionResponse;
+import com.sankalpapp.dto.request.QuestionRequest;
+import com.sankalpapp.dto.response.QuestionResponse;
 import com.sankalpapp.service.QuestionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

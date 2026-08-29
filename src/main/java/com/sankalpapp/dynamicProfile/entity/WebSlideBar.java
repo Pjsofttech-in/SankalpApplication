@@ -30,9 +30,6 @@ public class WebSlideBar {
     @Column(name = "image_url")
     private List<String> slideImages;
 
-    
-    
-    
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")

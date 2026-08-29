@@ -10,6 +10,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     // Fetch payment by orderId
     Optional<Payment> findByOrderId(String orderId);
 
-    Optional<Payment> findByMobileAndPaymentStatusIgnoreCase(String mobile, String  paymentStatus);
+    Optional<Payment> findByMobileAndPaymentStatusIgnoreCase(String mobile, String paymentStatus);
 
 }

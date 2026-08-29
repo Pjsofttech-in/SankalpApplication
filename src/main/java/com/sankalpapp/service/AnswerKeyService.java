@@ -1,6 +1,6 @@
 package com.sankalpapp.service;
 
-import com.sankalpapp.dto.Response.AnswerKeyResponse;
+import com.sankalpapp.dto.response.AnswerKeyResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

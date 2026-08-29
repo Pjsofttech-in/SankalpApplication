@@ -1,10 +1,10 @@
 package com.sankalpapp.serviceimpl;
 
-import com.sankalpapp.dto.Request.StudentRequest;
-import com.sankalpapp.dto.Response.StudentDTO;
-import com.sankalpapp.dto.Response.StudentFilterDTO;
 import com.sankalpapp.dto.mapper.StudentMapper;
 import com.sankalpapp.dto.mapper.StudentSpecification;
+import com.sankalpapp.dto.request.StudentRequest;
+import com.sankalpapp.dto.response.StudentDTO;
+import com.sankalpapp.dto.response.StudentFilterDTO;
 import com.sankalpapp.entity.*;
 import com.sankalpapp.repository.*;
 import com.sankalpapp.service.StudentService;

@@ -1,7 +1,7 @@
 package com.sankalpapp.service;
 
-import com.sankalpapp.dto.Request.CenterRequest;
-import com.sankalpapp.dto.Response.CenterDTO;
+import com.sankalpapp.dto.request.CenterRequest;
+import com.sankalpapp.dto.response.CenterDTO;
 
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package com.sankalpapp.controller;
 
-import com.sankalpapp.dto.Response.LeaderboardResponse;
+import com.sankalpapp.dto.response.LeaderboardResponse;
 import com.sankalpapp.service.LeaderboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

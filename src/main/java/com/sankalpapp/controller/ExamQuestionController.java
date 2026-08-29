@@ -1,7 +1,7 @@
 package com.sankalpapp.controller;
 
-import com.sankalpapp.dto.Request.AddQuestionRequest;
-import com.sankalpapp.dto.Response.ExamQuestionDto;
+import com.sankalpapp.dto.request.AddQuestionRequest;
+import com.sankalpapp.dto.response.ExamQuestionDto;
 import com.sankalpapp.service.ExamQuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

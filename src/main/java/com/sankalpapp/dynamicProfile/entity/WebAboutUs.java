@@ -28,8 +28,6 @@ public class WebAboutUs {
     private String totalFaculties;
     private String totalStudents;
 
-    
-    
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")

@@ -19,16 +19,13 @@ import java.util.List;
 @Service
 public class JobCareerOptionServiceImpl implements JobCareerOptionService {
 
+    private static final String folder = "JobCareerOption";
     @Autowired
     private JobCareerOptionRepository repository;
-
     @Autowired
     private WebHRDetailsRepository webHRDetailsRepository;
-
     @Autowired
     private S3Service s3Service;
-
-    private static final String folder = "JobCareerOption";
 
     @Override
     public WebJobCareerOptionDTO create(WebJobCareerOption option, MultipartFile resumeFile, String url, Long webHRDetailsId) {

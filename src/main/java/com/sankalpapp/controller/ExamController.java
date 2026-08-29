@@ -2,8 +2,8 @@ package com.sankalpapp.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sankalpapp.dto.Request.ExamRequest;
-import com.sankalpapp.dto.Response.ExamResponse;
+import com.sankalpapp.dto.request.ExamRequest;
+import com.sankalpapp.dto.response.ExamResponse;
 import com.sankalpapp.service.ExamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

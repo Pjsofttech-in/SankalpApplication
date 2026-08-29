@@ -1,6 +1,6 @@
 package com.sankalpapp.controller;
 
-import com.sankalpapp.dto.Response.AnswerKeyResponse;
+import com.sankalpapp.dto.response.AnswerKeyResponse;
 import com.sankalpapp.service.AnswerKeyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

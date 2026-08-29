@@ -1,11 +1,11 @@
 package com.sankalpapp.serviceimpl;
 
-import com.sankalpapp.dto.Request.TestSeriesExamRequest;
-import com.sankalpapp.dto.Request.TestSeriesRequest;
-import com.sankalpapp.dto.Response.TestSeriesExamResponse;
-import com.sankalpapp.dto.Response.TestSeriesProgressExamResponse;
-import com.sankalpapp.dto.Response.TestSeriesProgressResponse;
-import com.sankalpapp.dto.Response.TestSeriesResponse;
+import com.sankalpapp.dto.request.TestSeriesExamRequest;
+import com.sankalpapp.dto.request.TestSeriesRequest;
+import com.sankalpapp.dto.response.TestSeriesExamResponse;
+import com.sankalpapp.dto.response.TestSeriesProgressExamResponse;
+import com.sankalpapp.dto.response.TestSeriesProgressResponse;
+import com.sankalpapp.dto.response.TestSeriesResponse;
 import com.sankalpapp.entity.*;
 import com.sankalpapp.repository.*;
 import com.sankalpapp.service.TestSeriesService;

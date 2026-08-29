@@ -1,7 +1,7 @@
 package com.sankalpapp.controller;
 
-import com.sankalpapp.dto.Request.CenterRequest;
-import com.sankalpapp.dto.Response.CenterDTO;
+import com.sankalpapp.dto.request.CenterRequest;
+import com.sankalpapp.dto.response.CenterDTO;
 import com.sankalpapp.service.CenterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

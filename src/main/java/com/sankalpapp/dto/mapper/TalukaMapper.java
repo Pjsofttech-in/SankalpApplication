@@ -1,7 +1,7 @@
 package com.sankalpapp.dto.mapper;
 
-import com.sankalpapp.dto.Request.TalukaRequest;
-import com.sankalpapp.dto.Response.TalukaDTO;
+import com.sankalpapp.dto.request.TalukaRequest;
+import com.sankalpapp.dto.response.TalukaDTO;
 import com.sankalpapp.entity.District;
 import com.sankalpapp.entity.Taluka;
 
@@ -40,9 +40,9 @@ public class TalukaMapper {
                         taluka.getCenters() == null
                                 ? null
                                 : taluka.getCenters()
-                                    .stream()
-                                    .map(center -> center.getId())
-                                    .collect(Collectors.toList())
+                                .stream()
+                                .map(center -> center.getId())
+                                .collect(Collectors.toList())
                 )
 
                 .createdAt(taluka.getCreatedAt())

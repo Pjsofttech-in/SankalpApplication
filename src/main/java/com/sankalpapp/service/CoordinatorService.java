@@ -1,7 +1,7 @@
 package com.sankalpapp.service;
 
-import com.sankalpapp.dto.Request.CoordinatorRequest;
-import com.sankalpapp.dto.Response.CoordinatorDTO;
+import com.sankalpapp.dto.request.CoordinatorRequest;
+import com.sankalpapp.dto.response.CoordinatorDTO;
 
 import java.util.List;
 

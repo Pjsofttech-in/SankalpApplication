@@ -1,6 +1,6 @@
 package com.sankalpapp.dto.mapper;
 
-import com.sankalpapp.dto.Response.ExamQuestionDto;
+import com.sankalpapp.dto.response.ExamQuestionDto;
 import com.sankalpapp.entity.ExamQuestion;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -1,7 +1,7 @@
 package com.sankalpapp.controller;
 
-import com.sankalpapp.dto.Request.PaymentRequest;
-import com.sankalpapp.dto.Response.PaymentResponse;
+import com.sankalpapp.dto.request.PaymentRequest;
+import com.sankalpapp.dto.response.PaymentResponse;
 import com.sankalpapp.entity.Payment;
 import com.sankalpapp.repository.PaymentRepository;
 import com.sankalpapp.service.PaymentService;
@@ -46,6 +46,7 @@ public class PaymentController {
 
         return order.toString(); //  FIX
     }
+
     // ✅ Verify Payment
     @PostMapping("/verify")
     public String verifyPayment(@RequestBody PaymentRequest request) {

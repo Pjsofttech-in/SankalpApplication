@@ -1,7 +1,7 @@
 package com.sankalpapp.dynamicProfile.serviceImpl;
 
-import com.sankalpapp.dto.Request.LoginRequest;
-import com.sankalpapp.dto.Response.LoginResponse;
+import com.sankalpapp.dto.request.LoginRequest;
+import com.sankalpapp.dto.response.LoginResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;

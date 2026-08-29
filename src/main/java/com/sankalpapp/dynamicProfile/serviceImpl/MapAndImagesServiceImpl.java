@@ -15,13 +15,11 @@ import java.util.List;
 @Service
 public class MapAndImagesServiceImpl implements MapAndImagesService {
 
+    private static final String folder = "MapAndImage";
     @Autowired
     private MapAndImagesRepository repository;
-
     @Autowired
     private S3Service s3Service;
-
-    private static final String folder = "MapAndImage";
 
     @Override
     public WebMapAndImages create(WebMapAndImages entity, MultipartFile imageFile, String url) {

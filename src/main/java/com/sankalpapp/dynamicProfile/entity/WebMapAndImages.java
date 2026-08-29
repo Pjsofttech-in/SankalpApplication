@@ -27,9 +27,6 @@ public class WebMapAndImages {
     private String maps;
     private String url;
 
-    
-    
-    
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")

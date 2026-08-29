@@ -22,9 +22,6 @@ public class WebSecurityUrl {
 
     private String url;
 
-    
-    
-    
 
     @OneToMany(mappedBy = "webSecurityUrl", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -38,7 +35,7 @@ public class WebSecurityUrl {
     @JsonIgnore
     private List<WebAwardsAndAccolades> webAwardsAndAccolades;
 
-    @OneToMany(mappedBy = "webSecurityUrl" , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "webSecurityUrl", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<WebCourse> webCourse;
 

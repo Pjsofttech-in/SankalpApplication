@@ -1,7 +1,7 @@
 package com.sankalpapp.controller;
 
-import com.sankalpapp.dto.Request.CoordinatorRequest;
-import com.sankalpapp.dto.Response.CoordinatorDTO;
+import com.sankalpapp.dto.request.CoordinatorRequest;
+import com.sankalpapp.dto.response.CoordinatorDTO;
 import com.sankalpapp.service.CoordinatorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -53,7 +53,7 @@ public class CoordinatorController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public CoordinatorDTO updateCoordinator(@PathVariable Long id,
-                                                 @RequestBody CoordinatorRequest request) {
+                                            @RequestBody CoordinatorRequest request) {
 
         return coordinatorService.updateCoordinator(id, request);
     }

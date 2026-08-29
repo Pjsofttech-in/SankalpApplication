@@ -25,11 +25,8 @@ public class WebHRDetails {
     private String contact;
     private String url;
 
-    
-    
-    
 
-    @OneToMany(mappedBy = "webHRDetails",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "webHRDetails", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<WebJobCareerOption> webJobCareerOptions;
 

@@ -35,9 +35,6 @@ public class WebGallery {
     @Column(name = "image_url")
     private List<String> galleryImages = new ArrayList<>();
 
-    
-    
-    
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")

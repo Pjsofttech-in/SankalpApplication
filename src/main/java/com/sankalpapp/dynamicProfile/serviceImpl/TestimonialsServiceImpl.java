@@ -15,13 +15,11 @@ import java.util.List;
 @Service
 public class TestimonialsServiceImpl implements TestimonialsService {
 
+    private static final String folder = "Testimonials";
     @Autowired
     private TestimonialsRepository repository;
-
     @Autowired
     private S3Service s3Service;
-
-    private static final String folder = "Testimonials";
 
     @Override
     public WebTestimonials create(WebTestimonials webTestimonials, MultipartFile testimonialImage, String url) {

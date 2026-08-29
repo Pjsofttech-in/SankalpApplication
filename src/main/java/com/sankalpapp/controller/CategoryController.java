@@ -1,7 +1,7 @@
 package com.sankalpapp.controller;
 
-import com.sankalpapp.dto.Request.CategoryRequest;
-import com.sankalpapp.dto.Response.CategoryResponse;
+import com.sankalpapp.dto.request.CategoryRequest;
+import com.sankalpapp.dto.response.CategoryResponse;
 import com.sankalpapp.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
