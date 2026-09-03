@@ -35,5 +35,6 @@ public class QuestionResponse {
     private String examName;
     private String questionType;
     private String answerExplanation;
+    private String answerSupportingFile;
     private Boolean active;
 }

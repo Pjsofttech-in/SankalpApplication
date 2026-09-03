@@ -40,7 +40,7 @@ public class Question {
     @Column(columnDefinition = "TEXT")  // ✅ Store long text explanation
     private String answerExplanation;
 
-    @Column
+    @Column(length = 150)
     private String answerSupportingFile;
 
     @Builder.Default
