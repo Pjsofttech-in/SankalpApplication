@@ -12,25 +12,46 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class QuestionServiceImpl implements QuestionService {
 
+    private static final String folder = "Question";
     private final SectionService sectionService;
     private final QuestionRepository questionRepository;
     private final QuestionMapper questionMapper;
+    private final S3Service s3Service;
 
     @Override
     @Transactional
-    public QuestionResponse create(QuestionRequest questionRequest) {
+    public QuestionResponse create(QuestionRequest questionRequest,
+                                   MultipartFile createQuestionFile, MultipartFile optionAFile,
+                                   MultipartFile optionBFile,
+                                   MultipartFile optionCFile,
+                                   MultipartFile optionDFile,
+                                   MultipartFile answerSupportingFile) {
 
         Question question = new Question();
-        updateEntityFromRequest(question, questionRequest);
+        updateEntityFromRequest(question, questionRequest, createQuestionFile, optionAFile,
+                optionBFile, optionCFile, optionDFile, answerSupportingFile);
 
         return questionMapper.toResponse(questionRepository.save(question));
+    }
+
+    private String uploadIfImage(MultipartFile file, String textValue) {
+        if (file != null && !file.isEmpty()) {
+            try {
+                return s3Service.uploadFile(file, folder);
+            } catch (IOException e) {
+                throw new RuntimeException("Error uploading image to S3: " + e.getMessage());
+            }
+        }
+        return textValue;
     }
 
     @Override
@@ -56,11 +77,17 @@ public class QuestionServiceImpl implements QuestionService {
     @Transactional
     public QuestionResponse update(
             Long id,
-            QuestionRequest questionRequest
+            QuestionRequest questionRequest,
+            MultipartFile createQuestionFile, MultipartFile optionAFile,
+            MultipartFile optionBFile,
+            MultipartFile optionCFile,
+            MultipartFile optionDFile,
+            MultipartFile answerSupportingFile
     ) {
 
         Question question = questionRepository.findById(id).orElseThrow();
-        updateEntityFromRequest(question, questionRequest);
+        updateEntityFromRequest(question, questionRequest, createQuestionFile, optionAFile,
+                optionBFile, optionCFile, optionDFile, answerSupportingFile);
         return questionMapper.toResponse(questionRepository.save(question));
     }
 
@@ -69,6 +96,12 @@ public class QuestionServiceImpl implements QuestionService {
     public void delete(Long id) {
 
         Question question = questionRepository.findById(id).orElseThrow();
+        s3Service.deleteFileByUrl(question.getQuestion());
+        s3Service.deleteFileByUrl(question.getOptionA());
+        s3Service.deleteFileByUrl(question.getOptionB());
+        s3Service.deleteFileByUrl(question.getOptionC());
+        s3Service.deleteFileByUrl(question.getOptionD());
+        s3Service.deleteFileByUrl(question.getAnswerSupportingFile());
 
         questionRepository.delete(question);
     }
@@ -76,35 +109,30 @@ public class QuestionServiceImpl implements QuestionService {
     /**
      * Updates an existing Question entity with non-null values from the request.
      */
-    public void updateEntityFromRequest(Question entity, QuestionRequest request) {
+    public void updateEntityFromRequest(Question entity, QuestionRequest request,
+                                        MultipartFile createQuestionFile, MultipartFile optionAFile,
+                                        MultipartFile optionBFile, MultipartFile optionCFile,
+                                        MultipartFile optionDFile,
+                                        MultipartFile answerSupportingFile) {
         if (entity == null || request == null) {
             return;
         }
 
-        if (StringUtils.hasText(request.getQuestion())) {
-            entity.setQuestion(request.getQuestion());
-        }
+        entity.setQuestion(uploadIfImage(createQuestionFile, request.getQuestion()));
         if (StringUtils.hasText(request.getQuestionType())) {
             entity.setQuestionType(request.getQuestionType());
         }
-        if (StringUtils.hasText(request.getOptionA())) {
-            entity.setOptionA(request.getOptionA());
-        }
-        if (StringUtils.hasText(request.getOptionB())) {
-            entity.setOptionB(request.getOptionB());
-        }
-        if (StringUtils.hasText(request.getOptionC())) {
-            entity.setOptionC(request.getOptionC());
-        }
-        if (StringUtils.hasText(request.getOptionD())) {
-            entity.setOptionD(request.getOptionD());
-        }
+        entity.setOptionA(uploadIfImage(optionAFile, request.getOptionA()));
+        entity.setOptionB(uploadIfImage(optionBFile, request.getOptionB()));
+        entity.setOptionC(uploadIfImage(optionCFile, request.getOptionC()));
+        entity.setOptionD(uploadIfImage(optionDFile, request.getOptionD()));
         if (StringUtils.hasText(request.getCorrectAnswer())) {
             entity.setCorrectAnswer(request.getCorrectAnswer());
         }
         if (StringUtils.hasText(request.getAnswerExplanation())) {
             entity.setAnswerExplanation(request.getAnswerExplanation());
         }
+        entity.setAnswerSupportingFile(uploadIfImage(answerSupportingFile, request.getAnswerSupportingFile()));
         if (request.getActive() != null) {
             entity.setActive(request.getActive());
         }

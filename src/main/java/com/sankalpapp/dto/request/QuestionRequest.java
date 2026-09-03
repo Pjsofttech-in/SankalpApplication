@@ -19,6 +19,7 @@ public class QuestionRequest {
     private String optionD;
     private String correctAnswer;
     private String answerExplanation;
+    private String answerSupportingFile;
     private Boolean active;
 
     private Long sectionId;
