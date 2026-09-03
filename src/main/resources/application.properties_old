@@ -17,6 +17,18 @@ spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 
+spring.mail.host=${MAIL_HOST:smtp.gmail.com}
+spring.mail.port=${MAIL_PORT:587}
+spring.mail.username=${MAIL_USERNAME:info.pjsofttech@gmail.com}
+spring.mail.password=${MAIL_PASSWORD:nnoo sdza mqex mpdm}
+
+spring.mail.properties.mail.smtp.auth=${MAIL_SMTP_AUTH:true}
+spring.mail.properties.mail.smtp.starttls.enable=${MAIL_SMTP_STARTTLS:true}
+
+# OR, trust all hosts (less secure, use only for local testing)
+# Comment-out below line while going to LIVE/PROD env
+spring.mail.properties.mail.smtp.ssl.trust=*
+
 
 spring.datasource.hikari.maximum-pool-size=${HIKARI_MAX_POOL_SIZE:10}
 spring.datasource.hikari.minimum-idle=${HIKARI_MIN_IDLE:5}
