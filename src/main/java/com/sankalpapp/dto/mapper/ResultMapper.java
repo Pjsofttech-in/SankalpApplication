@@ -32,6 +32,16 @@ public class ResultMapper {
                                 .getExamName()
                 )
 
+                .studentId(
+                        result.getStudent()
+                                .getId()
+                )
+
+                .studentName(
+                        result.getStudent()
+                                .getFullName()
+                )
+
                 .totalMarks(
                         result.getTotalMarks()
                 )

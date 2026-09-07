@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -130,6 +132,11 @@ public class LeaderboardServiceImpl
                                     timeTakenSeconds
                             )
 
+                            .correctQuestions(result.getCorrectQuestions())
+                            .incorrectQuestions(result.getIncorrectQuestions())
+                            .solvedQuestions(result.getSolvedQuestions())
+                            .unsolvedQuestions(result.getUnsolvedQuestions())
+
                             .build()
             );
         }
@@ -198,17 +205,301 @@ public class LeaderboardServiceImpl
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<LeaderboardResponse> getTestSeriesLeaderboard(
-            Long testSeriesId
-    ) {
+            Long testSeriesId) {
+
+        // 1. Find test series
+        TestSeries testSeries = testSeriesRepository.findById(testSeriesId)
+                .orElseThrow(() ->
+                        new RuntimeException("Test series not found"));
+
+
+        // 2. Get active exams belonging to this test series
+        List<TestSeriesExam> testSeriesExams =
+                testSeries.getExams()
+                        .stream()
+                        .filter(exam -> Boolean.TRUE.equals(exam.getActive()))
+                        .sorted(
+                                Comparator.comparing(
+                                        TestSeriesExam::getSequence
+                                )
+                        )
+                        .toList();
+
+
+        // 3. No exams -> empty leaderboard
+        if (testSeriesExams.isEmpty()) {
+            return Collections.emptyList();
+        }
+
 
         /*
-         * We'll implement this next.
+         * studentId -> List of best Result for each exam
          */
-        throw new UnsupportedOperationException(
-                "Test series leaderboard not implemented yet"
-        );
+        Map<Long, List<Result>> studentResults = new HashMap<>();
+
+
+        // 4. Process every exam in the test series
+        for (TestSeriesExam testSeriesExam : testSeriesExams) {
+
+            Long examId = testSeriesExam.getExam().getId();
+
+
+            /*
+             * Get only published and active results.
+             */
+            List<Result> results =
+                    resultRepository
+                            .findByExamIdAndActiveTrue(
+                                    examId
+                            );
+
+
+            /*
+             * Keep the BEST attempt for each student.
+             *
+             * Priority:
+             * 1. Higher marks
+             * 2. Lower time if marks are equal
+             */
+            Map<Long, Result> bestExamResults =
+                    results.stream()
+                            .collect(Collectors.toMap(
+                                    result ->
+                                            result.getStudent().getId(),
+
+                                    Function.identity(),
+
+                                    (r1, r2) -> {
+
+                                        /*
+                                         * Higher marks wins
+                                         */
+                                        if (!r1.getObtainedMarks()
+                                                .equals(r2.getObtainedMarks())) {
+
+                                            return r1.getObtainedMarks()
+                                                    > r2.getObtainedMarks()
+                                                    ? r1
+                                                    : r2;
+                                        }
+
+
+                                        /*
+                                         * Same marks:
+                                         * lower time wins
+                                         */
+                                        long time1 = getTimeTaken(r1);
+                                        long time2 = getTimeTaken(r2);
+
+                                        return time1 <= time2
+                                                ? r1
+                                                : r2;
+                                    }
+                            ));
+
+
+            /*
+             * Add the best result of this exam
+             * to each student's overall results.
+             */
+            for (Result result : bestExamResults.values()) {
+
+                Long studentId =
+                        result.getStudent().getId();
+
+                studentResults
+                        .computeIfAbsent(
+                                studentId,
+                                key -> new ArrayList<>()
+                        )
+                        .add(result);
+            }
+        }
+
+
+        /*
+         * 5. Create leaderboard entries
+         */
+        List<LeaderboardResponse> leaderboard =
+                studentResults.entrySet()
+                        .stream()
+                        .map(entry -> {
+
+                            Long studentId = entry.getKey();
+
+                            List<Result> results = entry.getValue();
+
+
+                            /*
+                             * Total marks possible
+                             */
+                            int totalMarks = results.stream()
+                                    .mapToInt(Result::getTotalMarks)
+                                    .sum();
+
+
+                            /*
+                             * Total marks obtained
+                             */
+                            int obtainedMarks = results.stream()
+                                    .mapToInt(Result::getObtainedMarks)
+                                    .sum();
+
+
+                            /*
+                             * Total time taken across all exams
+                             */
+                            long totalTimeTaken = results.stream()
+                                    .mapToLong(this::getTimeTaken)
+                                    .sum();
+
+                            /*
+                             * Correct questions.
+                             */
+                            int correctQuestions =
+                                    results.stream()
+                                            .mapToInt(
+                                                    result ->
+                                                            result.getCorrectQuestions() != null
+                                                                    ? result.getCorrectQuestions()
+                                                                    : 0
+                                            )
+                                            .sum();
+
+
+                            /*
+                             * Incorrect questions.
+                             */
+                            int incorrectQuestions =
+                                    results.stream()
+                                            .mapToInt(
+                                                    result ->
+                                                            result.getIncorrectQuestions() != null
+                                                                    ? result.getIncorrectQuestions()
+                                                                    : 0
+                                            )
+                                            .sum();
+
+
+                            /*
+                             * Solved questions.
+                             */
+                            int solvedQuestions =
+                                    results.stream()
+                                            .mapToInt(
+                                                    result ->
+                                                            result.getSolvedQuestions() != null
+                                                                    ? result.getSolvedQuestions()
+                                                                    : 0
+                                            )
+                                            .sum();
+
+
+                            /*
+                             * Unsolved questions.
+                             */
+                            int unsolvedQuestions =
+                                    results.stream()
+                                            .mapToInt(
+                                                    result ->
+                                                            result.getUnsolvedQuestions() != null
+                                                                    ? result.getUnsolvedQuestions()
+                                                                    : 0
+                                            )
+                                            .sum();
+
+                            /*
+                             * Overall percentage
+                             */
+                            double percentage =
+                                    totalMarks == 0
+                                            ? 0.0
+                                            : (obtainedMarks * 100.0)
+                                            / totalMarks;
+
+
+                            /*
+                             * Student name
+                             */
+                            String studentName =
+                                    results.get(0)
+                                            .getStudent()
+                                            .getFullName();
+
+
+                            return LeaderboardResponse.builder()
+                                    .studentId(studentId)
+                                    .studentName(studentName)
+                                    .totalMarks(totalMarks)
+                                    .obtainedMarks(obtainedMarks)
+                                    .percentage(percentage)
+                                    .timeTakenSeconds(totalTimeTaken)
+                                    .correctQuestions(correctQuestions)
+                                    .incorrectQuestions(incorrectQuestions)
+                                    .solvedQuestions(solvedQuestions)
+                                    .unsolvedQuestions(unsolvedQuestions)
+                                    .build();
+                        })
+                        .sorted(
+                                Comparator
+                                        /*
+                                         * Higher marks first
+                                         */
+                                        .comparing(
+                                                LeaderboardResponse::
+                                                        getObtainedMarks,
+                                                Comparator.reverseOrder()
+                                        )
+
+                                        /*
+                                         * Same marks:
+                                         * lower time first
+                                         */
+                                        .thenComparing(
+                                                LeaderboardResponse::
+                                                        getTimeTakenSeconds
+                                        )
+                        )
+                        .collect(Collectors.toList());
+
+
+        /*
+         * 6. Competition ranking
+         *
+         * Example:
+         *
+         * Marks
+         * 100 -> Rank 1
+         * 95  -> Rank 2
+         * 95  -> Rank 2
+         * 90  -> Rank 4
+         */
+        int rank = 0;
+        Integer previousMarks = null;
+
+        for (int i = 0; i < leaderboard.size(); i++) {
+
+            LeaderboardResponse current =
+                    leaderboard.get(i);
+
+
+            if (previousMarks == null ||
+                    !current.getObtainedMarks()
+                            .equals(previousMarks)) {
+
+                rank = i + 1;
+
+                previousMarks =
+                        current.getObtainedMarks();
+            }
+
+
+            current.setRank(rank);
+        }
+
+
+        return leaderboard;
     }
 
     private long getTimeTaken(Result result) {

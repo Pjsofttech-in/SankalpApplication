@@ -1,5 +1,12 @@
 package com.sankalpapp.dto.response;
 
+import lombok.*;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class ResultQuestionResponse {
 
     private Long questionId;

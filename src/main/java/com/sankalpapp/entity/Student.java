@@ -1,5 +1,6 @@
 package com.sankalpapp.entity;
 
+import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -113,5 +114,30 @@ public class Student {
     @PreUpdate
     public void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    public String getFullName() {
+
+        StringBuilder fullName = new StringBuilder();
+
+        if (studentName != null && !studentName.trim().isEmpty()) {
+            fullName.append(studentName.trim());
+        }
+
+        if (fatherName != null && !fatherName.trim().isEmpty()) {
+            if (!fullName.isEmpty()) {
+                fullName.append(" ");
+            }
+            fullName.append(fatherName.trim());
+        }
+
+        if (lastName != null && !lastName.trim().isEmpty()) {
+            if (!fullName.isEmpty()) {
+                fullName.append(" ");
+            }
+            fullName.append(lastName.trim());
+        }
+
+        return fullName.toString();
     }
 }

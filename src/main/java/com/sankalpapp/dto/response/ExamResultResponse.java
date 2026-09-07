@@ -18,8 +18,10 @@ public class ExamResultResponse {
     private Integer rank;
 
     private Long examId;
+    private Long studentId;
 
     private String examName;
+    private String studentName;
 
     private Integer totalMarks;
 

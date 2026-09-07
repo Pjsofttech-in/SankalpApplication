@@ -1,5 +1,6 @@
 package com.sankalpapp.dto.response;
 
+import jakarta.persistence.Column;
 import lombok.*;
 
 @Getter
@@ -23,6 +24,11 @@ public class LeaderboardResponse {
 
     private Long timeTakenSeconds;
 
-    private Integer totalObtainedMarks;
-    private Long totalTimeTakenSeconds;
+    private Integer correctQuestions;
+
+    private Integer incorrectQuestions;
+
+    private Integer solvedQuestions;
+
+    private Integer unsolvedQuestions;
 }

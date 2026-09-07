@@ -4,6 +4,7 @@ import com.sankalpapp.dto.mapper.ResultMapper;
 import com.sankalpapp.dto.request.StudentAnswerRequest;
 import com.sankalpapp.dto.response.ExamResultResponse;
 import com.sankalpapp.dto.response.ExamStartResponse;
+import com.sankalpapp.dto.response.ResultQuestionResponse;
 import com.sankalpapp.dto.response.StudentQuestionResponse;
 import com.sankalpapp.entity.*;
 import com.sankalpapp.repository.*;
@@ -19,7 +20,10 @@ import org.springframework.util.CollectionUtils;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -385,7 +389,7 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
 //            );
 //        }
 
-        return mapWithRank(result);
+        return mapWithDetails(result);
     }
 
     @Transactional
@@ -404,22 +408,120 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
                         );
 
 
-        return mapWithRank(result);
+        return mapWithDetails(result);
     }
 
-    private ExamResultResponse mapWithRank(Result result) {
+    private ExamResultResponse mapWithDetails(Result result) {
 
         ExamResultResponse response =
                 resultMapper.toResponse(result);
 
-        Integer rank = leaderboardService.getStudentRank(
-                result.getExam().getId(),
-                result.getStudent().getId()
+        // Add rank
+        if (result.getExam() != null &&
+                result.getStudent() != null) {
+
+            Integer rank = leaderboardService.getStudentRank(
+                    result.getExam().getId(),
+                    result.getStudent().getId()
+            );
+
+            response.setRank(rank);
+        }
+
+        // Add question-wise result
+        response.setQuestions(
+                getQuestionResults(result)
         );
 
-        response.setRank(rank);
-
         return response;
+    }
+
+
+    private List<ResultQuestionResponse> getQuestionResults(
+            Result result) {
+
+        /*
+         * Get all questions belonging to this exam
+         */
+        List<ExamQuestion> examQuestions =
+                examQuestionRepository
+                        .findByExamOrderBySequenceAsc(
+                                result.getExam()
+                        );
+
+        /*
+         * Get student's answers for this attempt
+         */
+        List<StudentAnswer> studentAnswers =
+                studentAnswerRepository.findByAttempt(
+                        result.getAttempt()
+                );
+
+        /*
+         * Convert answers into Map<QuestionId, StudentAnswer>
+         */
+        Map<Long, StudentAnswer> answerMap =
+                studentAnswers.stream()
+                        .collect(Collectors.toMap(
+                                answer ->
+                                        answer.getQuestion()
+                                                .getId(),
+                                Function.identity(),
+                                (existing, replacement) -> existing
+                        ));
+
+        /*
+         * Build question-wise response
+         */
+        return examQuestions.stream()
+                .map(examQuestion -> {
+
+                    Question question =
+                            examQuestion.getQuestion();
+
+                    StudentAnswer studentAnswer =
+                            answerMap.get(question.getId());
+
+                    return ResultQuestionResponse.builder()
+
+                            .questionId(question.getId())
+
+                            .question(question.getQuestion())
+
+                            .optionA(question.getOptionA())
+                            .optionB(question.getOptionB())
+                            .optionC(question.getOptionC())
+                            .optionD(question.getOptionD())
+
+                            .correctAnswer(
+                                    question.getCorrectAnswer()
+                            )
+
+                            .studentAnswer(
+                                    studentAnswer != null
+                                            ? studentAnswer.getSelectedAnswer()
+                                            : null
+                            )
+
+                            .correct(
+                                    studentAnswer != null && studentAnswer.getCorrect()
+                            )
+
+                            .marks(examQuestion.getMarks())
+
+                            .marksObtained(
+                                    studentAnswer != null
+                                            ? studentAnswer.getMarksObtained()
+                                            : 0
+                            )
+
+                            .answerExplanation(
+                                    question.getAnswerExplanation()
+                            )
+
+                            .build();
+                })
+                .toList();
     }
 
     @Override
