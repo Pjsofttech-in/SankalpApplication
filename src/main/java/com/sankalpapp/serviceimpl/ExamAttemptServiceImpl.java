@@ -35,6 +35,7 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
     private final QuestionRepository questionRepository;
     private final UserRepository userRepository;
     private final ResultMapper resultMapper;
+    private final ExamAttemptHelperService examAttemptHelperService;
 
     @Override
     @Transactional
@@ -72,7 +73,7 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
             }
 
             // Existing attempt expired.
-            autoSubmitExpiredAttempt(existing);
+            examAttemptHelperService.autoSubmitExpiredAttempt(existing);
         }
 
         Exam exam = examRepository.findById(examId)
@@ -349,7 +350,7 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
         examAttemptRepository.save(attempt);
 
         Result result =
-                evaluateAttempt(attempt);
+                examAttemptHelperService.evaluateAttempt(attempt);
 
         return resultMapper.toResponse(result);
     }
@@ -463,37 +464,6 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
         }
     }
 
-    private String calculateGrade(
-            double percentage
-    ) {
-
-        if (percentage >= 90) {
-            return "A+";
-        }
-
-        if (percentage >= 80) {
-            return "A";
-        }
-
-        if (percentage >= 70) {
-            return "B";
-        }
-
-        if (percentage >= 60) {
-            return "C";
-        }
-
-        if (percentage >= 50) {
-            return "D";
-        }
-
-        if (percentage >= 35) {
-            return "E";
-        }
-
-        return "F";
-    }
-
     private void validateExamTime(
             ExamAttempt attempt
     ) {
@@ -522,7 +492,7 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
         if (now.isAfter(attempt.getExpiresAt())
                 || examEndTimeCheck || testSeriesEndTimeCheck) {
 
-            autoSubmitExpiredAttempt(attempt);
+            examAttemptHelperService.autoSubmitExpiredAttempt(attempt);
 
             throw new RuntimeException(
                     "Exam time has expired"
@@ -563,230 +533,6 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
         }
     }
 
-    private void autoSubmitExpiredAttempt(
-            ExamAttempt attempt
-    ) {
-
-        if (attempt.getStatus()
-                != ExamAttempt.AttemptStatus.STARTED) {
-
-            return;
-        }
-
-        attempt.setStatus(
-                ExamAttempt.AttemptStatus.SUBMITTED
-        );
-
-        attempt.setSubmittedAt(
-                attempt.getExpiresAt()
-        );
-
-        examAttemptRepository.save(attempt);
-
-        evaluateAttempt(attempt);
-    }
-
-    private Result evaluateAttempt(
-            ExamAttempt attempt
-    ) {
-
-        Exam exam = attempt.getExam();
-
-        List<StudentAnswer> answers =
-                studentAnswerRepository
-                        .findByAttempt(attempt);
-
-        /*
-         * Question statistics
-         */
-        int correctQuestions = 0;
-        int incorrectQuestions = 0;
-        int solvedQuestions = 0;
-
-        /*
-         * Marks
-         */
-        int totalMarks = 0;
-        int obtainedMarks = 0;
-
-        /*
-         * Get all questions assigned to this exam.
-         */
-        List<ExamQuestion> examQuestions =
-                examQuestionRepository
-                        .findByExamOrderBySequenceAsc(
-                                exam
-                        );
-
-        /*
-         * Calculate total marks from ExamQuestion.
-         */
-        totalMarks = examQuestions.stream().mapToInt(ExamQuestion::getMarks).sum();
-
-        /*
-         * Evaluate student's answers.
-         */
-        for (StudentAnswer answer : answers) {
-
-            String selectedAnswer =
-                    answer.getSelectedAnswer();
-
-            /*
-             * Unanswered question
-             */
-            if (selectedAnswer == null ||
-                    selectedAnswer.trim().isEmpty()) {
-
-                answer.setCorrect(false);
-
-                continue;
-            }
-
-            solvedQuestions++;
-
-            Question question =
-                    answer.getQuestion();
-
-            boolean correct =
-                    question.getCorrectAnswer()
-                            .equalsIgnoreCase(
-                                    selectedAnswer.trim()
-                            );
-
-            answer.setCorrect(correct);
-
-            if (correct) {
-
-                correctQuestions++;
-
-                /*
-                 * Find marks assigned to this question
-                 * in this particular exam.
-                 */
-                ExamQuestion examQuestion =
-                        examQuestions.stream()
-                                .filter(eq ->
-                                        eq.getQuestion()
-                                                .getId()
-                                                .equals(
-                                                        question.getId()
-                                                )
-                                )
-                                .findFirst()
-                                .orElseThrow(() ->
-                                        new RuntimeException(
-                                                "Question is not assigned to this exam"
-                                        )
-                                );
-
-                obtainedMarks +=
-                        examQuestion.getMarks();
-
-            } else {
-
-                incorrectQuestions++;
-            }
-        }
-
-        /*
-         * Calculate unsolved questions.
-         */
-        int unsolvedQuestions =
-                exam.getTotalQuestions()
-                        - solvedQuestions;
-
-        /*
-         * Prevent negative value if data is inconsistent.
-         */
-        if (unsolvedQuestions < 0) {
-            unsolvedQuestions = 0;
-        }
-
-        /*
-         * Save evaluated answers.
-         */
-        studentAnswerRepository.saveAll(answers);
-
-        /*
-         * Calculate percentage.
-         */
-        double percentage =
-                totalMarks == 0
-                        ? 0
-                        : (obtainedMarks * 100.0)
-                        / totalMarks;
-
-        /*
-         * Grade.
-         */
-        String grade =
-                calculateGrade(percentage);
-
-        /*
-         * Result status.
-         */
-        String resultStatus =
-                percentage >= 35
-                        ? "PASS"
-                        : "FAIL";
-
-        /*
-         * Create Result.
-         */
-        Result result =
-                Result.builder()
-
-                        .student(
-                                attempt.getStudent()
-                        )
-
-                        .exam(exam)
-
-                        .attempt(attempt)
-
-                        .totalMarks(totalMarks)
-
-                        .obtainedMarks(obtainedMarks)
-
-                        .percentage(percentage)
-
-                        .grade(grade)
-
-                        .resultStatus(resultStatus)
-
-                        .correctQuestions(
-                                correctQuestions
-                        )
-
-                        .incorrectQuestions(
-                                incorrectQuestions
-                        )
-
-                        .solvedQuestions(
-                                solvedQuestions
-                        )
-
-                        .unsolvedQuestions(
-                                unsolvedQuestions
-                        )
-
-                        .published(false)
-
-                        .active(true)
-
-                        .build();
-
-        /*
-         * Result is now evaluated.
-         */
-        attempt.setStatus(
-                ExamAttempt.AttemptStatus.EVALUATED
-        );
-
-        examAttemptRepository.save(attempt);
-
-        return resultRepository.save(result);
-    }
 
     private ExamAttempt getStudentAttempt(
             Long attemptId
