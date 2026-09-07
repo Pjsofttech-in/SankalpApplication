@@ -37,7 +37,7 @@ public class LeaderboardServiceImpl
 
         List<Result> results =
                 resultRepository
-                        .findByExamIdAndPublishedTrueAndActiveTrue(
+                        .findByExamIdAndActiveTrue(
                                 examId
                         );
 
@@ -262,7 +262,7 @@ public class LeaderboardServiceImpl
 
         List<Result> results =
                 resultRepository
-                        .findByExamIdAndPublishedTrueAndActiveTrue(
+                        .findByExamIdAndActiveTrue(
                                 examId
                         );
 
@@ -552,7 +552,7 @@ public class LeaderboardServiceImpl
 
         List<Result> results =
                 resultRepository
-                        .findByExamIdAndPublishedTrueAndActiveTrue(
+                        .findByExamIdAndActiveTrue(
                                 examId
                         );
 
@@ -711,7 +711,7 @@ public class LeaderboardServiceImpl
     public Integer getStudentRank(Long examId, Long studentId) {
 
         List<Result> results =
-                resultRepository.findByExamIdAndPublishedTrueAndActiveTrue(examId);
+                resultRepository.findByExamIdAndActiveTrue(examId);
 
         // Keep the best result for each student
         Map<Long, Result> bestResults = new HashMap<>();
