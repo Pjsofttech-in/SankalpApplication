@@ -21,7 +21,7 @@ public class ExamAttemptHelperService {
     private final StudentAnswerRepository studentAnswerRepository;
     private final ResultRepository resultRepository;
 
-    @Transactional(propagation = Propagation.NESTED)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void autoSubmitExpiredAttempt(
             ExamAttempt attempt
     ) {
@@ -45,7 +45,7 @@ public class ExamAttemptHelperService {
         evaluateAttempt(attempt);
     }
 
-    @Transactional(propagation = Propagation.NESTED)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Result evaluateAttempt(
             ExamAttempt attempt
     ) {
