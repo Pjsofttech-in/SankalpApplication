@@ -372,16 +372,14 @@ public class TestSeriesServiceImpl implements TestSeriesService {
         Result r = result.get();
 
         String status =
-                Boolean.TRUE.equals(r.getPublished())
-                        ? "PUBLISHED"
-                        : "EVALUATED";
+                "PUBLISHED";
 
         return response
                 .status(status)
                 .obtainedMarks(r.getObtainedMarks())
                 .percentage(r.getPercentage())
                 .grade(r.getGrade())
-                .published(r.getPublished())
+//                .published(r.getPublished())
                 .build();
     }
 

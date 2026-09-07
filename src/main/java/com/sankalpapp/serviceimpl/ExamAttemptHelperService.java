@@ -241,7 +241,7 @@ public class ExamAttemptHelperService {
                                 unsolvedQuestions
                         )
 
-                        .published(false)
+//                        .published(false)
 
                         .active(true)
 

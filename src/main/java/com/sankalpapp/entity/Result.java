@@ -56,9 +56,9 @@ public class Result {
     @JoinColumn(name = "attempt_id", nullable = false, unique = true)
     private ExamAttempt attempt;
 
-    @Builder.Default
-    @Column(nullable = false)
-    private Boolean published = false;
+//    @Builder.Default
+//    @Column(nullable = false)
+//    private Boolean published = false;
 
     @Builder.Default
     @Column(nullable = false)
@@ -76,9 +76,9 @@ public class Result {
             active = true;
         }
 
-        if (published == null) {
-            published = false;
-        }
+//        if (published == null) {
+//            published = false;
+//        }
 
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();

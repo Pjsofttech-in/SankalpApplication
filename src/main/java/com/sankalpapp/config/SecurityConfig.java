@@ -59,7 +59,7 @@ public class SecurityConfig {
 
                         // Exam attempt APIs
                         .requestMatchers("/api/exam-attempts/**")
-                        .hasAuthority("STUDENT")
+                        .hasAnyAuthority("STUDENT", "ADMIN")
 
                         .requestMatchers(
                                 HttpMethod.PUT,

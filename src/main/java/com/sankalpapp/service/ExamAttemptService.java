@@ -27,6 +27,11 @@ public interface ExamAttemptService {
 
     ExamResultResponse getResult(Long attemptId);
 
+    @Transactional
+    ExamResultResponse getResultByExamAndStudent(
+            Long examId, Long studentId
+    );
+
     ExamResultResponse publishResult(Long resultId);
 
     @Transactional

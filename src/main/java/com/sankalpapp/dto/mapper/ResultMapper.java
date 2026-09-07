@@ -68,9 +68,9 @@ public class ResultMapper {
                         result.getResultStatus()
                 )
 
-                .published(
-                        result.getPublished()
-                )
+//                .published(
+//                        result.getPublished()
+//                )
 
                 .build();
     }

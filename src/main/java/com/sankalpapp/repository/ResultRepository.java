@@ -16,4 +16,10 @@ public interface ResultRepository
     List<Result> findByExamIdAndPublishedTrueAndActiveTrue(
             Long examId
     );
+
+    Optional<Result> findTopByExamIdAndStudentIdAndActiveTrueOrderByObtainedMarksDesc(
+            Long examId,
+            Long studentId
+    );
+
 }

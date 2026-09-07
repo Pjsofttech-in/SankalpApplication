@@ -8,6 +8,7 @@ import com.sankalpapp.dto.response.StudentQuestionResponse;
 import com.sankalpapp.entity.*;
 import com.sankalpapp.repository.*;
 import com.sankalpapp.service.ExamAttemptService;
+import com.sankalpapp.service.LeaderboardService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -36,6 +37,7 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
     private final UserRepository userRepository;
     private final ResultMapper resultMapper;
     private final ExamAttemptHelperService examAttemptHelperService;
+    private final LeaderboardService leaderboardService;
 
     @Override
     @Transactional
@@ -374,16 +376,50 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
         /*
          * Don't allow students to see an unpublished result.
          */
-        if (!Boolean.TRUE.equals(
-                result.getPublished()
-        )) {
+//        if (!Boolean.TRUE.equals(
+//                result.getPublished()
+//        )) {
+//
+//            throw new RuntimeException(
+//                    "Result has not been published yet"
+//            );
+//        }
 
-            throw new RuntimeException(
-                    "Result has not been published yet"
-            );
-        }
+        return mapWithRank(result);
+    }
 
-        return resultMapper.toResponse(result);
+    @Transactional
+    @Override
+    public ExamResultResponse getResultByExamAndStudent(
+            Long examId, Long studentId
+    ) {
+
+        Result result =
+                resultRepository
+                        .findTopByExamIdAndStudentIdAndActiveTrueOrderByObtainedMarksDesc(examId, studentId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Result not found for given exam and given student"
+                                )
+                        );
+
+
+        return mapWithRank(result);
+    }
+
+    private ExamResultResponse mapWithRank(Result result) {
+
+        ExamResultResponse response =
+                resultMapper.toResponse(result);
+
+        Integer rank = leaderboardService.getStudentRank(
+                result.getExam().getId(),
+                result.getStudent().getId()
+        );
+
+        response.setRank(rank);
+
+        return response;
     }
 
     @Override
@@ -402,7 +438,7 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
                                 )
                         );
 
-        result.setPublished(true);
+//        result.setPublished(true);
 
         result.getAttempt()
                 .setStatus(
@@ -423,7 +459,7 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
         if (!CollectionUtils.isEmpty(resultIds)) {
             List<Result> allById = resultRepository.findAllById(resultIds);
             allById = allById.stream().peek(result -> {
-                result.setPublished(true);
+//                result.setPublished(true);
                 result.getAttempt()
                         .setStatus(
                                 ExamAttempt.AttemptStatus.PUBLISHED
@@ -449,19 +485,6 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
                                         + attemptId
                         )
                 );
-    }
-
-    private void validateAttemptIsActive(
-            ExamAttempt attempt
-    ) {
-
-        if (attempt.getStatus() !=
-                ExamAttempt.AttemptStatus.STARTED) {
-
-            throw new RuntimeException(
-                    "Exam attempt is not active"
-            );
-        }
     }
 
     private void validateExamTime(
