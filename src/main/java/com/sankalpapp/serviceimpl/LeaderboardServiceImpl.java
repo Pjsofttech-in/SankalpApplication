@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -311,7 +310,7 @@ public class LeaderboardServiceImpl
                 studentResults
                         .computeIfAbsent(
                                 studentId,
-                                key -> new ArrayList<>()
+                                _ -> new ArrayList<>()
                         )
                         .add(result);
             }
@@ -423,7 +422,7 @@ public class LeaderboardServiceImpl
                              * Student name
                              */
                             String studentName =
-                                    results.get(0)
+                                    results.getFirst()
                                             .getStudent()
                                             .getFullName();
 
@@ -484,9 +483,8 @@ public class LeaderboardServiceImpl
                     leaderboard.get(i);
 
 
-            if (previousMarks == null ||
-                    !current.getObtainedMarks()
-                            .equals(previousMarks)) {
+            if (!current.getObtainedMarks()
+                    .equals(previousMarks)) {
 
                 rank = i + 1;
 
@@ -817,7 +815,7 @@ public class LeaderboardServiceImpl
         /*
          * PDF generation comes next.
          *
-         * For now we have successfully calculated
+         * For now, we have successfully calculated
          * the combined leaderboard.
          */
 
@@ -890,7 +888,7 @@ public class LeaderboardServiceImpl
                 StudentSeriesScore score =
                         studentScores.computeIfAbsent(
                                 studentId,
-                                id -> new StudentSeriesScore(
+                                _ -> new StudentSeriesScore(
                                         result.getStudent()
                                 )
                         );
