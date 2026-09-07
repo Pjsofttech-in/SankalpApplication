@@ -77,7 +77,7 @@ public class SecurityConfig {
                         .hasAnyAuthority("ADMIN", "STUDENT")
 
                         // Coordinator GET APIs - public
-                        .requestMatchers("/api/payments/create-order", "/api/payments/verify")
+                        .requestMatchers("/api/payments/create-order", "/api/payments/verify", "/api2/createContactForm")
                         .permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/students")
