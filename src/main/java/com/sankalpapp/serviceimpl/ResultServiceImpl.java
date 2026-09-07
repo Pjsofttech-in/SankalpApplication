@@ -9,6 +9,7 @@ import com.sankalpapp.entity.Student;
 import com.sankalpapp.repository.ExamRepository;
 import com.sankalpapp.repository.ResultRepository;
 import com.sankalpapp.repository.StudentRepository;
+import com.sankalpapp.service.LeaderboardService;
 import com.sankalpapp.service.ResultService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class ResultServiceImpl implements ResultService {
     private final StudentRepository studentRepository;
     private final ExamRepository examRepository;
     private final ResultMapper resultMapper;
+    private final LeaderboardService leaderboardService;
 
     @Override
     public ExamResultResponse saveResult(ResultRequest request) {
@@ -80,20 +82,36 @@ public class ResultServiceImpl implements ResultService {
     }
 
     @Override
-    public ExamResultResponse getResultById(Long id) {
-
-        Result result = resultRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Result not found"));
-
-        return resultMapper.toResponse(result);
-    }
-
-    @Override
     public List<ExamResultResponse> getAllResults() {
 
         return resultRepository.findAll()
                 .stream()
-                .map(resultMapper::toResponse)
+                .map(this::mapWithRank)
                 .collect(Collectors.toList());
+    }
+
+    private ExamResultResponse mapWithRank(Result result) {
+
+        ExamResultResponse response =
+                resultMapper.toResponse(result);
+
+        Integer rank = leaderboardService.getStudentRank(
+                result.getExam().getId(),
+                result.getStudent().getId()
+        );
+
+        response.setRank(rank);
+
+        return response;
+    }
+
+    @Override
+    public ExamResultResponse getResultById(Long id) {
+
+        Result result = resultRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Result not found"));
+
+        return mapWithRank(result);
     }
 }

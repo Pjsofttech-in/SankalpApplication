@@ -213,19 +213,14 @@ public class LeaderboardServiceImpl
 
     private long getTimeTaken(Result result) {
 
-        if (result.getAttempt() == null) {
+        if (result.getAttempt() == null ||
+                result.getAttempt().getStartedAt() == null ||
+                result.getAttempt().getSubmittedAt() == null) {
+
             return Long.MAX_VALUE;
         }
 
-        if (result.getAttempt().getStartedAt() == null) {
-            return Long.MAX_VALUE;
-        }
-
-        if (result.getAttempt().getSubmittedAt() == null) {
-            return Long.MAX_VALUE;
-        }
-
-        return Duration.between(
+        return java.time.Duration.between(
                 result.getAttempt().getStartedAt(),
                 result.getAttempt().getSubmittedAt()
         ).getSeconds();
@@ -710,5 +705,82 @@ public class LeaderboardServiceImpl
             totalTimeSeconds +=
                     getTimeTaken(result);
         }
+    }
+
+    @Override
+    public Integer getStudentRank(Long examId, Long studentId) {
+
+        List<Result> results =
+                resultRepository.findByExamIdAndPublishedTrueAndActiveTrue(examId);
+
+        // Keep the best result for each student
+        Map<Long, Result> bestResults = new HashMap<>();
+
+        for (Result result : results) {
+
+            Long currentStudentId = result.getStudent().getId();
+
+            Result existing = bestResults.get(currentStudentId);
+
+            if (existing == null) {
+                bestResults.put(currentStudentId, result);
+                continue;
+            }
+
+            boolean betterMarks =
+                    result.getObtainedMarks() > existing.getObtainedMarks();
+
+            boolean sameMarks =
+                    result.getObtainedMarks().equals(existing.getObtainedMarks());
+
+            long resultTime = getTimeTaken(result);
+            long existingTime = getTimeTaken(existing);
+
+            boolean betterTime =
+                    sameMarks && resultTime < existingTime;
+
+            if (betterMarks || betterTime) {
+                bestResults.put(currentStudentId, result);
+            }
+        }
+
+        List<Result> rankedResults = new ArrayList<>(bestResults.values());
+
+        rankedResults.sort((r1, r2) -> {
+
+            int marksComparison =
+                    Integer.compare(
+                            r2.getObtainedMarks(),
+                            r1.getObtainedMarks()
+                    );
+
+            if (marksComparison != 0) {
+                return marksComparison;
+            }
+
+            return Long.compare(
+                    getTimeTaken(r1),
+                    getTimeTaken(r2)
+            );
+        });
+
+        int rank = 0;
+        int previousMarks = -1;
+
+        for (int i = 0; i < rankedResults.size(); i++) {
+
+            Result result = rankedResults.get(i);
+
+            if (result.getObtainedMarks() != previousMarks) {
+                rank = i + 1;
+                previousMarks = result.getObtainedMarks();
+            }
+
+            if (result.getStudent().getId().equals(studentId)) {
+                return rank;
+            }
+        }
+
+        return null;
     }
 }

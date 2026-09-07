@@ -50,6 +50,14 @@ public class ExamAttemptHelperService {
             ExamAttempt attempt
     ) {
 
+        Result existingResult =
+                resultRepository.findByAttemptId(attempt.getId())
+                        .orElse(null);
+
+        if (existingResult != null) {
+            return existingResult;
+        }
+
         Exam exam = attempt.getExam();
 
         List<StudentAnswer> answers =
@@ -98,6 +106,7 @@ public class ExamAttemptHelperService {
                     selectedAnswer.trim().isEmpty()) {
 
                 answer.setCorrect(false);
+                answer.setMarksObtained(0);
 
                 continue;
             }
@@ -139,12 +148,14 @@ public class ExamAttemptHelperService {
                                         )
                                 );
 
-                obtainedMarks +=
-                        examQuestion.getMarks();
+                int marks = examQuestion.getMarks();
+
+                obtainedMarks += marks;
+                answer.setMarksObtained(marks);
 
             } else {
-
                 incorrectQuestions++;
+                answer.setMarksObtained(0);
             }
         }
 

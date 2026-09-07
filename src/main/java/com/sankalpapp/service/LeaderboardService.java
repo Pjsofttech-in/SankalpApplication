@@ -25,4 +25,6 @@ public interface LeaderboardService {
     byte[] generateExamLeaderboardPdf(
             Long examId
     );
+
+    Integer getStudentRank(Long examId, Long studentId);
 }

@@ -2,6 +2,8 @@ package com.sankalpapp.dto.response;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -12,6 +14,8 @@ public class ExamResultResponse {
     private Long resultId;
 
     private Long attemptId;
+
+    private Integer rank;
 
     private Long examId;
 
@@ -36,4 +40,6 @@ public class ExamResultResponse {
     private Integer solvedQuestions;
 
     private Integer unsolvedQuestions;
+
+    private List<ResultQuestionResponse> questions;
 }
