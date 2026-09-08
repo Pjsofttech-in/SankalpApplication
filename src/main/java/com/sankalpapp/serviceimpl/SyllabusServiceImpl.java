@@ -58,6 +58,7 @@ public class SyllabusServiceImpl implements SyllabusService {
 
         existingSyllabus.setTitle(syllabus.getTitle());
         existingSyllabus.setLink(syllabus.getLink());
+        existingSyllabus.setDescription(syllabus.getDescription());
         uploadFile(file, syllabus);
 
         return syllabusRepository.save(existingSyllabus);
