@@ -66,7 +66,7 @@ public class Student {
     private Boolean active = true;
 
     // Payment
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "payment_id", nullable = false)
     private Payment payment;
 

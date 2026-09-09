@@ -88,7 +88,7 @@ public class S3Service {
         String prefix = "https://" + cloudFrontDomain + "/";
 
         if (!fileUrl.startsWith(prefix)) {
-            throw new IllegalArgumentException("Invalid CloudFront URL");
+            return "";
         }
 
         return fileUrl.substring(prefix.length());
