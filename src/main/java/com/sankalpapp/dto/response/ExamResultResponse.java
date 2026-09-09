@@ -15,6 +15,8 @@ public class ExamResultResponse {
 
     private Long attemptId;
 
+    private Integer attemptNo;
+
     private Integer rank;
 
     private Long examId;

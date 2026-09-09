@@ -61,6 +61,11 @@ public class ResultController {
         return ResponseEntity.ok(resultService.getAllResults());
     }
 
+    @GetMapping("/student/{studentId}")
+    public ResponseEntity<List<ExamResultResponse>> getAllResultsByStudentId(@PathVariable Long studentId) {
+        return ResponseEntity.ok(resultService.getAllResultsByStudentId(studentId));
+    }
+
     @GetMapping("/exam/{examId}/student/{studentId}")
     public ResponseEntity<ExamResultResponse> getResultByExamAndStudent(
             @PathVariable Long examId,
