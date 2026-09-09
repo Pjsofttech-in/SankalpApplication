@@ -35,11 +35,11 @@ public class ResultsPdfController {
     @PostMapping
     public ResponseEntity<ResultsPdf> createResultsPdf(
             @RequestParam(required = false) String resultsPdfJson,
-            @RequestPart(required = false) MultipartFile resultPdf) throws JsonProcessingException {
+            @RequestPart(required = false) MultipartFile filePdf) throws JsonProcessingException {
 
         ResultsPdf resultsPdf = mapper.readValue(resultsPdfJson, ResultsPdf.class);
         ResultsPdf savedPdf =
-                resultsPdfService.createResultsPdf(resultsPdf, resultPdf);
+                resultsPdfService.createResultsPdf(resultsPdf, filePdf);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -50,11 +50,11 @@ public class ResultsPdfController {
     public ResponseEntity<ResultsPdf> updateResultsPdf(
             @PathVariable Long id,
             @RequestParam(required = false) String resultsPdfJson,
-            @RequestPart(required = false) MultipartFile resultPdf) throws JsonProcessingException {
+            @RequestPart(required = false) MultipartFile filePdf) throws JsonProcessingException {
 
         ResultsPdf resultsPdf = mapper.readValue(resultsPdfJson, ResultsPdf.class);
         ResultsPdf updatedPdf =
-                resultsPdfService.updateResultsPdf(id, resultsPdf, resultPdf);
+                resultsPdfService.updateResultsPdf(id, resultsPdf, filePdf);
 
         return ResponseEntity.ok(updatedPdf);
     }

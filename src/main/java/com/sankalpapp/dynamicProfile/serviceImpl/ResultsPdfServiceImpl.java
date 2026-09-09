@@ -32,8 +32,8 @@ public class ResultsPdfServiceImpl implements ResultsPdfService {
     }
 
     @Override
-    public ResultsPdf createResultsPdf(ResultsPdf resultsPdf, MultipartFile resultPdf) {
-        uploadFile(resultPdf, resultsPdf);
+    public ResultsPdf createResultsPdf(ResultsPdf resultsPdf, MultipartFile filePdf) {
+        uploadFile(filePdf, resultsPdf);
         return resultsPdfRepository.save(resultsPdf);
     }
 
@@ -49,7 +49,7 @@ public class ResultsPdfServiceImpl implements ResultsPdfService {
     }
 
     @Override
-    public ResultsPdf updateResultsPdf(Long id, ResultsPdf resultsPdf, MultipartFile resultPdf) {
+    public ResultsPdf updateResultsPdf(Long id, ResultsPdf resultsPdf, MultipartFile filePdf) {
 
         ResultsPdf existingPdf = resultsPdfRepository.findById(id)
                 .orElseThrow(() ->
@@ -58,7 +58,7 @@ public class ResultsPdfServiceImpl implements ResultsPdfService {
         existingPdf.setTitle(resultsPdf.getTitle());
         existingPdf.setPdfLink(resultsPdf.getPdfLink());
 
-        uploadFile(resultPdf, resultsPdf);
+        uploadFile(filePdf, existingPdf);
 
         return resultsPdfRepository.save(existingPdf);
     }
