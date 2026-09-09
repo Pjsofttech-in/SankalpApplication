@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/results-pdfs")
+@RequestMapping("/results-pdfs")
 @RequiredArgsConstructor
 public class ResultsPdfController {
 
