@@ -49,9 +49,10 @@ public class ResultsPdfController {
     @PutMapping("/{id}")
     public ResponseEntity<ResultsPdf> updateResultsPdf(
             @PathVariable Long id,
-            @RequestBody ResultsPdf resultsPdf,
-            @RequestPart(required = false) MultipartFile resultPdf) {
+            @RequestParam(required = false) String resultsPdfJson,
+            @RequestPart(required = false) MultipartFile resultPdf) throws JsonProcessingException {
 
+        ResultsPdf resultsPdf = mapper.readValue(resultsPdfJson, ResultsPdf.class);
         ResultsPdf updatedPdf =
                 resultsPdfService.updateResultsPdf(id, resultsPdf, resultPdf);
 
