@@ -92,6 +92,10 @@ public class HeroSectionServiceImpl implements HeroSectionService {
                 heroSection.getLink()
         );
 
+        existingHeroSection.setButtonText(
+                heroSection.getButtonText()
+        );
+
         existingHeroSection.setPriority(
                 heroSection.getPriority()
         );

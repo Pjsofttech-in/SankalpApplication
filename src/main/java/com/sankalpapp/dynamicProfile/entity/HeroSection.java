@@ -22,6 +22,8 @@ public class HeroSection {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    private String buttonText;
+
     private String link;
 
     private String image;
