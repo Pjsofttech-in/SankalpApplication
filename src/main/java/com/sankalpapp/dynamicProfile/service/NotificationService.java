@@ -8,6 +8,8 @@ public interface NotificationService {
 
     Notification create(Notification notification);
 
+    Notification update(Long id, Notification incomingNotification);
+
     List<Notification> getAll();
 
     Notification getById(Long id);

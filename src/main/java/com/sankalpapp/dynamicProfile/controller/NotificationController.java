@@ -21,6 +21,11 @@ public class NotificationController {
         return notificationService.create(notification);
     }
 
+    @PutMapping("{id}")
+    public Notification update(@PathVariable Long id, @RequestBody Notification notification) {
+        return notificationService.update(id, notification);
+    }
+
     @GetMapping
     public List<Notification> getAll() {
         return notificationService.getAll();

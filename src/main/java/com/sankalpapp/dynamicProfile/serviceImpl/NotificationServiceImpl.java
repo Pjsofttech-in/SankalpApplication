@@ -20,6 +20,16 @@ public class NotificationServiceImpl implements NotificationService {
         return notificationRepository.save(notification);
     }
 
+    @Override
+    public Notification update(Long id, Notification incomingNotification) {
+        Notification existingNotification =  notificationRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Notification not found"));
+        existingNotification.setTitle(incomingNotification.getTitle());
+        existingNotification.setDescription(incomingNotification.getDescription());
+        return notificationRepository.save(existingNotification);
+    }
+
     public List<Notification> getAll() {
         return notificationRepository.findAll();
     }
