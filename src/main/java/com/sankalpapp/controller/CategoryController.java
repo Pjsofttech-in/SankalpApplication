@@ -27,7 +27,7 @@ public class CategoryController {
 
     // Get All Categories
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
     public List<CategoryResponse> getAllCategories() {
 
         return categoryService.getAllCategories();
@@ -35,7 +35,7 @@ public class CategoryController {
 
     // Get Category By Id
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
     public CategoryResponse getCategoryById(@PathVariable Long id) {
 
         return categoryService.getCategoryById(id);

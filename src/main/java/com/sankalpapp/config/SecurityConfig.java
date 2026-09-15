@@ -54,7 +54,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/coordinators/**", "/api/districts/**",
                                 "/api/talukas/**", "/api/centers/**", "/api/payments/create-order", "/api/payments/verify",
                                 "/api/downloads/**", "/api/answerkeys/**", "/api/getAllSyllabus",
-                                "/api/getSyllabusById/**", "/api/test-series/**", "/api/questions/**", "/api/exams/**")
+                                "/api/getSyllabusById/**", "/api/test-series/**", "/api/questions/**",
+                                "/api/exams/**", "/api2/**", "/api/leaderboard/**", "/api/categories/**")
                         .permitAll()
 
                         // Exam attempt APIs
@@ -85,9 +86,6 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST, "/api2/**")
                         .hasAuthority("ADMIN")
-
-                        .requestMatchers(HttpMethod.GET, "/api2/**")
-                        .permitAll()
 
                         // Admin APIs
                         .requestMatchers("/api/users/**")
