@@ -36,15 +36,6 @@ public class TalukaMapper {
 
                 .active(taluka.getActive())
 
-                .centerIds(
-                        taluka.getCenters() == null
-                                ? null
-                                : taluka.getCenters()
-                                .stream()
-                                .map(center -> center.getId())
-                                .collect(Collectors.toList())
-                )
-
                 .createdAt(taluka.getCreatedAt())
                 .updatedAt(taluka.getUpdatedAt())
                 .build();

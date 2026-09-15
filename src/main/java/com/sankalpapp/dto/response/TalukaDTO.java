@@ -22,8 +22,6 @@ public class TalukaDTO {
 
     private Boolean active;
 
-    private List<Long> centerIds;
-
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

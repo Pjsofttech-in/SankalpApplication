@@ -36,6 +36,4 @@ public class StudentRequest {
     private Long userId;
     private Long districtId;
     private Long talukaId;
-    private Long centerId;
-    private Long coordinatorId;
 }

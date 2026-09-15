@@ -32,9 +32,6 @@ public class Taluka {
     @Column(nullable = false)
     private Boolean active = true;
 
-    @OneToMany(mappedBy = "taluka", cascade = CascadeType.ALL)
-    private List<Center> centers;
-
     @Column(updatable = false)
     private LocalDateTime createdAt;
 

@@ -52,14 +52,6 @@ public class StudentDTO {
 
     private String talukaName;
 
-    private Long centerId;
-
-    private String centerName;
-
-    private Long coordinatorId;
-
-    private String coordinatorName;
-
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
