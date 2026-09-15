@@ -83,10 +83,10 @@ public class StudentServiceImpl implements StudentService {
         Coordinator coordinator = coordinatorRepository.findById(request.getCoordinatorId())
                 .orElseThrow(() -> new RuntimeException("Coordinator not found"));
 
-        Payment payment;
+        Payment payment = null;
         if (StringUtils.isBlank(request.getPaymentMode()) || StringUtils.isBlank(request.getPaymentStatus())) {
-            payment = paymentRepository.findByMobileAndPaymentStatusIgnoreCase(request.getMobile(), "success")
-                    .orElseThrow(() -> new RuntimeException("Payment not found"));
+//            payment = paymentRepository.findByMobileAndPaymentStatusIgnoreCase(request.getMobile(), "success")
+//                    .orElseThrow(() -> new RuntimeException("Payment not found"));
         } else {
             String orderId = "order-" + createOfflinePayment();
             String paymentId = "payment-" + createOfflinePayment();
@@ -131,9 +131,11 @@ public class StudentServiceImpl implements StudentService {
                 .coordinator(coordinator)
                 .build();
 
-        payment.setStudent(student);
+        if (payment != null) {
+            payment.setStudent(student);
+        }
         student = studentRepository.saveAndFlush(student);
-        return mapToResponse(student);
+        return StudentMapper.toDTO(student);
     }
 
     @Override
@@ -177,7 +179,7 @@ public class StudentServiceImpl implements StudentService {
         student.setCenter(center);
         student.setCoordinator(coordinator);
 
-        return mapToResponse(studentRepository.save(student));
+        return StudentMapper.toDTO(studentRepository.save(student));
     }
 
     @Override
@@ -195,7 +197,7 @@ public class StudentServiceImpl implements StudentService {
         Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Student not found with id : " + id));
 
-        return mapToResponse(student);
+        return StudentMapper.toDTO(student);
     }
 
     @Override
@@ -203,46 +205,8 @@ public class StudentServiceImpl implements StudentService {
 
         return studentRepository.findAll()
                 .stream()
-                .map(this::mapToResponse)
+                .map(StudentMapper::toDTO)
                 .collect(Collectors.toList());
-    }
-
-    private StudentDTO mapToResponse(Student student) {
-
-        return StudentDTO.builder()
-                .id(student.getId())
-                .studentName(student.getStudentName())
-                .fatherName(student.getFatherName())
-                .lastName(student.getLastName())
-                .mobile(student.getMobile())
-                .email(student.getEmail())
-                .gender(student.getGender())
-                .studentClass(student.getStudentClass())
-                .medium(student.getMedium())
-                .address(student.getAddress())
-                .village(student.getVillage())
-                .state(student.getState())
-                .pincode(student.getPincode())
-                .dateOfBirth(student.getDateOfBirth())
-                .active(student.getActive())
-
-                .school(student.getSchool())
-
-                .districtId(student.getDistrict().getId())
-                .districtName(student.getDistrict().getDistrictName())
-
-                .talukaId(student.getTaluka().getId())
-                .talukaName(student.getTaluka().getTalukaName())
-
-                .centerId(student.getCenter().getId())
-                .centerName(student.getCenter().getCenterName())
-
-                .coordinatorId(student.getCoordinator().getId())
-                .coordinatorName(student.getCoordinator().getFullName())
-
-                .isPaymentDone(student.getPayment() != null)
-
-                .build();
     }
 
     @Override

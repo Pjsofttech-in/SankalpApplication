@@ -37,8 +37,8 @@ public class StudentController {
             @PageableDefault(
                     page = 0,
                     size = 20,
-                    sort = "studentName",
-                    direction = Sort.Direction.ASC
+                    sort = "id",
+                    direction = Sort.Direction.DESC
             )
             Pageable pageable
     ) {

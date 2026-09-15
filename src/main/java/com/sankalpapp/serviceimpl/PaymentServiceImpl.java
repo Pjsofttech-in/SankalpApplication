@@ -42,7 +42,8 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentResponse savePayment(PaymentRequest request) {
         Student student = null;
-        if (Objects.nonNull(request.getStudentId())) {
+        if (Objects.nonNull(request.getStudentId()) &&
+                Payment.PaymentStatus.SUCCESS.name().equalsIgnoreCase(request.getPaymentStatus())) {
             student = studentRepository.findById(request.getStudentId()).orElse(null);
         }
 

@@ -1,6 +1,7 @@
 package com.sankalpapp.dto.mapper;
 
 import com.sankalpapp.dto.response.StudentDTO;
+import com.sankalpapp.entity.Payment;
 import com.sankalpapp.entity.Student;
 
 public final class StudentMapper {
@@ -15,75 +16,37 @@ public final class StudentMapper {
         }
 
         return StudentDTO.builder()
-
                 .id(student.getId())
-
                 .studentName(student.getStudentName())
+                .fatherName(student.getFatherName())
+                .lastName(student.getLastName())
                 .mobile(student.getMobile())
                 .email(student.getEmail())
                 .gender(student.getGender())
                 .studentClass(student.getStudentClass())
                 .medium(student.getMedium())
-
                 .address(student.getAddress())
                 .village(student.getVillage())
                 .state(student.getState())
                 .pincode(student.getPincode())
-
-                .school(student.getSchool())
                 .dateOfBirth(student.getDateOfBirth())
                 .active(student.getActive())
 
-                .districtId(
-                        student.getDistrict() != null
-                                ? student.getDistrict().getId()
-                                : null
-                )
+                .school(student.getSchool())
 
-                .districtName(
-                        student.getDistrict() != null
-                                ? student.getDistrict().getDistrictName()
-                                : null
-                )
+                .districtId(student.getDistrict().getId())
+                .districtName(student.getDistrict().getDistrictName())
 
-                .talukaId(
-                        student.getTaluka() != null
-                                ? student.getTaluka().getId()
-                                : null
-                )
+                .talukaId(student.getTaluka().getId())
+                .talukaName(student.getTaluka().getTalukaName())
 
-                .talukaName(
-                        student.getTaluka() != null
-                                ? student.getTaluka().getTalukaName()
-                                : null
-                )
+                .centerId(student.getCenter().getId())
+                .centerName(student.getCenter().getCenterName())
 
-                .centerId(
-                        student.getCenter() != null
-                                ? student.getCenter().getId()
-                                : null
-                )
+                .coordinatorId(student.getCoordinator().getId())
+                .coordinatorName(student.getCoordinator().getFullName())
 
-                .centerName(
-                        student.getCenter() != null
-                                ? student.getCenter().getCenterName()
-                                : null
-                )
-
-                .coordinatorId(
-                        student.getCoordinator() != null
-                                ? student.getCoordinator().getId()
-                                : null
-                )
-
-                .coordinatorName(
-                        student.getCoordinator() != null
-                                ? student.getCoordinator().getFullName()
-                                : null
-                )
-
-                .createdAt(student.getCreatedAt())
-                .updatedAt(student.getUpdatedAt())
+                .isPaymentDone(student.getPayment() != null && Payment.PaymentStatus.SUCCESS.name().equalsIgnoreCase(student.getPayment().getPaymentStatus()))
 
                 .build();
     }
