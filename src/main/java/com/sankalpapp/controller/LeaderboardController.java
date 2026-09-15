@@ -17,7 +17,6 @@ public class LeaderboardController {
     private final LeaderboardService leaderboardService;
 
     @GetMapping("/exam/{examId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<LeaderboardResponse>> getExamLeaderboard(
             @PathVariable Long examId
     ) {
@@ -28,7 +27,6 @@ public class LeaderboardController {
     }
 
     @GetMapping("/test-series/{testSeriesId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<LeaderboardResponse>> getTestSeriesLeaderboard(
             @PathVariable Long testSeriesId
     ) {
@@ -41,7 +39,7 @@ public class LeaderboardController {
     }
 
     @GetMapping("/exam/{examId}/pdf")
-    @PreAuthorize("hasAuthority('ADMIN')")
+//    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<byte[]> getExamLeaderboardPdf(
             @PathVariable Long examId
     ) {
