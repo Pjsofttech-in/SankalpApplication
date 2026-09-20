@@ -21,6 +21,8 @@ public class StudentDTO {
 
     private String lastName;
 
+    private String examMode;
+
     private String mobile;
 
     private String email;

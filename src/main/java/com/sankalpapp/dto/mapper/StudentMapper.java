@@ -27,6 +27,7 @@ public final class StudentMapper {
                 .studentName(student.getStudentName())
                 .fatherName(student.getFatherName())
                 .lastName(student.getLastName())
+                .examMode(student.getExamMode())
                 .mobile(student.getMobile())
                 .email(student.getEmail())
                 .gender(student.getGender())

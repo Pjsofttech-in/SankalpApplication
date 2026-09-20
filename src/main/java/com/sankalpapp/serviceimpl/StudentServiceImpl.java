@@ -127,6 +127,7 @@ public class StudentServiceImpl implements StudentService {
                 .lastName(request.getLastName())
                 .mobile(request.getMobile())
                 .email(request.getEmail())
+                .examMode(request.getExamMode())
                 .gender(request.getGender())
                 .studentClass(request.getStudentClass())
                 .medium(request.getMedium())
@@ -188,6 +189,7 @@ public class StudentServiceImpl implements StudentService {
         student.setStudentName(request.getStudentName());
         student.setMobile(request.getMobile());
         student.setEmail(request.getEmail());
+        student.setExamMode(request.getExamMode());
         student.setGender(request.getGender());
         student.setStudentClass(request.getStudentClass());
         student.setMedium(request.getMedium());
