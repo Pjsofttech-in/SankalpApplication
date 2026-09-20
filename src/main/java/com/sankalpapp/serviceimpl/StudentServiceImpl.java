@@ -31,6 +31,8 @@ public class StudentServiceImpl implements StudentService {
     private final StudentRepository studentRepository;
     private final DistrictRepository districtRepository;
     private final TalukaRepository talukaRepository;
+    private final CenterRepository centerRepository;
+    private final CoordinatorRepository coordinatorRepository;
     private final UserRepository userRepository;
     private final RoleRepository rolerepository;
     private final PaymentRepository paymentRepository;
@@ -74,6 +76,12 @@ public class StudentServiceImpl implements StudentService {
 
         Taluka taluka = talukaRepository.findById(request.getTalukaId())
                 .orElseThrow(() -> new RuntimeException("Taluka not found"));
+
+        Center center = centerRepository.findById(request.getCenterId())
+                .orElseThrow(() -> new RuntimeException("Center not found"));
+
+        Coordinator coordinator = coordinatorRepository.findById(request.getCoordinatorId())
+                .orElseThrow(() -> new RuntimeException("Coordinator not found"));
 
         Payment payment = null;
         if (StringUtils.isBlank(request.getPaymentMode()) || StringUtils.isBlank(request.getPaymentStatus())) {
@@ -119,6 +127,8 @@ public class StudentServiceImpl implements StudentService {
                 .payment(payment)
                 .district(district)
                 .taluka(taluka)
+                .center(center)
+                .coordinator(coordinator)
                 .build();
 
         if (payment != null) {
@@ -143,6 +153,12 @@ public class StudentServiceImpl implements StudentService {
         Taluka taluka = talukaRepository.findById(request.getTalukaId())
                 .orElseThrow(() -> new RuntimeException("Taluka not found"));
 
+        Center center = centerRepository.findById(request.getCenterId())
+                .orElseThrow(() -> new RuntimeException("Center not found"));
+
+        Coordinator coordinator = coordinatorRepository.findById(request.getCoordinatorId())
+                .orElseThrow(() -> new RuntimeException("Coordinator not found"));
+
         student.setStudentName(request.getStudentName());
         student.setMobile(request.getMobile());
         student.setEmail(request.getEmail());
@@ -160,6 +176,8 @@ public class StudentServiceImpl implements StudentService {
         student.setUser(user);
         student.setDistrict(district);
         student.setTaluka(taluka);
+        student.setCenter(center);
+        student.setCoordinator(coordinator);
 
         return StudentMapper.toDTO(studentRepository.save(student));
     }
@@ -203,6 +221,7 @@ public class StudentServiceImpl implements StudentService {
 
                         filter.getDistrictId(),
                         filter.getTalukaId(),
+                        filter.getCenterId(),
 
                         filter.getSchool(),
                         filter.getStudentClass(),

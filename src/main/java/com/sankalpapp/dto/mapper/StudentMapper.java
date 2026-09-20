@@ -40,6 +40,12 @@ public final class StudentMapper {
                 .talukaId(student.getTaluka().getId())
                 .talukaName(student.getTaluka().getTalukaName())
 
+                .centerId(student.getCenter().getId())
+                .centerName(student.getCenter().getCenterName())
+
+                .coordinatorId(student.getCoordinator().getId())
+                .coordinatorName(student.getCoordinator().getFullName())
+
                 .isPaymentDone(student.getPayment() != null && Payment.PaymentStatus.SUCCESS.name().equalsIgnoreCase(student.getPayment().getPaymentStatus()))
 
                 .build();

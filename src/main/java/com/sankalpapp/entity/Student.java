@@ -85,6 +85,16 @@ public class Student {
     @JoinColumn(name = "taluka_id", nullable = false)
     private Taluka taluka;
 
+    // Center
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "center_id", nullable = false)
+    private Center center;
+
+    // Coordinator
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coordinator_id", nullable = false)
+    private Coordinator coordinator;
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
 

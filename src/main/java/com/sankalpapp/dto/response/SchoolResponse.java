@@ -28,6 +28,11 @@ public class SchoolResponse {
     private Long userId;
     private String userEmail; // Optional helper field
 
+    private Long centerId;
+    private String centerName; // Optional helper field
+
+    // Counter helpers instead of pulling heavy nested lists
+    private int totalCoordinators;
     private int totalStudents;
 
     private LocalDateTime createdAt;

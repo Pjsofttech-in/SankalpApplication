@@ -3,26 +3,31 @@ package com.sankalpapp.dto.response;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TalukaDTO {
+public class CoordinatorDTO {
 
     private Long id;
 
-    private String talukaName;
+    private String fullName;
 
-    private Long districtId;
+    private String email;
 
-    private String districtName;
+    private String mobile;
+
+    private String address;
 
     private Boolean active;
 
-    private List<Long> centerIds;
+    private Long userId;
+
+    private Long centerId;
+
+    private String centerName;
 
     private LocalDateTime createdAt;
 

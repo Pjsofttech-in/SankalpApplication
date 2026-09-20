@@ -1,39 +1,47 @@
 package com.sankalpapp.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
-@Table(name = "talukas")
+@Table(name = "coordinators")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Taluka {
+public class Coordinator {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String talukaName;
+    private String fullName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "district_id", nullable = false)
-    @JsonBackReference
-    private District district;
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false, unique = true, length = 10)
+    private String mobile;
+
+    @Column(nullable = false)
+    private String address;
 
     @Builder.Default
     @Column(nullable = false)
     private Boolean active = true;
 
-    @OneToMany(mappedBy = "taluka", cascade = CascadeType.ALL)
-    private List<Center> centers;
+    // Login Account
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "center_id")
+    private Center center;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;

@@ -18,6 +18,7 @@ public final class StudentSpecification {
             EntityManager entityManager,
             Long districtId,
             Long talukaId,
+            Long centerId,
             String school,
             String studentClass,
             String medium,
@@ -50,6 +51,18 @@ public final class StudentSpecification {
                         cb.equal(
                                 root.get("taluka").get("id"),
                                 talukaId
+                        )
+                );
+            }
+
+            /*
+             * Center
+             */
+            if (centerId != null) {
+                predicates.add(
+                        cb.equal(
+                                root.get("center").get("id"),
+                                centerId
                         )
                 );
             }
