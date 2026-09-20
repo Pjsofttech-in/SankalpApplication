@@ -1,8 +1,12 @@
 package com.sankalpapp.dto.mapper;
 
 import com.sankalpapp.dto.response.StudentDTO;
+import com.sankalpapp.entity.Center;
+import com.sankalpapp.entity.Coordinator;
 import com.sankalpapp.entity.Payment;
 import com.sankalpapp.entity.Student;
+
+import java.util.Optional;
 
 public final class StudentMapper {
 
@@ -14,6 +18,9 @@ public final class StudentMapper {
         if (student == null) {
             return null;
         }
+
+        Center center = student.getCenter();
+        Coordinator coordinator = student.getCoordinator();
 
         return StudentDTO.builder()
                 .id(student.getId())
@@ -40,11 +47,11 @@ public final class StudentMapper {
                 .talukaId(student.getTaluka().getId())
                 .talukaName(student.getTaluka().getTalukaName())
 
-                .centerId(student.getCenter().getId())
-                .centerName(student.getCenter().getCenterName())
+                .centerId(Optional.ofNullable(center).map(Center::getId).orElse(null))
+                .centerName(Optional.ofNullable(center).map(Center::getCenterName).orElse(""))
 
-                .coordinatorId(student.getCoordinator().getId())
-                .coordinatorName(student.getCoordinator().getFullName())
+                .coordinatorId(Optional.ofNullable(coordinator).map(Coordinator::getId).orElse(null))
+                .coordinatorName(Optional.ofNullable(coordinator).map(Coordinator::getFullName).orElse(""))
 
                 .isPaymentDone(student.getPayment() != null && Payment.PaymentStatus.SUCCESS.name().equalsIgnoreCase(student.getPayment().getPaymentStatus()))
 
