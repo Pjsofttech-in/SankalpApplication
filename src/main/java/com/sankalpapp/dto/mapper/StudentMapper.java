@@ -59,6 +59,8 @@ public final class StudentMapper {
                         ? student.getPayment().getAmount() : null)
                 .paymentMode(student.getPayment() != null && student.getPayment().getPaymentMode() != null
                         ? student.getPayment().getPaymentMode() : null)
+                .paymentStatus(student.getPayment() != null && student.getPayment().getPaymentStatus() != null
+                        ? student.getPayment().getPaymentStatus() : null)
                 .build();
     }
 }
