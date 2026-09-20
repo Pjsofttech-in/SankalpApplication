@@ -90,12 +90,12 @@ public class Student {
 
     // Center
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "center_id", nullable = false)
+    @JoinColumn(name = "center_id")
     private Center center;
 
     // Coordinator
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coordinator_id", nullable = false)
+    @JoinColumn(name = "coordinator_id")
     private Coordinator coordinator;
 
     @Column(updatable = false)

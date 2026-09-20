@@ -77,11 +77,15 @@ public class StudentServiceImpl implements StudentService {
         Taluka taluka = talukaRepository.findById(request.getTalukaId())
                 .orElseThrow(() -> new RuntimeException("Taluka not found"));
 
-        Center center = centerRepository.findById(request.getCenterId()).orElse(null);
-//                .orElseThrow(() -> new RuntimeException("Center not found"));
+        Center center = null;
+        if(request.getCenterId()!=null) {
+            center = centerRepository.findById(request.getCenterId()).orElse(null);
+        }
 
-        Coordinator coordinator = coordinatorRepository.findById(request.getCoordinatorId()).orElse(null);
-//                .orElseThrow(() -> new RuntimeException("Coordinator not found"));
+        Coordinator coordinator = null;
+        if(request.getCenterId()!=null) {
+            coordinator = coordinatorRepository.findById(request.getCoordinatorId()).orElse(null);
+        }
 
         if (StringUtils.isNotBlank(request.getExamMode()) && "offline".equalsIgnoreCase(request.getExamMode())) {
             if (center == null) {
