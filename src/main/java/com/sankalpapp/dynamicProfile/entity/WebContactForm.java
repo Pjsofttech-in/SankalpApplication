@@ -33,6 +33,8 @@ public class WebContactForm {
     private String academicYear;
     private String url;
 
+    private Boolean isReplied;
+
 
     @ManyToOne
     @JoinColumn(name = "security_url_id")

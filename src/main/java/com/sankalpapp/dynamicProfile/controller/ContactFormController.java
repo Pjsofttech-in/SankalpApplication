@@ -41,6 +41,13 @@ public class ContactFormController {
         return ResponseEntity.ok(service.update(id, webContactForm, url));
     }
 
+    @PutMapping("/markContactFormAsReplied/{id}")
+    public ResponseEntity<String> markContactFormAsReplied(@PathVariable Long id,
+                                                            @RequestParam Boolean isReplied) {
+        service.markAsReplied(id, isReplied);
+        return ResponseEntity.ok("success");
+    }
+
     @DeleteMapping("/deleteContactForm/{id}")
     public ResponseEntity<String> deleteContactForm(@PathVariable Long id,
                                                     @RequestParam(required = false) String url) {

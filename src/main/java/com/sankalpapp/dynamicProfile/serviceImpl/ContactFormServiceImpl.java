@@ -50,6 +50,14 @@ public class ContactFormServiceImpl implements ContactFormService {
     }
 
     @Override
+    public void markAsReplied(Long id, Boolean isReplied) {
+        WebContactForm webContactForm = repository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("ContactForm not found"));
+        webContactForm.setIsReplied(isReplied);
+        repository.save(webContactForm);
+    }
+
+    @Override
     public void delete(Long id, String url) {
         repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("ContactForm not found"));
         repository.deleteById(id);

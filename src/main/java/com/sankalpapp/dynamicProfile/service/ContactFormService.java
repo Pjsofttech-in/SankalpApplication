@@ -11,6 +11,8 @@ public interface ContactFormService {
 
     WebContactForm update(Long id, WebContactForm webContactForm, String url);
 
+    void markAsReplied(Long id, Boolean isReplied);
+
     void delete(Long id, String url);
 
     WebContactForm getById(Long id, String url);
