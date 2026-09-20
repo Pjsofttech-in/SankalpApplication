@@ -27,6 +27,8 @@ public class StudentRequest {
     private String schoolName;
     private LocalDate dateOfBirth;
 
+    private String examMode;
+
     private String paymentMode;
     private String paymentStatus;
     private Double amount;

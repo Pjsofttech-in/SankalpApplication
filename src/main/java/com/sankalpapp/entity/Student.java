@@ -59,6 +59,9 @@ public class Student {
     @Column(nullable = false)
     private String school;
 
+    @Column(nullable = false, length = 10)
+    private String examMode;
+
     private LocalDate dateOfBirth;
 
     @Builder.Default

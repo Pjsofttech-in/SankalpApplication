@@ -77,11 +77,22 @@ public class StudentServiceImpl implements StudentService {
         Taluka taluka = talukaRepository.findById(request.getTalukaId())
                 .orElseThrow(() -> new RuntimeException("Taluka not found"));
 
-        Center center = centerRepository.findById(request.getCenterId())
-                .orElseThrow(() -> new RuntimeException("Center not found"));
+        Center center = centerRepository.findById(request.getCenterId()).orElse(null);
+//                .orElseThrow(() -> new RuntimeException("Center not found"));
 
-        Coordinator coordinator = coordinatorRepository.findById(request.getCoordinatorId())
-                .orElseThrow(() -> new RuntimeException("Coordinator not found"));
+        Coordinator coordinator = coordinatorRepository.findById(request.getCoordinatorId()).orElse(null);
+//                .orElseThrow(() -> new RuntimeException("Coordinator not found"));
+
+        if (StringUtils.isNotBlank(request.getExamMode()) && "offline".equalsIgnoreCase(request.getExamMode())) {
+            if (center == null) {
+                throw new RuntimeException("Center not found");
+            } else if (coordinator == null) {
+                throw new RuntimeException("Coordinator not found");
+            }
+        } else {
+            center = null;
+            coordinator = null;
+        }
 
         Payment payment = null;
         if (StringUtils.isBlank(request.getPaymentMode()) || StringUtils.isBlank(request.getPaymentStatus())) {
@@ -153,11 +164,22 @@ public class StudentServiceImpl implements StudentService {
         Taluka taluka = talukaRepository.findById(request.getTalukaId())
                 .orElseThrow(() -> new RuntimeException("Taluka not found"));
 
-        Center center = centerRepository.findById(request.getCenterId())
-                .orElseThrow(() -> new RuntimeException("Center not found"));
+        Center center = centerRepository.findById(request.getCenterId()).orElse(null);
+//                .orElseThrow(() -> new RuntimeException("Center not found"));
 
-        Coordinator coordinator = coordinatorRepository.findById(request.getCoordinatorId())
-                .orElseThrow(() -> new RuntimeException("Coordinator not found"));
+        Coordinator coordinator = coordinatorRepository.findById(request.getCoordinatorId()).orElse(null);
+//                .orElseThrow(() -> new RuntimeException("Coordinator not found"));
+
+        if (StringUtils.isNotBlank(request.getExamMode()) && "offline".equalsIgnoreCase(request.getExamMode())) {
+            if (center == null) {
+                throw new RuntimeException("Center not found");
+            } else if (coordinator == null) {
+                throw new RuntimeException("Coordinator not found");
+            }
+        } else {
+            center = null;
+            coordinator = null;
+        }
 
         student.setStudentName(request.getStudentName());
         student.setMobile(request.getMobile());
