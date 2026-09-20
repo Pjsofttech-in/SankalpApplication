@@ -54,6 +54,8 @@ public final class StudentMapper {
                 .coordinatorName(Optional.ofNullable(coordinator).map(Coordinator::getFullName).orElse(""))
 
                 .isPaymentDone(student.getPayment() != null && Payment.PaymentStatus.SUCCESS.name().equalsIgnoreCase(student.getPayment().getPaymentStatus()))
+                .paymentAmount(student.getPayment() != null && student.getPayment().getAmount() != null
+                        ? student.getPayment().getAmount() : null)
 
                 .build();
     }
