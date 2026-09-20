@@ -70,4 +70,8 @@ public class StudentDTO {
     private boolean isPaymentDone;
 
     private Double paymentAmount;
+
+    private String paymentMode;
+
+    private String paymentStatus;
 }
