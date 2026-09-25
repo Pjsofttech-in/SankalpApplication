@@ -3,6 +3,8 @@ package com.sankalpapp.service;
 import com.razorpay.RazorpayException;
 import com.sankalpapp.dto.request.PaymentRequest;
 import com.sankalpapp.dto.response.PaymentResponse;
+import com.sankalpapp.dto.response.TestSeriesPurchaseResponse;
+import com.sankalpapp.dto.response.VMMaterialPurchaseResponse;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -22,4 +24,8 @@ public interface PaymentService {
     JSONObject createOrder(PaymentRequest request) throws RazorpayException;
 
     boolean verifyPayment(String orderId, String paymentId, String signature);
+
+    VMMaterialPurchaseResponse createEbookOrder(Long ebookId, PaymentRequest request) throws RazorpayException;
+
+    TestSeriesPurchaseResponse createTestSeriesOrder(Long testSeriesId, PaymentRequest request) throws RazorpayException;
 }

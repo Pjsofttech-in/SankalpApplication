@@ -2,7 +2,6 @@ package com.sankalpapp.serviceimpl;
 
 import com.sankalpapp.entity.Role;
 import com.sankalpapp.entity.User;
-import com.sankalpapp.repository.PaymentRepository;
 import com.sankalpapp.repository.RoleRepository;
 import com.sankalpapp.repository.UserRepository;
 import com.sankalpapp.service.UserService;

@@ -1,14 +1,23 @@
 package com.sankalpapp.controller;
 
+import com.razorpay.RazorpayException;
 import com.sankalpapp.dto.request.PaymentRequest;
 import com.sankalpapp.dto.response.PaymentResponse;
+import com.sankalpapp.dto.response.TestSeriesPurchaseResponse;
+import com.sankalpapp.dto.response.VMMaterialPurchaseResponse;
 import com.sankalpapp.entity.Payment;
+import com.sankalpapp.entity.TestSeriesOrder;
+import com.sankalpapp.entity.VMOrder;
 import com.sankalpapp.repository.PaymentRepository;
+import com.sankalpapp.repository.TestSeriesOrderRepository;
+import com.sankalpapp.repository.VMOrderRepository;
 import com.sankalpapp.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import software.amazon.awssdk.utils.StringUtils;
 
 import java.util.List;
 
@@ -20,6 +29,8 @@ public class PaymentController {
 
     private final PaymentService paymentService;
     private final PaymentRepository paymentRepository;
+    private final VMOrderRepository vmOrderRepository;
+    private final TestSeriesOrderRepository testSeriesOrderRepository;
 
     // Save Payment
     @PostMapping
@@ -29,14 +40,6 @@ public class PaymentController {
         return paymentService.savePayment(request);
     }
 
-//    // Create Razorpay Order
-//    @PostMapping("/create-order")
-//    public String createOrder(@RequestParam Double amount)
-//            throws RazorpayException {
-//
-//        return paymentService.createOrder(amount).toString();
-//    }
-
     // ✅ Create Order
     @PostMapping("/create-order")
 //    @PreAuthorize("hasAnyAuthority('ADMIN','COORDINATOR','STUDENT')")
@@ -45,6 +48,52 @@ public class PaymentController {
         JSONObject order = paymentService.createOrder(request);
 
         return order.toString(); //  FIX
+    }
+
+    @PostMapping("/purchase/ebook/{ebookId}")
+    public ResponseEntity<VMMaterialPurchaseResponse> purchaseMaterial(
+            @PathVariable Long ebookId,
+            @RequestBody PaymentRequest request) throws RazorpayException {
+
+        VMMaterialPurchaseResponse response =
+                paymentService.createEbookOrder(ebookId, request);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/purchase/testSeries/{testSeriesId}")
+    public ResponseEntity<TestSeriesPurchaseResponse> purchaseTestSeries(
+            @PathVariable Long testSeriesId,
+            @RequestBody PaymentRequest request) throws RazorpayException {
+
+        TestSeriesPurchaseResponse response =
+                paymentService.createTestSeriesOrder(testSeriesId, request);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/verify/ebook")
+    public ResponseEntity<String> purchaseMaterialVerify(
+            @RequestBody PaymentRequest request) {
+
+        String status = verifyPayment(request);
+        VMOrder order = vmOrderRepository.findById(request.getOrderId()).orElseThrow();
+        order.setOrderStatus(StringUtils.equals(status, "Payment Successful") ? "SUCCESS" : "FAILED");
+        vmOrderRepository.save(order);
+
+        return ResponseEntity.ok(status);
+    }
+
+    @PostMapping("/verify/testSeries")
+    public ResponseEntity<String> purchaseTestSeriesVerify(
+            @RequestBody PaymentRequest request) {
+
+        String status = verifyPayment(request);
+        TestSeriesOrder order = testSeriesOrderRepository.findById(request.getOrderId()).orElseThrow();
+        order.setOrderStatus(StringUtils.equals(status, "Payment Successful") ? "SUCCESS" : "FAILED");
+        testSeriesOrderRepository.save(order);
+
+        return ResponseEntity.ok(status);
     }
 
     // ✅ Verify Payment

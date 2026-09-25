@@ -22,12 +22,6 @@ public interface VMMaterialService {
     void deleteMaterial(Long id);
 
 
-    Map<String, Object> getReport();
-
-    List<Map<String, Object>> getMonthlyReport(int year);
-
-    List<Map<String, Object>> getYearlyReport();
-
     Map<String, Object> compareTwoYears(int year1, int year2);
 
     List<Map<String, Object>> getCategoryRevenueByCategoryName(String categoryName);

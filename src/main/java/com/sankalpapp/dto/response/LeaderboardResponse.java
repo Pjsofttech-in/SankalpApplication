@@ -1,6 +1,5 @@
 package com.sankalpapp.dto.response;
 
-import jakarta.persistence.Column;
 import lombok.*;
 
 @Getter

@@ -160,9 +160,6 @@ public class StudentServiceImpl implements StudentService {
         Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Student not found with id : " + id));
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
         District district = districtRepository.findById(request.getDistrictId())
                 .orElseThrow(() -> new RuntimeException("District not found"));
 
@@ -201,7 +198,6 @@ public class StudentServiceImpl implements StudentService {
         student.setDateOfBirth(request.getDateOfBirth());
         student.setActive(request.getActive());
 
-        student.setUser(user);
         student.setDistrict(district);
         student.setTaluka(taluka);
         student.setCenter(center);

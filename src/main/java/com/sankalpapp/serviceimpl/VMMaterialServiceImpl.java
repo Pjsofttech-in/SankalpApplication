@@ -174,25 +174,6 @@ public class VMMaterialServiceImpl implements VMMaterialService {
         vmMaterialRepository.deleteById(id);
     }
 
-    @Override
-    public Map<String, Object> getReport() {
-        Map<String, Object> reportData = new HashMap<>();
-
-        LocalDate today = LocalDate.now();
-        LocalDate sevenDaysAgo = today.minusDays(7);
-        LocalDate thirtyDaysAgo = today.minusDays(30);
-        LocalDate oneYearAgo = today.minusDays(365);
-
-        reportData.put("today", processResult(vmOrderRepository.findCountAndRevenueByDateRange(today, today)));
-        reportData.put("last7Days", processResult(vmOrderRepository.findCountAndRevenueByDateRange(sevenDaysAgo, today)));
-        reportData.put("last30Days", processResult(vmOrderRepository.findCountAndRevenueByDateRange(thirtyDaysAgo, today)));
-        reportData.put("last365Days", processResult(vmOrderRepository.findCountAndRevenueByDateRange(oneYearAgo, today)));
-        reportData.put("total", processResult(vmOrderRepository.findTotalCountAndRevenue()));
-
-        return reportData;
-    }
-
-
     private Map<String, Object> processResult(List<Object[]> result) {
         Map<String, Object> data = new HashMap<>();
         if (result == null || result.isEmpty()) {
@@ -204,37 +185,6 @@ public class VMMaterialServiceImpl implements VMMaterialService {
             data.put("revenue", row[1] != null ? row[1] : 0.0);
         }
         return data;
-    }
-
-    @Override
-    public List<Map<String, Object>> getMonthlyReport(int year) {
-        LocalDate startDate = YearMonth.of(year, 1).atDay(1);
-        LocalDate endDate = YearMonth.of(year, 12).atEndOfMonth();
-
-        List<Object[]> results = vmOrderRepository.findMonthlyReport(startDate, endDate);
-
-        return results.stream().map(row -> {
-            Map<String, Object> map = new HashMap<>();
-            Integer month = (Integer) row[0];
-            map.put("month", Month.of(month).name()); // Optional: convert numeric month to name like JANUARY
-            map.put("totalOrders", row[1] != null ? row[1] : 0);
-            map.put("totalRevenue", row[2] != null ? row[2] : 0.0);
-            return map;
-        }).collect(Collectors.toList());
-    }
-
-
-    @Override
-    public List<Map<String, Object>> getYearlyReport() {
-        List<Object[]> results = vmOrderRepository.findYearlyReport();
-
-        return results.stream().map(row -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("year", row[0]);
-            map.put("totalOrders", row[1] != null ? row[1] : 0);
-            map.put("totalRevenue", row[2] != null ? row[2] : 0.0);
-            return map;
-        }).collect(Collectors.toList());
     }
 
 

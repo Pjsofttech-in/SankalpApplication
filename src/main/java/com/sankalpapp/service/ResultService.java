@@ -1,6 +1,5 @@
 package com.sankalpapp.service;
 
-import com.sankalpapp.dto.request.ResultRequest;
 import com.sankalpapp.dto.response.ExamResultResponse;
 
 import java.util.List;

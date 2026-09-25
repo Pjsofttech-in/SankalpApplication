@@ -5,11 +5,11 @@ import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
 import com.sankalpapp.dto.request.PaymentRequest;
 import com.sankalpapp.dto.response.PaymentResponse;
-import com.sankalpapp.entity.Payment;
-import com.sankalpapp.entity.Student;
+import com.sankalpapp.dto.response.TestSeriesPurchaseResponse;
+import com.sankalpapp.dto.response.VMMaterialPurchaseResponse;
+import com.sankalpapp.entity.*;
 import com.sankalpapp.exception.ResourceNotFoundException;
-import com.sankalpapp.repository.PaymentRepository;
-import com.sankalpapp.repository.StudentRepository;
+import com.sankalpapp.repository.*;
 import com.sankalpapp.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -32,6 +33,18 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
     private final StudentRepository studentRepository;
+
+    @Autowired
+    private final VMOrderRepository vmOrderRepository;
+
+    @Autowired
+    private final VMMaterialRepository vmMaterialRepository;
+
+    @Autowired
+    private final TestSeriesRepository testSeriesRepository;
+
+    @Autowired
+    private final TestSeriesOrderRepository testSeriesOrderRepository;
 
     @Value("${razorpay.key}")
     private String key;
@@ -152,6 +165,76 @@ public class PaymentServiceImpl implements PaymentService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    @Override
+    public VMMaterialPurchaseResponse createEbookOrder(Long ebookId, PaymentRequest request) throws RazorpayException {
+        JSONObject paymentOrder = createOrder(request);
+
+        Student student = studentRepository.findById(request.getStudentId()).orElseThrow();
+
+        VMMaterial material = vmMaterialRepository
+                .findById(ebookId)
+                .orElseThrow(() ->
+                        new RuntimeException("Ebook not found"));
+
+        VMOrder order = VMOrder.builder()
+                .orderId(request.getOrderId())
+                .amount(request.getAmount())
+                .orderStatus("CREATED")
+                .customerEmail(student.getEmail())
+                .customerPhone(student.getMobile())
+                .student(student)
+                .vmMaterial(material)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        vmOrderRepository.save(order);
+
+        return VMMaterialPurchaseResponse.builder()
+                .orderId(request.getOrderId())
+                .materialId(material.getId())
+                .materialName(material.getChapterName())
+                .amount(request.getAmount())
+                .orderStatus("CREATED")
+                .paymentStatus("PENDING")
+                .build();
+
+    }
+
+    @Override
+    public TestSeriesPurchaseResponse createTestSeriesOrder(Long testSeriesId, PaymentRequest request) throws RazorpayException {
+        JSONObject paymentOrder = createOrder(request);
+
+        Student student = studentRepository.findById(request.getStudentId()).orElseThrow();
+
+        TestSeries material = testSeriesRepository
+                .findById(testSeriesId)
+                .orElseThrow(() ->
+                        new RuntimeException("TestSeries not found"));
+
+        TestSeriesOrder order = TestSeriesOrder.builder()
+                .orderId(request.getOrderId())
+                .amount(request.getAmount())
+                .orderStatus("CREATED")
+                .customerEmail(student.getEmail())
+                .customerPhone(student.getMobile())
+                .student(student)
+                .testSeries(material)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        testSeriesOrderRepository.save(order);
+
+        return TestSeriesPurchaseResponse.builder()
+                .orderId(request.getOrderId())
+                .testSeriesId(material.getId())
+                .testSeriesName(material.getTitle())
+                .amount(request.getAmount())
+                .orderStatus("CREATED")
+                .paymentStatus("PENDING")
+                .build();
+
     }
 
     private PaymentResponse mapToResponse(Payment payment) {

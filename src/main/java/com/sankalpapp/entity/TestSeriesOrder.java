@@ -3,6 +3,7 @@ package com.sankalpapp.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class VMOrder {
+public class TestSeriesOrder {
 
     @Id
     private String orderId;
@@ -34,8 +35,8 @@ public class VMOrder {
     private Student student;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vm_material_id")
-    private VMMaterial vmMaterial;
+    @JoinColumn(name = "test_series_id")
+    private TestSeries testSeries;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id")

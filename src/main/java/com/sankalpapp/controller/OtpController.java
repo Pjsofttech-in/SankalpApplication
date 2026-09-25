@@ -2,7 +2,6 @@ package com.sankalpapp.controller;
 
 import com.sankalpapp.dto.request.SendOtpRequest;
 import com.sankalpapp.dto.request.VerifyOtpRequest;
-import com.sankalpapp.entity.EmailOtp;
 import com.sankalpapp.service.OtpService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
